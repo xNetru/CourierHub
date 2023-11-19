@@ -1,6 +1,10 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class Inquire {
+namespace CourierHub.Shared.Models;
+
+public partial class Inquire
+{
     public int Id { get; set; }
 
     public int? ClientId { get; set; }

@@ -1,9 +1,12 @@
 ﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SM = CourierHub.Shared.Models;
 
 namespace CourierHub.Server.Data;
-public partial class CourierHubDbContext : DbContext {
+
+public partial class CourierHubDbContext : DbContext
+{
     public CourierHubDbContext() { }
 
     public CourierHubDbContext(DbContextOptions<CourierHubDbContext> options) : base(options) { }
@@ -35,12 +38,14 @@ public partial class CourierHubDbContext : DbContext {
     public virtual DbSet<Status> Statuses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AppSettings")["AZURE_SQL_CONNECTIONSTRING"];
+        string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
         optionsBuilder.UseSqlServer(connection);
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Address>(entity => {
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Address>(entity =>
+        {
             entity.ToTable("Address");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -60,7 +65,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Street).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<SM.Client>(entity => {
+        modelBuilder.Entity<SM.Client>(entity =>
+        {
             entity.HasKey(e => e.Id).HasName("PK_User");
 
             entity.ToTable("Client");
@@ -75,14 +81,22 @@ public partial class CourierHubDbContext : DbContext {
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Photo).HasColumnType("image");
+            entity.Property(e => e.SourceAddressId).HasColumnName("Source_address_Id");
             entity.Property(e => e.Surname).HasMaxLength(50);
 
-            entity.HasOne(d => d.Address).WithMany(p => p.Clients)
+            entity.HasOne(d => d.Address).WithMany(p => p.ClientAddresses)
                 .HasForeignKey(d => d.AddressId)
-                .HasConstraintName("FK_User_Address");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Client_Address1");
+
+            entity.HasOne(d => d.SourceAddress).WithMany(p => p.ClientSourceAddresses)
+                .HasForeignKey(d => d.SourceAddressId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Client_Address2");
         });
 
-        modelBuilder.Entity<Courier>(entity => {
+        modelBuilder.Entity<Courier>(entity =>
+        {
             entity.ToTable("Courier");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -91,7 +105,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Surname).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<Evaluation>(entity => {
+        modelBuilder.Entity<Evaluation>(entity =>
+        {
             entity.ToTable("Evaluation");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -107,7 +122,8 @@ public partial class CourierHubDbContext : DbContext {
                 .HasConstraintName("FK_Evaluation_Office_worker");
         });
 
-        modelBuilder.Entity<Inquire>(entity => {
+        modelBuilder.Entity<Inquire>(entity =>
+        {
             entity.ToTable("Inquire");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -124,7 +140,7 @@ public partial class CourierHubDbContext : DbContext {
 
             entity.HasOne(d => d.Client).WithMany(p => p.Inquires)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK_Inquire_User");
+                .HasConstraintName("FK_Inquire_Client");
 
             entity.HasOne(d => d.Destination).WithMany(p => p.InquireDestinations)
                 .HasForeignKey(d => d.DestinationId)
@@ -137,7 +153,8 @@ public partial class CourierHubDbContext : DbContext {
                 .HasConstraintName("FK_Inquire_Address");
         });
 
-        modelBuilder.Entity<OfficeWorker>(entity => {
+        modelBuilder.Entity<OfficeWorker>(entity =>
+        {
             entity.ToTable("Office_worker");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -146,7 +163,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Surname).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<Order>(entity => {
+        modelBuilder.Entity<Order>(entity =>
+        {
             entity.ToTable("Order");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -209,7 +227,8 @@ public partial class CourierHubDbContext : DbContext {
                 .HasConstraintName("FK_Order_Status");
         });
 
-        modelBuilder.Entity<Parcel>(entity => {
+        modelBuilder.Entity<Parcel>(entity =>
+        {
             entity.ToTable("Parcel");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -230,7 +249,8 @@ public partial class CourierHubDbContext : DbContext {
                 .HasConstraintName("FK_Parcel_Courier");
         });
 
-        modelBuilder.Entity<Review>(entity => {
+        modelBuilder.Entity<Review>(entity =>
+        {
             entity.ToTable("Review");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -238,7 +258,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Description).HasColumnType("ntext");
         });
 
-        modelBuilder.Entity<Rule>(entity => {
+        modelBuilder.Entity<Rule>(entity =>
+        {
             entity.ToTable("Rule");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -249,7 +270,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.WidthMax).HasColumnName("Width_max");
         });
 
-        modelBuilder.Entity<Scaler>(entity => {
+        modelBuilder.Entity<Scaler>(entity =>
+        {
             entity.ToTable("Scaler");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -266,7 +288,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Width).HasColumnType("money");
         });
 
-        modelBuilder.Entity<Service>(entity => {
+        modelBuilder.Entity<Service>(entity =>
+        {
             entity.ToTable("Service");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -277,7 +300,8 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Statute).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<Status>(entity => {
+        modelBuilder.Entity<Status>(entity =>
+        {
             entity.ToTable("Status");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
@@ -289,4 +313,3 @@ public partial class CourierHubDbContext : DbContext {
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-

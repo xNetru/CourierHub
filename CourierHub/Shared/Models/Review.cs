@@ -1,6 +1,10 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class Review {
+namespace CourierHub.Shared.Models;
+
+public partial class Review
+{
     public int Id { get; set; }
 
     public int Value { get; set; }

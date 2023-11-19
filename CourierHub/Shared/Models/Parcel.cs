@@ -1,6 +1,10 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class Parcel {
+namespace CourierHub.Shared.Models;
+
+public partial class Parcel
+{
     public int Id { get; set; }
 
     public DateTime? PickupDatetime { get; set; }
