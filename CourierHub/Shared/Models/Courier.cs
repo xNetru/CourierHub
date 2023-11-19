@@ -1,6 +1,10 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using CourierHub.Shared.Abstractions;
+using System;
+using System.Collections.Generic;
 
-public partial class Courier {
+namespace CourierHub.Shared.Models;
+
+public partial class Courier : IUser {
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;

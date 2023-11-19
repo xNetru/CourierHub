@@ -15,7 +15,7 @@ namespace CourierHub.Server.Controllers {
         }
 
         // HEAD: <UserController>/email@gmail.com
-        [HttpHead]
+        [HttpHead("{email}")]
         public async Task<IActionResult> Head(string email) {
             var client = await _context.Clients.FirstOrDefaultAsync(cl => cl.Email == email);
             if (client != null) { return Ok(); } else {
@@ -26,6 +26,21 @@ namespace CourierHub.Server.Controllers {
                 }
             }
             return NotFound();
+        }
+
+        // consider different endpoint
+        // GET: <UserController>/email@gmail.com
+        [HttpGet("{email}")]
+        public async Task<IEnumerable<int>> Get(string email) {
+            var client = await _context.Clients.FirstOrDefaultAsync(cl => cl.Email == email);
+            if (client != null) { return new int[] { 1 }; } else {
+                var worker = await _context.OfficeWorkers.FirstOrDefaultAsync(wo => wo.Email == email);
+                if (worker != null) { return new int[] { 2 }; } else {
+                    var courier = await _context.Couriers.FirstOrDefaultAsync(co => co.Email == email);
+                    if (courier != null) { return new int[] { 3 }; }
+                }
+            }
+            return new int[] { 0 };
         }
 
         // POST <UserController>

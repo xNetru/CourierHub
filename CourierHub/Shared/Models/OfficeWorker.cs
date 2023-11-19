@@ -1,6 +1,10 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class OfficeWorker {
+namespace CourierHub.Shared.Models;
+
+public partial class OfficeWorker
+{
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;

@@ -1,6 +1,10 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class Service {
+namespace CourierHub.Shared.Models;
+
+public partial class Service
+{
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
