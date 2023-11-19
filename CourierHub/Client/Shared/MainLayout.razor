@@ -7,7 +7,14 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a href="authentication/login">Log in</a>
+                </NotAuthorized>
+                <Authorized>
+                    Hello, @context.User.Identity.Name (@context.User.Claims.FirstOrDefault(c => c.Type=="email")?.Value)
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
