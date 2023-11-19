@@ -23,7 +23,8 @@
                     <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
                     @if (present != null && present.IsSuccessStatusCode) {
 
-                    } else {
+                    } else
+                    {
                         
                     }
                 </Authorized>
@@ -57,6 +58,7 @@
                 if (present.IsSuccessStatusCode) {
                     Console.WriteLine("IM HERE 3");
                 } else {
+                    Navigation.NavigateTo("/registrationForm");
                     string username = context.User.Identity!.Name!;
                     string[] credentials = username.Split(" ");
                     var client = new SM.Client {

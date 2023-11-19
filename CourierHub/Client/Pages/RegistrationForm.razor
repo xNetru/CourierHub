@@ -1,0 +1,77 @@
+﻿@page "/registrationForm"
+
+<h2>Rejestracja</h2>
+
+<h3>Adres</h3>
+
+<div class="column-layout">
+    <div class="form-group">
+        <label for="inputField">Miasto:</label>
+        <InputText @bind-Value="city" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Ulica:</label>
+        <InputText @bind-Value="street" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Numer budynku:</label>
+        <InputText @bind-Value="buildingNumber" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Numer mieszkania:</label>
+        <InputText @bind-Value="apartmentNumber" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Kod pocztowy:</label>
+        <InputText @bind-Value="zipCode" />
+    </div>
+</div>
+
+@code {
+    private string? city { get; set; }
+    private string? street { get; set; }
+    private string? buildingNumber { get; set; }
+    private string? apartmentNumber { get; set; }
+    private string? zipCode { get; set; }
+}
+
+<h3>Domyślny adres nadawcy</h3>
+
+<div class="column-layout">
+    <div class="form-group">
+        <label for="inputField">Miasto:</label>
+        <InputText @bind-Value="s_city" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Ulica:</label>
+        <InputText @bind-Value="s_street" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Numer budynku:</label>
+        <InputText @bind-Value="s_buildingNumber" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Numer mieszkania:</label>
+        <InputText @bind-Value="s_apartmentNumber" />
+    </div>
+
+    <div class="form-group">
+        <label for="inputField">Kod pocztowy:</label>
+        <InputText @bind-Value="s_zipCode" />
+    </div>
+</div>
+
+@code {
+    private string? s_city { get; set; }
+    private string? s_street { get; set; }
+    private string? s_buildingNumber { get; set; }
+    private string? s_apartmentNumber { get; set; }
+    private string? s_zipCode { get; set; }
+}
