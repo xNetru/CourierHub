@@ -12,6 +12,10 @@ a, .btn-link {
     color: #0071c1;
 }
 
+.form-group {
+    margin-bottom: 15px; /* Adjust this value to change the separation */
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
