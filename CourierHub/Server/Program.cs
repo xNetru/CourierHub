@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.ResponseCompression;
-
 namespace CourierHub {
     public class Program {
         public static void Main(string[] args) {
