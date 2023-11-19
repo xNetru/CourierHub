@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Server.Models;
-
-public partial class Address
-{
+public partial class Address {
     public int Id { get; set; }
 
     public string Street { get; set; } = null!;

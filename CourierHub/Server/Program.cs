@@ -1,3 +1,6 @@
+using CourierHub.Server.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace CourierHub {
     public class Program {
         public static void Main(string[] args) {
@@ -7,6 +10,10 @@ namespace CourierHub {
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+
+            IConfiguration configuration = builder.Configuration.AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+
+            builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("AppSettings")["DefaultConnection"]));
 
             var app = builder.Build();
 

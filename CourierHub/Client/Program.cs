@@ -12,8 +12,7 @@ namespace CourierHub.Client {
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            services.AddOidcAuthentication(options =>
-            {
+            services.AddOidcAuthentication(options => {
                 configuration.Bind(key: "Auth", options.ProviderOptions);
                 options.ProviderOptions.DefaultScopes.Add(item: "email");
             });
