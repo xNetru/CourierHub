@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Server.Models;
-
-public partial class Client
-{
+public partial class Client {
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;
@@ -19,9 +15,13 @@ public partial class Client
 
     public string? Company { get; set; }
 
-    public int? AddressId { get; set; }
+    public int AddressId { get; set; }
 
-    public virtual Address? Address { get; set; }
+    public virtual Address Address { get; set; } = null!;
+
+    public int SourceAddressId { get; set; }
+
+    public virtual Address SourceAddress { get; set; } = null!;
 
     public virtual ICollection<Inquire> Inquires { get; } = new List<Inquire>();
 }

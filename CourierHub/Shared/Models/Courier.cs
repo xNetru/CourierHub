@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Server.Models;
-
-public partial class Courier
-{
+public partial class Courier {
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;

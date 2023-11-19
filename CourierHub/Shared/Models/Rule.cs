@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Server.Models;
-
-public partial class Rule
-{
+public partial class Rule {
     public int Id { get; set; }
 
     public int? DepthMax { get; set; }

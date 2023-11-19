@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Server.Models;
-
-public partial class Evaluation
-{
+public partial class Evaluation {
     public int Id { get; set; }
 
     public DateTime Datetime { get; set; }
