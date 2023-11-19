@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CourierHub.Shared.Entities
+namespace CourierHub.Shared.Objects
 {
     public class Client : IUser
     {
@@ -15,7 +15,8 @@ namespace CourierHub.Shared.Entities
 
         public string Surname { get; set; }
 
-        public Client(string email, string name, string surname) {
+        public Client(string email, string name, string surname)
+        {
             Email = email;
             Name = name;
             Surname = surname;
