@@ -44,23 +44,31 @@
 
     private HttpResponseMessage? present;
     private HttpResponseMessage? added;
+    private bool checkNeeded = true;
 
     protected override async Task OnAfterRenderAsync(bool _) {
+        if (!checkNeeded)
+        {
+            return;
+        }
         Console.WriteLine("IM HERE 0");
         var context = await Provider.GetAuthenticationStateAsync();
         if (context != null) {
             Console.WriteLine("IM HERE 1");
             var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
             if (email != null) {
+                var image = context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+                Console.WriteLine("IMAGE: " + image);
+                checkNeeded = false;
                 Console.WriteLine("IM HERE 2");
                 Console.WriteLine($"{Http.BaseAddress}User/{email.Value}");
                 present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
                 if (present.IsSuccessStatusCode) {
                     Console.WriteLine("IM HERE 3");
                 } else {
-                    Navigation.NavigateTo("/registrationForm");
                     string username = context.User.Identity!.Name!;
                     string[] credentials = username.Split(" ");
+                    Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
                     var client = new SM.Client {
                         Id = 0,
                         Email = email.Value,
