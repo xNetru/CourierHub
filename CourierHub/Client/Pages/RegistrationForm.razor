@@ -1,77 +1,130 @@
-﻿@page "/registrationForm"
+﻿@page "/registrationForm/{name}/{surname}/{email}"
 
-<h2>Rejestracja</h2>
+@using SM = CourierHub.Shared.Models;
 
-<h3>Adres</h3>
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
 
-<div class="column-layout">
-    <div class="form-group">
-        <label for="inputField">Miasto:</label>
-        <InputText @bind-Value="city" />
-    </div>
+<div claa="page">
+    <main>
+        <h2>Rejestracja</h2>
 
-    <div class="form-group">
-        <label for="inputField">Ulica:</label>
-        <InputText @bind-Value="street" />
-    </div>
+        <h3>Adres</h3>
 
-    <div class="form-group">
-        <label for="inputField">Numer budynku:</label>
-        <InputText @bind-Value="buildingNumber" />
-    </div>
+        <div class="column-layout">
+            <div class="form-group">
+                <label for="inputField">Miasto:</label>
+                <InputText @bind-Value="city" />
+            </div>
 
-    <div class="form-group">
-        <label for="inputField">Numer mieszkania:</label>
-        <InputText @bind-Value="apartmentNumber" />
-    </div>
+            <div class="form-group">
+                <label for="inputField">Ulica:</label>
+                <InputText @bind-Value="street" />
+            </div>
 
-    <div class="form-group">
-        <label for="inputField">Kod pocztowy:</label>
-        <InputText @bind-Value="zipCode" />
-    </div>
+            <div class="form-group">
+                <label for="inputField">Numer budynku:</label>
+                <InputText @bind-Value="buildingNumber" />
+            </div>
+
+            <div class="form-group">
+                <label for="inputField">Numer mieszkania:</label>
+                <InputText @bind-Value="apartmentNumber" />
+            </div>
+
+            <div class="form-group">
+                <label for="inputField">Kod pocztowy:</label>
+                <InputText @bind-Value="zipCode" />
+            </div>
+        </div>
+
+        @code {
+            private string? city { get; set; }
+            private string? street { get; set; }
+            private string? buildingNumber { get; set; }
+            private string? apartmentNumber { get; set; }
+            private string? zipCode { get; set; }
+        }
+
+        <h3>Domyślny adres nadawcy</h3>
+
+        <div class="column-layout">
+            <div class="form-group">
+                <label for="inputField">Miasto:</label>
+                <InputText @bind-Value="s_city" />
+            </div>
+
+            <div class="form-group">
+                <label for="inputField">Ulica:</label>
+                <InputText @bind-Value="s_street" />
+            </div>
+
+            <div class="form-group">
+                <label for="inputField">Numer budynku:</label>
+                <InputText @bind-Value="s_buildingNumber" />
+            </div>
+
+            <div class="form-group">
+                <label for="inputField">Numer mieszkania:</label>
+                <InputText @bind-Value="s_apartmentNumber" />
+            </div>
+
+            <div class="form-group">
+                <label for="inputField">Kod pocztowy:</label>
+                <InputText @bind-Value="s_zipCode" />
+            </div>
+        </div>
+
+        @code {
+            private string? s_city { get; set; }
+            private string? s_street { get; set; }
+            private string? s_buildingNumber { get; set; }
+            private string? s_apartmentNumber { get; set; }
+            private string? s_zipCode { get; set; }
+        }
+        
+        <AuthorizeView>
+            <Authorized>
+                <img src=@context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value alt="Image" />
+                <div class="form-group">
+                    <label for="inputField">Imię:</label>
+                    <InputText @bind-Value="name"/>
+                </div>
+                <div class="form-group">
+                    <label for="inputField">Nazwisko:</label>
+                    <InputText @bind-Value="surname" />
+                </div>
+                <div class="form-group">
+                    <label for="inputField">Email:</label>
+                    <span>@email</span>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+        @code {
+            [Parameter]
+            public string? name { get; set; }
+            [Parameter]
+            public string? surname { get; set; }
+            [Parameter]
+            public string? email { get; set; }
+        }
+
+        <button>Potwierdź dane</button>
+
+        @code {
+            // do uzupełnienia (klasy Client i Address do poprawy?)
+            private void Sumbit()
+            {
+                //byte[] imageBytes = await Http.GetByteArrayAsync(photo);
+                var client = new SM.Client
+                {
+                    Id = 0,
+                    Email = email!,
+                    Name = name!,
+                    Surname = surname!,
+                };
+            }
+        }
+    </main>
 </div>
-
-@code {
-    private string? city { get; set; }
-    private string? street { get; set; }
-    private string? buildingNumber { get; set; }
-    private string? apartmentNumber { get; set; }
-    private string? zipCode { get; set; }
-}
-
-<h3>Domyślny adres nadawcy</h3>
-
-<div class="column-layout">
-    <div class="form-group">
-        <label for="inputField">Miasto:</label>
-        <InputText @bind-Value="s_city" />
-    </div>
-
-    <div class="form-group">
-        <label for="inputField">Ulica:</label>
-        <InputText @bind-Value="s_street" />
-    </div>
-
-    <div class="form-group">
-        <label for="inputField">Numer budynku:</label>
-        <InputText @bind-Value="s_buildingNumber" />
-    </div>
-
-    <div class="form-group">
-        <label for="inputField">Numer mieszkania:</label>
-        <InputText @bind-Value="s_apartmentNumber" />
-    </div>
-
-    <div class="form-group">
-        <label for="inputField">Kod pocztowy:</label>
-        <InputText @bind-Value="s_zipCode" />
-    </div>
-</div>
-
-@code {
-    private string? s_city { get; set; }
-    private string? s_street { get; set; }
-    private string? s_buildingNumber { get; set; }
-    private string? s_apartmentNumber { get; set; }
-    private string? s_zipCode { get; set; }
-}
