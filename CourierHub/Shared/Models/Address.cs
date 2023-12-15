@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Shared.Models;
-
-public partial class Address
-{
+public partial class Address {
     public int Id { get; set; }
 
     public string Street { get; set; } = null!;
@@ -15,9 +11,9 @@ public partial class Address
 
     public string PostalCode { get; set; } = null!;
 
-    public virtual ICollection<Client> ClientAddresses { get; } = new List<Client>();
+    public virtual ICollection<ClientData> ClientDatumAddresses { get; } = new List<ClientData>();
 
-    public virtual ICollection<Client> ClientSourceAddresses { get; } = new List<Client>();
+    public virtual ICollection<ClientData> ClientDatumSourceAddresses { get; } = new List<ClientData>();
 
     public virtual ICollection<Inquire> InquireDestinations { get; } = new List<Inquire>();
 

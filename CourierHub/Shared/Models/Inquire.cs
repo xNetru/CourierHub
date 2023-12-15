@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Shared.Models;
-
-public partial class Inquire
-{
+public partial class Inquire {
     public int Id { get; set; }
 
     public int? ClientId { get; set; }
@@ -33,11 +29,11 @@ public partial class Inquire
 
     public int Priority { get; set; }
 
-    public virtual Client? Client { get; set; }
-
     public virtual Address Destination { get; set; } = null!;
 
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 
     public virtual Address Source { get; set; } = null!;
+
+    public virtual User? Client { get; set; }
 }

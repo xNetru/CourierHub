@@ -1,7 +1,9 @@
 ﻿using CourierHub.Server.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using CourierHub.Shared.Models;
 using SM = CourierHub.Shared.Models;
 
 namespace CourierHub.Server.Controllers {
@@ -17,19 +19,15 @@ namespace CourierHub.Server.Controllers {
         // HEAD: <UserController>/email@gmail.com
         [HttpHead("{email}")]
         public async Task<IActionResult> Head(string email) {
-            var client = await _context.Clients.FirstOrDefaultAsync(cl => cl.Email == email);
-            if (client != null) { return Ok(); } else {
-                var worker = await _context.OfficeWorkers.FirstOrDefaultAsync(wo => wo.Email == email);
-                if (worker != null) { return Ok(); } else {
-                    var courier = await _context.Couriers.FirstOrDefaultAsync(co => co.Email == email);
-                    if (courier != null) { return Ok(); }
-                }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user != null) { return Ok(); } else {
+                return NotFound();
             }
-            return NotFound();
         }
 
         // consider different endpoint
         // GET: <UserController>/email@gmail.com
+        /*
         [HttpGet("{email}")]
         public async Task<IEnumerable<int>> Get(string email) {
             var client = await _context.Clients.FirstOrDefaultAsync(cl => cl.Email == email);
@@ -42,14 +40,18 @@ namespace CourierHub.Server.Controllers {
             }
             return new int[] { 0 };
         }
+        */
 
         // POST <UserController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] string value) {
             SM.Client? client = (SM.Client?)JsonSerializer.Deserialize(value, typeof(SM.Client));
             if (client == null) { return BadRequest(); }
-            await _context.Clients.AddAsync(client);
-            await _context.SaveChangesAsync();
+            // create user
+            // create client data
+            // add both
+            //await _context.Clients.AddAsync(client);
+            //await _context.SaveChangesAsync();
             return Ok();
         }
 
