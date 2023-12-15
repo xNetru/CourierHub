@@ -78,7 +78,7 @@ public partial class CourierHubDbContext : DbContext
                 .IsFixedLength();
             entity.Property(e => e.Photo).HasColumnType("image");
             entity.Property(e => e.SourceAddressId).HasColumnName("Source_address_Id");
-            entity.Property(e => e.ClientId).HasColumnName("User_Id");
+            entity.Property(e => e.ClientId).HasColumnName("Client_Id");
 
             entity.HasOne(d => d.Address).WithMany(p => p.ClientDatumAddresses)
                 .HasForeignKey(d => d.AddressId)
@@ -104,7 +104,7 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.RejectionReason)
                 .HasColumnType("ntext")
                 .HasColumnName("Rejection_reason");
-            entity.Property(e => e.OfficeWorkerId).HasColumnName("User_Id");
+            entity.Property(e => e.OfficeWorkerId).HasColumnName("Worker_Id");
 
             entity.HasOne(d => d.OfficeWorker).WithMany(p => p.Evaluations)
                 .HasForeignKey(d => d.OfficeWorkerId)
@@ -126,7 +126,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasColumnType("date")
                 .HasColumnName("Source_date");
             entity.Property(e => e.SourceId).HasColumnName("Source_Id");
-            entity.Property(e => e.ClientId).HasColumnName("User_Id");
+            entity.Property(e => e.ClientId).HasColumnName("Client_Id");
 
             entity.HasOne(d => d.Destination).WithMany(p => p.InquireDestinations)
                 .HasForeignKey(d => d.DestinationId)
@@ -221,7 +221,7 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.UndeliveredReason)
                 .HasColumnType("ntext")
                 .HasColumnName("Undelivered_reason");
-            entity.Property(e => e.CourierId).HasColumnName("User_Id");
+            entity.Property(e => e.CourierId).HasColumnName("Courier_Id");
 
             entity.HasOne(d => d.Courier).WithMany(p => p.Parcels)
                 .HasForeignKey(d => d.CourierId)
