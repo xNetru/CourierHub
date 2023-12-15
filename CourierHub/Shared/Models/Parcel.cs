@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Shared.Models;
-
-public partial class Parcel
-{
+public partial class Parcel {
     public int Id { get; set; }
 
     public DateTime? PickupDatetime { get; set; }
@@ -15,7 +11,7 @@ public partial class Parcel
 
     public int CourierId { get; set; }
 
-    public virtual Courier Courier { get; set; } = null!;
-
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
+
+    public virtual User Courier { get; set; } = null!;
 }

@@ -1,6 +1,5 @@
 ﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using SM = CourierHub.Shared.Models;
 
 namespace CourierHub.Server.Data;
@@ -13,15 +12,11 @@ public partial class CourierHubDbContext : DbContext
 
     public virtual DbSet<Address> Addresses { get; set; }
 
-    public virtual DbSet<SM.Client> Clients { get; set; }
-
-    public virtual DbSet<Courier> Couriers { get; set; }
+    public virtual DbSet<ClientData> ClientDatum { get; set; }
 
     public virtual DbSet<Evaluation> Evaluations { get; set; }
 
     public virtual DbSet<Inquire> Inquires { get; set; }
-
-    public virtual DbSet<OfficeWorker> OfficeWorkers { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
@@ -37,7 +32,10 @@ public partial class CourierHubDbContext : DbContext
 
     public virtual DbSet<Status> Statuses { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+    public virtual DbSet<User> Users { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
         string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
         optionsBuilder.UseSqlServer(connection);
     }
@@ -48,7 +46,7 @@ public partial class CourierHubDbContext : DbContext
         {
             entity.ToTable("Address");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Flat)
                 .HasMaxLength(5)
                 .IsUnicode(false)
@@ -65,69 +63,60 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.Street).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<SM.Client>(entity =>
+        modelBuilder.Entity<ClientData>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_User");
+            entity.HasKey(e => e.Id).HasName("PK_Client_data");
 
-            entity.ToTable("Client");
+            entity.ToTable("Client_data");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.AddressId).HasColumnName("Address_Id");
             entity.Property(e => e.Company).HasMaxLength(50);
-            entity.Property(e => e.Email).HasMaxLength(50);
-            entity.Property(e => e.Name).HasMaxLength(50);
             entity.Property(e => e.Phone)
                 .HasMaxLength(11)
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Photo).HasColumnType("image");
             entity.Property(e => e.SourceAddressId).HasColumnName("Source_address_Id");
-            entity.Property(e => e.Surname).HasMaxLength(50);
+            entity.Property(e => e.ClientId).HasColumnName("Client_Id");
 
-            entity.HasOne(d => d.Address).WithMany(p => p.ClientAddresses)
+            entity.HasOne(d => d.Address).WithMany(p => p.ClientDatumAddresses)
                 .HasForeignKey(d => d.AddressId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Client_Address1");
+                .HasConstraintName("FK_Client_data_Address1");
 
-            entity.HasOne(d => d.SourceAddress).WithMany(p => p.ClientSourceAddresses)
+            entity.HasOne(d => d.SourceAddress).WithMany(p => p.ClientDatumSourceAddresses)
                 .HasForeignKey(d => d.SourceAddressId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Client_Address2");
-        });
+                .HasConstraintName("FK_Client_data_Address2");
 
-        modelBuilder.Entity<Courier>(entity =>
-        {
-            entity.ToTable("Courier");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Email).HasMaxLength(50);
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.Surname).HasMaxLength(50);
+            entity.HasOne(d => d.Client).WithMany(p => p.ClientData)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK_Client_data_User");
         });
 
         modelBuilder.Entity<Evaluation>(entity =>
         {
             entity.ToTable("Evaluation");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Datetime).HasColumnType("datetime");
-            entity.Property(e => e.OfficeWorkerId).HasColumnName("Office_worker_Id");
             entity.Property(e => e.RejectionReason)
                 .HasColumnType("ntext")
                 .HasColumnName("Rejection_reason");
+            entity.Property(e => e.OfficeWorkerId).HasColumnName("Worker_Id");
 
             entity.HasOne(d => d.OfficeWorker).WithMany(p => p.Evaluations)
                 .HasForeignKey(d => d.OfficeWorkerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Evaluation_Office_worker");
+                .HasConstraintName("FK_Evaluation_User");
         });
 
         modelBuilder.Entity<Inquire>(entity =>
         {
             entity.ToTable("Inquire");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.ClientId).HasColumnName("Client_Id");
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Datetime).HasColumnType("datetime");
             entity.Property(e => e.DestinationDate)
                 .HasColumnType("date")
@@ -137,10 +126,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasColumnType("date")
                 .HasColumnName("Source_date");
             entity.Property(e => e.SourceId).HasColumnName("Source_Id");
-
-            entity.HasOne(d => d.Client).WithMany(p => p.Inquires)
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK_Inquire_Client");
+            entity.Property(e => e.ClientId).HasColumnName("Client_Id");
 
             entity.HasOne(d => d.Destination).WithMany(p => p.InquireDestinations)
                 .HasForeignKey(d => d.DestinationId)
@@ -151,23 +137,17 @@ public partial class CourierHubDbContext : DbContext
                 .HasForeignKey(d => d.SourceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Inquire_Address");
-        });
 
-        modelBuilder.Entity<OfficeWorker>(entity =>
-        {
-            entity.ToTable("Office_worker");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Email).HasMaxLength(50);
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.Surname).HasMaxLength(50);
+            entity.HasOne(d => d.Client).WithMany(p => p.Inquires)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK_Inquire_User");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
             entity.ToTable("Order");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ClientAddressId).HasColumnName("Client_Address_Id");
             entity.Property(e => e.ClientCompany)
                 .HasMaxLength(50)
@@ -231,8 +211,7 @@ public partial class CourierHubDbContext : DbContext
         {
             entity.ToTable("Parcel");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.CourierId).HasColumnName("Courier_Id");
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.DeliveryDatetime)
                 .HasColumnType("datetime")
                 .HasColumnName("Delivery_datetime");
@@ -242,18 +221,19 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.UndeliveredReason)
                 .HasColumnType("ntext")
                 .HasColumnName("Undelivered_reason");
+            entity.Property(e => e.CourierId).HasColumnName("Courier_Id");
 
             entity.HasOne(d => d.Courier).WithMany(p => p.Parcels)
                 .HasForeignKey(d => d.CourierId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Parcel_Courier");
+                .HasConstraintName("FK_Parcel_User");
         });
 
         modelBuilder.Entity<Review>(entity =>
         {
             entity.ToTable("Review");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Datetime).HasColumnType("datetime");
             entity.Property(e => e.Description).HasColumnType("ntext");
         });
@@ -262,7 +242,7 @@ public partial class CourierHubDbContext : DbContext
         {
             entity.ToTable("Rule");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.DepthMax).HasColumnName("Depth_max");
             entity.Property(e => e.LengthMax).HasColumnName("Length_max");
             entity.Property(e => e.MassMax).HasColumnName("Mass_max");
@@ -274,7 +254,7 @@ public partial class CourierHubDbContext : DbContext
         {
             entity.ToTable("Scaler");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Company).HasColumnType("money");
             entity.Property(e => e.Depth).HasColumnType("money");
             entity.Property(e => e.Distance).HasColumnType("money");
@@ -292,7 +272,7 @@ public partial class CourierHubDbContext : DbContext
         {
             entity.ToTable("Service");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.ApiKey)
                 .HasMaxLength(100)
                 .HasColumnName("Api_key");
@@ -304,9 +284,33 @@ public partial class CourierHubDbContext : DbContext
         {
             entity.ToTable("Status");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasMaxLength(50);
         });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_User");
+
+            entity.ToTable("User");
+
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Email).HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Surname).HasMaxLength(50);
+
+        });
+
+        modelBuilder.Entity<User>().HasDiscriminator<int>("Type")
+            .HasValue<SM.Client>(0)
+            .HasValue<OfficeWorker>(1)
+            .HasValue<Courier>(2);
+
+        modelBuilder.Entity<SM.Client>().HasBaseType<User>();
+        modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
+        modelBuilder.Entity<Courier>().HasBaseType<User>();
+
+        modelBuilder.Entity<SM.Client>().HasOne(c => c.ClientData).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
 
         OnModelCreatingPartial(modelBuilder);
     }

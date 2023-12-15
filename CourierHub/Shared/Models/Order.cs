@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace CourierHub.Shared.Models;
 
-namespace CourierHub.Shared.Models;
-
-public partial class Order
-{
+public partial class Order {
     public int Id { get; set; }
 
     public int InquireId { get; set; }
