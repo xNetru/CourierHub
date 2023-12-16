@@ -24,7 +24,6 @@ namespace CourierHubWebApi.Services
 
             Address address = new Address();
             // address.Id = 10;
-            address.Id = Guid.NewGuid();
             address.Street = "1";
             address.Number = "1";
             address.Flat = "1";
