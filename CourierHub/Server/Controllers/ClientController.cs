@@ -3,6 +3,7 @@ using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace CourierHub.Server.Controllers {
@@ -23,23 +24,20 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <ClientController>/Client?email=email@gmail.com
+        // GET: <ClientController>/Client?id=123&email=email@gmail.com
         [HttpGet]
-        public async Task<Shared.Models.Client?> GetByEmail([FromQuery] string email) {
-            var client = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Client);
-            if (client == null) { return null; }
-            var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
-            if (data == null) { return null; }
-            return new Shared.Models.Client() {
-                Data = data
-            };
-        }
+        public async Task<Shared.Models.Client?> Get(
+            [FromQuery(Name = "email")] string? email,
+            [FromQuery(Name = "id")] int? id) {
 
-        // GET: <ClientController>/Client?id=123
-        [HttpGet]
-        public async Task<Shared.Models.Client?> GetById([FromQuery] int id) {
-            var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
+            User? client = null;
+            if (id != null) {
+                client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
+            } else if (!email.IsNullOrEmpty()) {
+                client = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Client);
+            }
             if (client == null) { return null; }
+
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
             if (data == null) { return null; }
             return new Shared.Models.Client() {
@@ -59,7 +57,7 @@ namespace CourierHub.Server.Controllers {
             return Ok();
         }
 
-        // PUT <UserController>/123
+        // PUT <ClientController>/123
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] string value) {
             var client = (Shared.Models.Client?)JsonSerializer.Deserialize(value, typeof(Shared.Models.Client));

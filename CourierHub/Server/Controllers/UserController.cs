@@ -2,6 +2,7 @@
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace CourierHub.Server.Controllers {
@@ -22,16 +23,18 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <UserController>/User?email=email@gmail.com
+        // GET: <UserController>/User?id=123&email=email@gmail.com
         [HttpGet]
-        public async Task<User?> GetByEmail([FromQuery] string email) {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
+        public async Task<User?> Get(
+            [FromQuery(Name = "email")] string? email,
+            [FromQuery(Name = "id")] int? id) {
 
-        // GET: <UserController>/User?id=123
-        [HttpGet]
-        public async Task<User?> GetById([FromQuery] int id) {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (id != null) {
+                return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            } else if (!email.IsNullOrEmpty()) {
+                return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            }
+            return null;
         }
 
         // POST <UserController>/{...}
