@@ -2,8 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public partial class ClientData
-{
+public partial class ClientData {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -22,10 +21,10 @@ public partial class ClientData
     public int ClientId { get; set; }
 
     [ValidateComplexType]
-    public virtual Address Address { get; set; } = null!;
+    public virtual Address? Address { get; set; } = null!;
 
     [ValidateComplexType]
-    public virtual Address SourceAddress { get; set; } = null!;
+    public virtual Address? SourceAddress { get; set; } = null!;
 
-    public virtual User Client { get; set; } = null!;
+    public virtual User? Client { get; set; } = null!;
 }
