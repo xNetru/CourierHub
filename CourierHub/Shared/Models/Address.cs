@@ -6,7 +6,7 @@ namespace CourierHub.Shared.Models;
 public partial class Address {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? Id { get; set; } = null;
+    public int Id { get; set; }
 
     public string Street { get; set; } = null!;
 

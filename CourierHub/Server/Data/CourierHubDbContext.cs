@@ -291,9 +291,11 @@ public partial class CourierHubDbContext : DbContext {
         //    .HasValue<OfficeWorker>(1)
         //    .HasValue<Courier>(2);
 
-        //modelBuilder.Entity<SM.Client>().HasBaseType<User>();
-        //modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
-        //modelBuilder.Entity<Courier>().HasBaseType<User>();
+        modelBuilder.Entity<SM.Client>().HasBaseType<User>();
+        modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
+        modelBuilder.Entity<Courier>().HasBaseType<User>();
+
+        modelBuilder.Entity<SM.Client>().HasOne(c => c.Data).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
 
         //modelBuilder.Entity<SM.Client>()
         //    .HasOne(c => c.Data)

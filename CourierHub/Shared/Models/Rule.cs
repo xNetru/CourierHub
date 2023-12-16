@@ -1,6 +1,11 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace CourierHub.Shared.Models;
 
 public partial class Rule {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     public int? DepthMax { get; set; }
