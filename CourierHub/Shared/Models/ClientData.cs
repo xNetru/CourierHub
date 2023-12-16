@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace CourierHub.Shared.Models;
 using System.ComponentModel.DataAnnotations;
-
-namespace CourierHub.Shared.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public partial class ClientData {
     [Key]
@@ -10,6 +9,7 @@ public partial class ClientData {
 
     public byte[]? Photo { get; set; }
 
+    [RegularExpression(@"^\d{9}$", ErrorMessage = "Numer telefonu musi mieć 9 cyfr")]
     public string? Phone { get; set; }
 
     public string? Company { get; set; }
@@ -20,9 +20,11 @@ public partial class ClientData {
 
     public int ClientId { get; set; }
 
-    public virtual Address Address { get; set; } = null!;
+    [ValidateComplexType]
+    public virtual Address? Address { get; set; } = null!;
 
-    public virtual Address SourceAddress { get; set; } = null!;
+    [ValidateComplexType]
+    public virtual Address? SourceAddress { get; set; } = null!;
 
-    public virtual User Client { get; set; } = null!;
+    public virtual User? Client { get; set; } = null!;
 }

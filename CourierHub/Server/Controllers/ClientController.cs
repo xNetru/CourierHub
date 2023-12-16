@@ -4,7 +4,6 @@ using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text.Json;
 
 namespace CourierHub.Server.Controllers {
     [ApiController]
@@ -45,8 +44,7 @@ namespace CourierHub.Server.Controllers {
 
         // POST <ClientController>/{...}
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] string value) {
-            var client = (Shared.Models.Client?)JsonSerializer.Deserialize(value, typeof(Shared.Models.Client));
+        public async Task<ActionResult> Post([FromBody] Shared.Models.Client? client) {
             if (client == null) { return BadRequest(); }
             await _context.Users.AddAsync(client);
             ClientData data = client.Data;
@@ -57,8 +55,7 @@ namespace CourierHub.Server.Controllers {
 
         // PUT <ClientController>/123
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] string value) {
-            var client = (Shared.Models.Client?)JsonSerializer.Deserialize(value, typeof(Shared.Models.Client));
+        public async Task<ActionResult> Put(int id, [FromBody] Shared.Models.Client? client) {
             if (client == null) { return BadRequest(); }
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == id);
