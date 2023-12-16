@@ -16,5 +16,5 @@ public partial class Evaluation {
 
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 
-    public virtual User OfficeWorker { get; set; } = null!;
+    public virtual User? OfficeWorker { get; set; } = null!;
 }

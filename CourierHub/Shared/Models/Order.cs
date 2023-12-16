@@ -34,17 +34,17 @@ public partial class Order {
 
     public int ClientAddressId { get; set; }
 
-    public virtual Address ClientAddress { get; set; } = null!;
+    public virtual Address? ClientAddress { get; set; } = null!;
 
     public virtual Evaluation? Evaluation { get; set; }
 
-    public virtual Inquire Inquire { get; set; } = null!;
+    public virtual Inquire? Inquire { get; set; } = null!;
 
     public virtual Parcel? Parcel { get; set; }
 
     public virtual Review? Review { get; set; }
 
-    public virtual Service Service { get; set; } = null!;
+    public virtual Service? Service { get; set; } = null!;
 
-    public virtual Status Status { get; set; } = null!;
+    public virtual Status? Status { get; set; } = null!;
 }

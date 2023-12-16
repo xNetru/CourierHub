@@ -2,7 +2,6 @@
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 namespace CourierHub.Server.Controllers {
     [ApiController]
     [Route("[controller]")]
