@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-
-namespace CourierHubWebApi.Models
-{
+﻿namespace CourierHubWebApi.Models {
     public record CreateInquireRequest(
         int? ClientId,
         int Depth,

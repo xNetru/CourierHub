@@ -1,13 +1,9 @@
 ﻿using CourierHub.Shared.Models;
 using CourierHubWebApi.Models;
-using System.Runtime.CompilerServices;
 
-namespace CourierHubWebApi.Extensions
-{
-    public static class InquireExtensions
-    {
-        public static Inquire CreateInquire(this CreateInquireRequest request)
-        {
+namespace CourierHubWebApi.Extensions {
+    public static class InquireExtensions {
+        public static Inquire CreateInquire(this CreateInquireRequest request) {
             Inquire inquire = new();
             // inquire.Id = 0;
             inquire.ClientId = request.ClientId;
@@ -23,8 +19,7 @@ namespace CourierHubWebApi.Extensions
             inquire.Priority = request.Priority;
             return inquire;
         }
-        public static Address CreateSourceAddress(this CreateInquireRequest request)
-        {
+        public static Address CreateSourceAddress(this CreateInquireRequest request) {
             Address sourceAddress = new();
             // sourceAddress.Id = 0;   
             sourceAddress.Street = request.SourceStreet;
@@ -33,8 +28,7 @@ namespace CourierHubWebApi.Extensions
             sourceAddress.PostalCode = request.SourcePostalCode;
             return sourceAddress;
         }
-        public static Address CreateDestinationAddress(this CreateInquireRequest request)
-        { 
+        public static Address CreateDestinationAddress(this CreateInquireRequest request) {
             Address destinationAddress = new();
             // destinationAddress.Id = 0;
             destinationAddress.Street = request.DestinationStreet;

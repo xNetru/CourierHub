@@ -1,10 +1,10 @@
-﻿using CourierHub.Server.Data;
+﻿using CourierHub.Shared.Data;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CourierHub.Server.Controllers {
+namespace CourierHub.Shared.Controllers {
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase {

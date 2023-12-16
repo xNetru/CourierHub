@@ -6,17 +6,13 @@ using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace CourierHubWebApi.Services
-{
-    public class InquireService : IInquireService
-    {
+namespace CourierHubWebApi.Services {
+    public class InquireService : IInquireService {
         private CourierHubDbContext _dbContext;
-        public InquireService(CourierHubDbContext dbContext)
-        {
+        public InquireService(CourierHubDbContext dbContext) {
             _dbContext = dbContext;
         }
-        public async Task<ErrorOr<Inquire>> CreateInquire(CreateInquireRequest request)
-        {
+        public async Task<ErrorOr<Inquire>> CreateInquire(CreateInquireRequest request) {
 
             Address sourceAddress = request.CreateSourceAddress();
             Address destinationAddress = request.CreateDestinationAddress();
@@ -31,16 +27,14 @@ namespace CourierHubWebApi.Services
 
             PropertyValues? sourceAddressValues = await sourceAddressEntity.GetDatabaseValuesAsync();
             PropertyValues? destinationAddressValues = await destinationAddressEntity.GetDatabaseValuesAsync();
-            if (sourceAddressValues == null || destinationAddressValues == null)
-            {
+            if (sourceAddressValues == null || destinationAddressValues == null) {
                 // TODO: rollback changes
                 return Error.Failure();
             }
 
             int sourceAddressId, destinationAddressId;
             if (!sourceAddressValues.TryGetValue("Id", out sourceAddressId) ||
-                !sourceAddressValues.TryGetValue("Id", out destinationAddressId))
-            {
+                !sourceAddressValues.TryGetValue("Id", out destinationAddressId)) {
                 // TODO: rollback changes
                 return Error.Failure();
             }
@@ -53,15 +47,13 @@ namespace CourierHubWebApi.Services
 
             PropertyValues? inquirePropertyValues = await inquireEntity.GetDatabaseValuesAsync();
 
-            if (inquirePropertyValues == null)
-            {
+            if (inquirePropertyValues == null) {
                 // TODO: rollback changes
                 return Error.Failure();
             }
 
             int inquireId;
-            if (!inquirePropertyValues.TryGetValue("Id", out inquireId))
-            {
+            if (!inquirePropertyValues.TryGetValue("Id", out inquireId)) {
                 // TODO: rollback changes
                 return Error.Failure();
             }
