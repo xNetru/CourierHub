@@ -17,7 +17,7 @@ namespace CourierHub.Server.Controllers {
 
         // HEAD: <UserController>/email@gmail.com
         [HttpHead("{email}")]
-        public async Task<IActionResult> Head(string email) {
+        public async Task<ActionResult> Head(string email) {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user != null) { return Ok(); }
             return NotFound();
@@ -25,21 +25,21 @@ namespace CourierHub.Server.Controllers {
 
         // GET: <UserController>/User?id=123&email=email@gmail.com
         [HttpGet]
-        public async Task<User?> Get(
+        public async Task<ActionResult<User?>> Get(
             [FromQuery(Name = "email")] string? email,
             [FromQuery(Name = "id")] int? id) {
 
             if (id != null) {
-                return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+                return Ok(await _context.Users.FirstOrDefaultAsync(u => u.Id == id));
             } else if (!email.IsNullOrEmpty()) {
-                return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                return Ok(await _context.Users.FirstOrDefaultAsync(u => u.Email == email));
             }
-            return null;
+            return NotFound(null);
         }
 
         // POST <UserController>/{...}
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] string value) {
+        public async Task<ActionResult> Post([FromBody] string value) {
             var user = (User?)JsonSerializer.Deserialize(value, typeof(User));
             if (user == null) { return BadRequest(); }
             await _context.Users.AddAsync(user);
@@ -49,7 +49,7 @@ namespace CourierHub.Server.Controllers {
 
         // PUT <UserController>/123
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] string value) {
+        public async Task<ActionResult> Put(int id, [FromBody] string value) {
             var user = (User?)JsonSerializer.Deserialize(value, typeof(User));
             if (user == null) { return BadRequest(); }
             var entity = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);

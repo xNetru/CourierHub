@@ -17,7 +17,7 @@ namespace CourierHub.Server.Controllers {
 
         // HEAD: <OfficeWorkerController>/email@gmail.com
         [HttpHead("{email}")]
-        public async Task<IActionResult> Head(string email) {
+        public async Task<ActionResult> Head(string email) {
             var worker = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.OfficeWorker);
             if (worker != null) { return Ok(); }
             return NotFound();
@@ -25,16 +25,16 @@ namespace CourierHub.Server.Controllers {
 
         // GET: <OfficeWorkerController>/OfficeWorker?id=123&email=email@gmail.com
         [HttpGet]
-        public async Task<OfficeWorker?> Get(
+        public async Task<ActionResult<OfficeWorker?>> Get(
             [FromQuery(Name = "email")] string? email,
             [FromQuery(Name = "id")] int? id) {
 
             if (id != null) {
-                return (OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+                return Ok((OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id));
             } else if (!email.IsNullOrEmpty()) {
-                return (OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                return Ok((OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email));
             }
-            return null;
+            return NotFound(null);
         }
     }
 }
