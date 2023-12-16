@@ -1,8 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using CourierHub.Shared.Abstractions;
 using System.IO.Compression;
 using System.Text;
-using CourierHub.Shared.Abstractions;
 
 namespace CourierHub.Server.Data;
 
