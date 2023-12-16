@@ -1,16 +1,11 @@
 
 using CourierHub.Shared.Data;
-using CourierHubWebApi.Common;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
 using CourierHubWebApi.Services.Contracts;
 using CourierHubWebApi.Validations;
-using Elasticsearch.Net;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Data.SqlTypes;
 
 namespace CourierHubWebApi {
     public class Program {
