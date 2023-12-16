@@ -17,11 +17,10 @@ namespace CourierHubWebApi.Controllers
         {
             _inquireService = inquireService;
         }   
-        // POST api/<InquireController>
         [HttpPost]
         public IActionResult CreateInquire(CreateInquireRequest request)
         {
-            return _inquireService.CreateInquire(request).Match(
+            return _inquireService.CreateInquire(request).Result.Match(
                 inquire => CreatedAtAction(
                     actionName: nameof(CreateInquire),
                     routeValues: new { id = inquire.Id },

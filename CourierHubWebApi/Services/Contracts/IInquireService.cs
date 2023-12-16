@@ -6,6 +6,6 @@ namespace CourierHubWebApi.Services.Contracts
 {
     public interface IInquireService
     {
-        ErrorOr<Inquire> CreateInquire(CreateInquireRequest inquire);
+        Task<ErrorOr<Inquire>> CreateInquire(CreateInquireRequest inquire);
     }
 }

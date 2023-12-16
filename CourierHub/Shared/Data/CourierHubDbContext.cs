@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations.Schema;
 using SM = CourierHub.Shared.Models; 
 
 namespace CourierHub.Shared.Data;
@@ -54,9 +55,9 @@ public partial class CourierHubDbContext : DbContext
     {
         modelBuilder.Entity<Address>(entity =>
         {
+            //entity.HasKey(e => e.Id).HasName("PK_Address");
             entity.ToTable("Address");
-
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).HasDefaultValueSql("Identity(1,1)");
             entity.Property(e => e.Flat)
                 .HasMaxLength(5)
                 .IsUnicode(false)
