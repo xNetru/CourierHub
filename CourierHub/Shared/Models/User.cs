@@ -1,6 +1,11 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-public partial class User {
+namespace CourierHub.Shared.Models;
+
+public abstract partial class User {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;

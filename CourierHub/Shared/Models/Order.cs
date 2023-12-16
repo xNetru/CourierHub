@@ -1,6 +1,11 @@
-﻿namespace CourierHub.Shared.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace CourierHub.Shared.Models;
 
 public partial class Order {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     public int InquireId { get; set; }

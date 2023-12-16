@@ -3,6 +3,7 @@ using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CourierHub.Server.Controllers {
     [ApiController]
@@ -16,22 +17,24 @@ namespace CourierHub.Server.Controllers {
 
         // HEAD: <OfficeWorkerController>/email@gmail.com
         [HttpHead("{email}")]
-        public async Task<IActionResult> Head(string email) {
+        public async Task<ActionResult> Head(string email) {
             var worker = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.OfficeWorker);
             if (worker != null) { return Ok(); }
             return NotFound();
         }
 
-        // GET: <OfficeWorkerController>/email@gmail.com
-        [HttpGet("{email}")]
-        public async Task<OfficeWorker?> Get(string email) {
-            return (OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.OfficeWorker);
-        }
+        // GET: <OfficeWorkerController>/OfficeWorker?id=123&email=email@gmail.com
+        [HttpGet]
+        public async Task<ActionResult<OfficeWorker?>> Get(
+            [FromQuery(Name = "email")] string? email,
+            [FromQuery(Name = "id")] int? id) {
 
-        // GET: <OfficeWorkerController>/id
-        [HttpGet("{id}")]
-        public async Task<OfficeWorker?> Get(int id) {
-            return (OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.OfficeWorker);
+            if (id != null) {
+                return Ok((OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id));
+            } else if (!email.IsNullOrEmpty()) {
+                return Ok((OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email));
+            }
+            return NotFound(null);
         }
     }
 }
