@@ -3,6 +3,7 @@ using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace CourierHub.Server.Controllers {
@@ -17,39 +18,34 @@ namespace CourierHub.Server.Controllers {
 
         // HEAD: <ClientController>/email@gmail.com
         [HttpHead("{email}")]
-        public async Task<IActionResult> Head(string email) {
+        public async Task<ActionResult> Head(string email) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Client);
             if (client != null) { return Ok(); }
             return NotFound();
         }
 
-        // GET: <ClientController>/email@gmail.com
-        [HttpGet("{email}")]
-        public async Task<Shared.Models.Client?> Get(string email) {
-            var client = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Client);
-            if (client == null) { return null; }
-            var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
-            if (data == null) { return null; }
-            return new Shared.Models.Client() {
-                Data = data
-            };
-        }
+        // GET: <ClientController>/Client?id=123&email=email@gmail.com
+        [HttpGet]
+        public async Task<ActionResult<Shared.Models.Client?>> Get(
+            [FromQuery(Name = "email")] string? email,
+            [FromQuery(Name = "id")] int? id) {
 
-        // GET: <ClientController>/id
-        [HttpGet("{id}")]
-        public async Task<Shared.Models.Client?> Get(int id) {
-            var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
-            if (client == null) { return null; }
+            User? client = null;
+            if (id != null) {
+                client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
+            } else if (!email.IsNullOrEmpty()) {
+                client = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Client);
+            }
+            if (client == null) { return NotFound(null); }
+
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
-            if (data == null) { return null; }
-            return new Shared.Models.Client() {
-                Data = data
-            };
+            if (data == null) { return NotFound(null); }
+            return Ok(new Shared.Models.Client() { Data = data });
         }
 
         // POST <ClientController>/{...}
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] string value) {
+        public async Task<ActionResult> Post([FromBody] string value) {
             var client = (Shared.Models.Client?)JsonSerializer.Deserialize(value, typeof(Shared.Models.Client));
             if (client == null) { return BadRequest(); }
             await _context.Users.AddAsync(client);
@@ -59,9 +55,9 @@ namespace CourierHub.Server.Controllers {
             return Ok();
         }
 
-        // PUT <UserController>/id
+        // PUT <ClientController>/123
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] string value) {
+        public async Task<ActionResult> Put(int id, [FromBody] string value) {
             var client = (Shared.Models.Client?)JsonSerializer.Deserialize(value, typeof(Shared.Models.Client));
             if (client == null) { return BadRequest(); }
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
@@ -77,20 +73,20 @@ namespace CourierHub.Server.Controllers {
             return Ok();
         }
 
-        // GET: <ClientController>/id/inquires
+        // GET: <ClientController>/123/inquires
         [HttpGet("{id}/inquires")]
-        public async Task<IEnumerable<Inquire>> GetInquires(int id) {
+        public async Task<ActionResult<IEnumerable<Inquire>>> GetInquires(int id) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
-            if (client == null) { return Array.Empty<Inquire>(); }
-            return await _context.Inquires.Where(i => i.ClientId == client.Id).ToListAsync();
+            if (client == null) { return NotFound(Array.Empty<Inquire>()); }
+            return Ok(await _context.Inquires.Where(i => i.ClientId == client.Id).ToListAsync());
         }
 
-        // GET: <ClientController>/id/orders
-        [HttpGet("{id}/inquires")]
-        public async Task<IEnumerable<Order>> GetOrders(int id) {
+        // GET: <ClientController>/123/orders
+        [HttpGet("{id}/orders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders(int id) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
-            if (client == null) { return Array.Empty<Order>(); }
-            return await _context.Orders.Where(o => o.Inquire.ClientId == client.Id).ToListAsync();
+            if (client == null) { return NotFound(Array.Empty<Order>()); }
+            return Ok(await _context.Orders.Where(o => o.Inquire.ClientId == client.Id).ToListAsync());
         }
     }
 }
