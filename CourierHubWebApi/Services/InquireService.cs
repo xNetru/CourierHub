@@ -17,73 +17,56 @@ namespace CourierHubWebApi.Services
         }
         public async Task<ErrorOr<Inquire>> CreateInquire(CreateInquireRequest request)
         {
-            
-            //Address sourceAddress = request.CreateSourceAddress();
-            //Address destinationAddress = request.CreateDestinationAddress();
+
+            Address sourceAddress = request.CreateSourceAddress();
+            Address destinationAddress = request.CreateDestinationAddress();
             Inquire inquire = request.CreateInquire();
 
-            Address address = new Address();
-            // address.Id = 10;
-            address.Street = "1";
-            address.Number = "1";
-            address.Flat = "1";
-            address.PostalCode = "1";
+            EntityEntry<Address> sourceAddressEntity = await _dbContext.Addresses.AddAsync(sourceAddress);
+            EntityEntry<Address> destinationAddressEntity = await _dbContext.Addresses.AddAsync(destinationAddress);
 
-            await _dbContext.Addresses.AddAsync(address);
-            try
+
+
+            int writtenToDatabase = await _dbContext.SaveChangesAsync();
+
+            PropertyValues? sourceAddressValues = await sourceAddressEntity.GetDatabaseValuesAsync();
+            PropertyValues? destinationAddressValues = await destinationAddressEntity.GetDatabaseValuesAsync();
+            if (sourceAddressValues == null || destinationAddressValues == null)
             {
-                _dbContext.SaveChanges();
-
+                // TODO: rollback changes
+                return Error.Failure();
             }
-            catch (Exception ex) 
+
+            int sourceAddressId, destinationAddressId;
+            if (!sourceAddressValues.TryGetValue("Id", out sourceAddressId) ||
+                !sourceAddressValues.TryGetValue("Id", out destinationAddressId))
             {
-                Console.WriteLine(ex.ToString());
+                // TODO: rollback changes
+                return Error.Failure();
             }
-            //EntityEntry<Address> sourceAddressEntity = await _dbContext.Addresses.AddAsync(sourceAddress);
-            //EntityEntry<Address> destinationAddressEntity = await _dbContext.Addresses.AddAsync(destinationAddress);
 
+            inquire.SourceId = sourceAddressId;
+            inquire.DestinationId = destinationAddressId;
 
+            EntityEntry<Inquire> inquireEntity = _dbContext.Inquires.Add(inquire);
+            writtenToDatabase = await _dbContext.SaveChangesAsync();
 
-            //int writtenToDatabase = await _dbContext.SaveChangesAsync();
+            PropertyValues? inquirePropertyValues = await inquireEntity.GetDatabaseValuesAsync();
 
-            //PropertyValues? sourceAddressValues = await sourceAddressEntity.GetDatabaseValuesAsync();
-            //PropertyValues? destinationAddressValues = await destinationAddressEntity.GetDatabaseValuesAsync();
-            //if (sourceAddressValues == null || destinationAddressValues == null)
-            //{
-            //    // TODO: rollback changes
-            //    return Error.Failure();
-            //}
+            if (inquirePropertyValues == null)
+            {
+                // TODO: rollback changes
+                return Error.Failure();
+            }
 
-            //int sourceAddressId, destinationAddressId;
-            //if (!sourceAddressValues.TryGetValue("Id", out sourceAddressId) ||
-            //   !sourceAddressValues.TryGetValue("Id", out destinationAddressId))
-            //{
-            //    // TODO: rollback changes
-            //    return Error.Failure();
-            //}
+            int inquireId;
+            if (!inquirePropertyValues.TryGetValue("Id", out inquireId))
+            {
+                // TODO: rollback changes
+                return Error.Failure();
+            }
 
-            //inquire.SourceId = sourceAddressId;
-            //inquire.DestinationId = destinationAddressId;
-
-            //EntityEntry<Inquire> inquireEntity = _dbContext.Inquires.Add(inquire);
-            //writtenToDatabase = await _dbContext.SaveChangesAsync();
-
-            //PropertyValues? inquirePropertyValues = await inquireEntity.GetDatabaseValuesAsync();
-
-            //if(inquirePropertyValues == null)
-            //{
-            //    // TODO: rollback changes
-            //    return Error.Failure();
-            //}
-
-            //int inquireId;
-            //if(!inquirePropertyValues.TryGetValue("Id", out inquireId))
-            //{
-            //    // TODO: rollback changes
-            //    return Error.Failure();
-            //}
-
-            //inquire.Id = inquireId;
+            inquire.Id = inquireId;
             return inquire;
         }
     }

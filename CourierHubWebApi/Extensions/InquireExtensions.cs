@@ -15,6 +15,9 @@ namespace CourierHubWebApi.Extensions
             inquire.Width = request.Width;
             inquire.Length = request.Length;
             inquire.Mass = request.Mass;
+            inquire.SourceDate = request.SourceDate;
+            inquire.DestinationDate = request.DestinationDate;
+            inquire.Datetime = request.Datetime;
             inquire.IsCompany = request.IsCompany;
             inquire.IsWeekend = request.IsWeekend;
             inquire.Priority = request.Priority;
@@ -33,7 +36,7 @@ namespace CourierHubWebApi.Extensions
         public static Address CreateDestinationAddress(this CreateInquireRequest request)
         { 
             Address destinationAddress = new();
-            destinationAddress.Id = 0;
+            // destinationAddress.Id = 0;
             destinationAddress.Street = request.DestinationStreet;
             destinationAddress.Number = request.DestinationNumber;
             destinationAddress.Flat = request.DestinationFlat;
