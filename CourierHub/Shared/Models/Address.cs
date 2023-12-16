@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace CourierHub.Shared.Models;
-=======
-﻿namespace CourierHub.Shared.Models;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
->>>>>>> 28296336b69f8456147901bf8b138a44ba40ba84
+
 
 public partial class Address {
     [Key]

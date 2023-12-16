@@ -286,10 +286,10 @@ public partial class CourierHubDbContext : DbContext {
 
         });
 
-        //modelBuilder.Entity<User>().HasDiscriminator<int>("Type")
-        //    .HasValue<SM.Client>(0)
-        //    .HasValue<OfficeWorker>(1)
-        //    .HasValue<Courier>(2);
+        modelBuilder.Entity<User>().HasDiscriminator<int>("Type")
+            .HasValue<SM.Client>(0)
+            .HasValue<OfficeWorker>(1)
+            .HasValue<Courier>(2);
 
         modelBuilder.Entity<SM.Client>().HasBaseType<User>();
         modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
@@ -297,11 +297,7 @@ public partial class CourierHubDbContext : DbContext {
 
         modelBuilder.Entity<SM.Client>().HasOne(c => c.Data).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
 
-        //modelBuilder.Entity<SM.Client>()
-        //    .HasOne(c => c.Data)
-        //    .WithOne(cd => (SM.Client)cd.Client)
-        //    .HasForeignKey<ClientData>(cd => cd.ClientId);
-        //OnModelCreatingPartial(modelBuilder);
+        OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CourierHub.Shared.Models {
-    public partial class Client : User {
-<<<<<<< HEAD
-        public virtual ClientData Data { get; set; } = null!;
-=======
+namespace CourierHub.Shared.Models
+{
+    public partial class Client : User
+    {
         [ValidateComplexType]
         public ClientData Data { get; set; } = null!;
->>>>>>> 28296336b69f8456147901bf8b138a44ba40ba84
     }
 }

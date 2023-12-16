@@ -17,7 +17,7 @@ public abstract partial class User {
     [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Nazwisko musi się zaczynać od duzej litery")]
     public string Surname { get; set; } = null!;
 
-    public virtual int Type { get; set; }
+    public int Type { get; set; }
 
     public virtual ICollection<ClientData> ClientData { get; } = new List<ClientData>();
 
