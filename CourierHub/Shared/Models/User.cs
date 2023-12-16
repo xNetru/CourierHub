@@ -1,6 +1,6 @@
 ﻿namespace CourierHub.Shared.Models;
 
-public partial class User {
+public abstract partial class User {
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;

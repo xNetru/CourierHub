@@ -22,15 +22,15 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <OfficeWorkerController>/email@gmail.com
-        [HttpGet("{email}")]
-        public async Task<OfficeWorker?> Get(string email) {
+        // GET: <OfficeWorkerController>/Courier?email=email@gmail.com
+        [HttpGet]
+        public async Task<OfficeWorker?> Get([FromQuery] string email) {
             return (OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.OfficeWorker);
         }
 
-        // GET: <OfficeWorkerController>/id
-        [HttpGet("{id}")]
-        public async Task<OfficeWorker?> Get(int id) {
+        // GET: <OfficeWorkerController>/Courier?id=123
+        [HttpGet]
+        public async Task<OfficeWorker?> Get([FromQuery] int id) {
             return (OfficeWorker?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.OfficeWorker);
         }
     }

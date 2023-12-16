@@ -22,15 +22,15 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <CourierController>/email@gmail.com
-        [HttpGet("{email}")]
-        public async Task<Courier?> Get(string email) {
+        // GET: <CourierController>/Courier?email=email@gmail.com
+        [HttpGet]
+        public async Task<Courier?> Get([FromQuery] string email) {
             return (Courier?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Courier);
         }
 
-        // GET: <CourierController>/id
-        [HttpGet("{id}")]
-        public async Task<Courier?> Get(int id) {
+        // GET: <CourierController>/Courier?id=123
+        [HttpGet]
+        public async Task<Courier?> Get([FromQuery] int id) {
             return (Courier?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Courier);
         }
     }

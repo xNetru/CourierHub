@@ -295,7 +295,7 @@ public partial class CourierHubDbContext : DbContext {
         modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
         modelBuilder.Entity<Courier>().HasBaseType<User>();
 
-        modelBuilder.Entity<SM.Client>().HasOne(c => c.ClientData).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
+        modelBuilder.Entity<SM.Client>().HasOne(c => c.Data).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
 
         OnModelCreatingPartial(modelBuilder);
     }

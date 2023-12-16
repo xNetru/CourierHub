@@ -22,15 +22,15 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <UserController>/email@gmail.com
-        [HttpGet("{email}")]
-        public async Task<User?> Get(string email) {
+        // GET: <UserController>/User?email=email@gmail.com
+        [HttpGet]
+        public async Task<User?> GetByEmail([FromQuery] string email) {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        // GET: <UserController>/id
-        [HttpGet("{id}")]
-        public async Task<User?> Get(int id) {
+        // GET: <UserController>/User?id=123
+        [HttpGet]
+        public async Task<User?> GetById([FromQuery] int id) {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
@@ -44,7 +44,7 @@ namespace CourierHub.Server.Controllers {
             return Ok();
         }
 
-        // PUT <UserController>/id
+        // PUT <UserController>/123
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] string value) {
             var user = (User?)JsonSerializer.Deserialize(value, typeof(User));

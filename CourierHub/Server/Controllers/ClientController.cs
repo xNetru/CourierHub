@@ -23,9 +23,9 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <ClientController>/email@gmail.com
-        [HttpGet("{email}")]
-        public async Task<Shared.Models.Client?> Get(string email) {
+        // GET: <ClientController>/Client?email=email@gmail.com
+        [HttpGet]
+        public async Task<Shared.Models.Client?> GetByEmail([FromQuery] string email) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Type == (int)UserType.Client);
             if (client == null) { return null; }
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
@@ -35,9 +35,9 @@ namespace CourierHub.Server.Controllers {
             };
         }
 
-        // GET: <ClientController>/id
-        [HttpGet("{id}")]
-        public async Task<Shared.Models.Client?> Get(int id) {
+        // GET: <ClientController>/Client?id=123
+        [HttpGet]
+        public async Task<Shared.Models.Client?> GetById([FromQuery] int id) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
             if (client == null) { return null; }
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
@@ -59,7 +59,7 @@ namespace CourierHub.Server.Controllers {
             return Ok();
         }
 
-        // PUT <UserController>/id
+        // PUT <UserController>/123
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] string value) {
             var client = (Shared.Models.Client?)JsonSerializer.Deserialize(value, typeof(Shared.Models.Client));
@@ -77,7 +77,7 @@ namespace CourierHub.Server.Controllers {
             return Ok();
         }
 
-        // GET: <ClientController>/id/inquires
+        // GET: <ClientController>/123/inquires
         [HttpGet("{id}/inquires")]
         public async Task<IEnumerable<Inquire>> GetInquires(int id) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
@@ -85,7 +85,7 @@ namespace CourierHub.Server.Controllers {
             return await _context.Inquires.Where(i => i.ClientId == client.Id).ToListAsync();
         }
 
-        // GET: <ClientController>/id/orders
+        // GET: <ClientController>/123/orders
         [HttpGet("{id}/inquires")]
         public async Task<IEnumerable<Order>> GetOrders(int id) {
             var client = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
