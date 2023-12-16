@@ -1,14 +1,21 @@
 ﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using SM = CourierHub.Shared.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using SM = CourierHub.Shared.Models; 
 
-namespace CourierHub.Server.Data;
+namespace CourierHub.Shared.Data;
 
 public partial class CourierHubDbContext : DbContext
 {
+    //private static readonly ILoggerFactory MyLoggerFactory
+    //    = LoggerFactory.Create(builder => builder.AddConsole());
     public CourierHubDbContext() { }
 
-    public CourierHubDbContext(DbContextOptions<CourierHubDbContext> options) : base(options) { }
+    public CourierHubDbContext(DbContextOptions<CourierHubDbContext> options) : base(options)
+    {
+        //this.Database.SetCommandTimeout(60);
+    }
 
     public virtual DbSet<Address> Addresses { get; set; }
 
@@ -36,8 +43,11 @@ public partial class CourierHubDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+        string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+            .Build()
+            .GetSection("ConnectionStrings")["DefaultConnection"];
         optionsBuilder.UseSqlServer(connection);
+        //optionsBuilder.UseLoggerFactory(MyLoggerFactory);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -301,20 +311,18 @@ public partial class CourierHubDbContext : DbContext
 
         });
 
-        //modelBuilder.Entity<User>().HasDiscriminator<int>("Type")
-        //    .HasValue<SM.Client>(0)
-        //    .HasValue<OfficeWorker>(1)
-        //    .HasValue<Courier>(2);
+        modelBuilder.Entity<User>().HasDiscriminator<int>("Type")
+            .HasValue<SM.Client>(0)
+            .HasValue<OfficeWorker>(1)
+            .HasValue<Courier>(2);
 
-        //modelBuilder.Entity<SM.Client>().HasBaseType<User>();
-        //modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
-        //modelBuilder.Entity<Courier>().HasBaseType<User>();
+        modelBuilder.Entity<SM.Client>().HasBaseType<User>();
+        modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
+        modelBuilder.Entity<Courier>().HasBaseType<User>();
 
-        //modelBuilder.Entity<SM.Client>()
-        //    .HasOne(c => c.Data)
-        //    .WithOne(cd => (SM.Client)cd.Client)
-        //    .HasForeignKey<ClientData>(cd => cd.ClientId);
-        //OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<SM.Client>().HasOne(c => c.Data).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
+
+        OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

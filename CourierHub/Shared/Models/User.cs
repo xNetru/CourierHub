@@ -1,6 +1,6 @@
 ﻿namespace CourierHub.Shared.Models;
 
-public partial class User {
+public abstract partial class User {
     public int Id { get; set; }
 
     public string Email { get; set; } = null!;
@@ -9,7 +9,7 @@ public partial class User {
 
     public string Surname { get; set; } = null!;
 
-    public int Type { get; set; }
+    public virtual int Type { get; set; }
 
     public virtual ICollection<ClientData> ClientData { get; } = new List<ClientData>();
 
