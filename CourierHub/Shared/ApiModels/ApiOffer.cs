@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CourierHub.Shared.ApiModels {
+    public class ApiOffer {
+        public decimal Price { get; set; }
 
-namespace CourierHub.Shared.ApiModels {
-    internal class ApiOffer {
+        public string Code { get; set; } = null!;
+
+        public DateTime ExpirationDate { get; set; }
     }
 }

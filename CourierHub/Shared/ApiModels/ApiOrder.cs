@@ -1,10 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CourierHub.Shared.ApiModels {
+    public class ApiOrder {
+        public int ApiInquire { get; set; }
 
-namespace CourierHub.Shared.ApiModels {
-    internal class ApiOrder {
+        public decimal Price { get; set; }
+
+        public string ClientEmail { get; set; } = null!;
+
+        public string ClientName { get; set; } = null!;
+
+        public string ClientSurname { get; set; } = null!;
+
+        public string ClientPhone { get; set; } = null!;
+
+        public string ClientCompany { get; set; } = null!;
+
+        public ApiAddress ClientAddress { get; set; } = null!;
     }
 }
