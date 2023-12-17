@@ -1,0 +1,79 @@
+﻿@page "/offerSubmitForm"
+
+@using CourierHub.Shared.Models
+@using Client = CourierHub.Shared.Models.Client;
+@using System.Text.Json;
+@using System.Text;
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<div class="container">
+    <EditForm Model="NewOrder" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+        <h2>Dane podstawowe</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Name" class="col-form-label">Imię</label>
+                        <input type="text" class="form-control" id="Name" @bind-value="@NewOrder.ClientName" placeholder="podaj imię..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientName)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Surname" class="col-form-label">Nazwisko</label>
+                        <input type="text" class="form-control" id="Surname" @bind-value="@NewOrder.ClientSurname" placeholder="podaj nazwisko..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientSurname)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="Email" class="col-form-label">Email</label>
+                        <input type="text" class="form-control" id="Email" @bind-value="@NewOrder.ClientEmail" placeholder="podaj email..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Dane dodatkowe</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Phone" class="col-form-label">Numer telefonu</label>
+                        <input type="text" class="form-control" id="Phone" @bind-value="@NewOrder.ClientPhone" placeholder="podaj numer telefonu..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientPhone)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Company" class="col-form-label">Firma</label>
+                        <input type="text" class="form-control" id="Company" @bind-value="@NewOrder.ClientCompany" placeholder="podaj nazwę firmy..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code{
+    private Order NewOrder = new Order {
+            ClientAddress = new Address()
+    };
+
+    private bool displayInquireSent = false;
+    private bool isButtonDisabled = false;
+
+    private void HandleValidSubmit(EditContext context)
+    {
+        displayInquireSent = true;
+        isButtonDisabled = true;
+    }
+
+    private void HandleInvalidSubmit(EditContext context)
+    {
+        displayInquireSent = false;
+    }
+}
