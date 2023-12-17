@@ -45,6 +45,8 @@ public partial class Inquire
     [Range(0, 2, ErrorMessage = "Należy ustalić priorytet")]
     public int Priority { get; set; } = -1;
 
+    public string Code { get; set; } = null!;
+
     [ValidateComplexType]
     public virtual Address Destination { get; set; } = null!;
 
