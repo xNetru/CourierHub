@@ -1,5 +1,5 @@
 ﻿namespace CourierHub.Shared.Abstractions {
-    public interface IWebAPI {
+    public interface IWebApi {
         /* tutaj musisz Kamilu dać 
          * POST /inquires {} -> /inquires/id
          * GET /offers/id -> {}
