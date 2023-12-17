@@ -10,7 +10,7 @@ namespace CourierHub.Shared.Abstractions {
         Task<string> PostOrder(ApiOrder order);
 
         // client withraws the order, receives message
-        Task<string> PutOrderWithrawal();
+        Task<string> PutOrderWithrawal(string code);
 
         // client checks the status of order, receives message
         Task<(StatusType?, string)> GetOrderStatus(string code);
