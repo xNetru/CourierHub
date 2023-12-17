@@ -45,19 +45,20 @@ public partial class CourierHubDbContext : DbContext {
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Flat)
-                .HasMaxLength(5)
+                .HasMaxLength(6)
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Number)
-                .HasMaxLength(5)
+                .HasMaxLength(6)
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.PostalCode)
-                .HasMaxLength(5)
+                .HasMaxLength(6)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("Postal_code");
             entity.Property(e => e.Street).HasMaxLength(50);
+            entity.Property(e => e.City).HasMaxLength(50);
         });
 
         modelBuilder.Entity<ClientData>(entity => {
@@ -69,7 +70,7 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.AddressId).HasColumnName("Address_Id");
             entity.Property(e => e.Company).HasMaxLength(50);
             entity.Property(e => e.Phone)
-                .HasMaxLength(11)
+                .HasMaxLength(12)
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Photo).HasColumnType("image");
@@ -121,6 +122,7 @@ public partial class CourierHubDbContext : DbContext {
                 .HasColumnName("Source_date");
             entity.Property(e => e.SourceId).HasColumnName("Source_Id");
             entity.Property(e => e.ClientId).HasColumnName("Client_Id");
+            entity.Property(e => e.Code).HasMaxLength(50);
 
             entity.HasOne(d => d.Destination).WithMany(p => p.InquireDestinations)
                 .HasForeignKey(d => d.DestinationId)
@@ -152,7 +154,7 @@ public partial class CourierHubDbContext : DbContext {
                 .HasMaxLength(50)
                 .HasColumnName("Client_Name");
             entity.Property(e => e.ClientPhone)
-                .HasMaxLength(11)
+                .HasMaxLength(12)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("Client_Phone");

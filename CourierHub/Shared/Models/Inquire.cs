@@ -2,8 +2,7 @@
 using CourierHub.Shared.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-public partial class Inquire
-{
+public partial class Inquire {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -44,6 +43,8 @@ public partial class Inquire
 
     [Range(0, 2, ErrorMessage = "Należy ustalić priorytet")]
     public int Priority { get; set; } = -1;
+
+    public string Code { get; set; } = null!;
 
     [ValidateComplexType]
     public virtual Address Destination { get; set; } = null!;

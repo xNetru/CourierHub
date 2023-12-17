@@ -1,13 +1,11 @@
 ﻿namespace CourierHub.Shared.Enums;
-public enum PriorityType
-{
+public enum PriorityType {
     Low,
     Medium,
     High
 }
 
-public enum PriorityTypePL
-{
+public enum PriorityTypePL {
     Niski,
     Średni,
     Wysoki
