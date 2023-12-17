@@ -1,6 +1,7 @@
 ﻿@page "/inquireForm"
 
 @using CourierHub.Shared.Models
+@using CourierHub.Shared.Enums
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -76,6 +77,17 @@
 
                     <div class="col-md-4">
                         <InputCheckbox @bind-Value="NewInquire.IsCompany" /> Wysyłka jako prcownik firmy
+                    </div>
+
+                    <div class="col-md-4">
+                        <InputSelect @bind-Value="NewInquire.Priority">
+                            <option value="-1">Wybierz priorytet paczki</option>
+                            @foreach (var val in Enum.GetValues(typeof(PriorityTypePL)))
+                            {
+                                <option value="@Convert.ToInt32(val)">@val</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(()=>NewInquire.Priority)" />
                     </div>
                 </div>
             </div>
@@ -162,16 +174,17 @@
 
 @code {
     private Inquire NewInquire = new Inquire
-        {
-            Source = new Address(),
-            Destination = new Address()
-        };
+    {
+        Source = new Address(),
+        Destination = new Address()
+    };
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
 
     private void HandleValidSubmit(EditContext context)
     {
         displayInquireSent = true;
+        isButtonDisabled = true;
     }
 
     private void HandleInvalidSubmit(EditContext context)

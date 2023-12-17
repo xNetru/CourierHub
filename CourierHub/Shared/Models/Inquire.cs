@@ -41,13 +41,16 @@ public partial class Inquire
 
     public bool IsWeekend { get; set; }
 
-    public int Priority { get; set; }
+    [Range(0, 2, ErrorMessage = "Należy ustalić priorytet")]
+    public int Priority { get; set; } = -1;
 
-    public virtual Address? Destination { get; set; } = null!;
+    [ValidateComplexType]
+    public virtual Address Destination { get; set; } = null!;
 
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 
-    public virtual Address? Source { get; set; } = null!;
+    [ValidateComplexType]
+    public virtual Address Source { get; set; } = null!;
 
     public virtual User? Client { get; set; }
 }
