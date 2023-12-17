@@ -35,9 +35,9 @@ namespace CourierHub.Shared.ApiModels {
         public int Priority { get; set; } = -1;
 
         [ValidateComplexType]
-        public virtual ApiAddress Destination { get; set; } = null!;
+        public ApiAddress Destination { get; set; } = null!;
 
         [ValidateComplexType]
-        public virtual ApiAddress Source { get; set; } = null!;
+        public ApiAddress Source { get; set; } = null!;
     }
 }
