@@ -1,4 +1,4 @@
-﻿namespace CourierHub.Shared.Abstractions;
+﻿namespace CourierHub.Shared.Enums;
 public enum StatusType {
     NotConfirmed,
     Confirmed,

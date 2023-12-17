@@ -1,10 +1,10 @@
-﻿using CourierHub.Server.Data;
+﻿using CourierHub.Shared.Data;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CourierHub.Server.Controllers {
+namespace CourierHub.Shared.Controllers {
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase {
@@ -22,7 +22,7 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <UserController>/User?id=123&email=email@gmail.com
+        // GET: <UserController>?id=123&email=email@gmail.com
         [HttpGet]
         public async Task<ActionResult<User?>> Get(
             [FromQuery(Name = "email")] string? email,

@@ -9,7 +9,7 @@ public partial class ClientData {
 
     public byte[]? Photo { get; set; }
 
-    [RegularExpression(@"^\d{9}$", ErrorMessage = "Numer telefonu musi mieć 9 cyfr")]
+    [Phone]
     public string? Phone { get; set; }
 
     public string? Company { get; set; }

@@ -1,11 +1,11 @@
-﻿using CourierHub.Server.Data;
-using CourierHub.Shared.Abstractions;
+﻿using CourierHub.Shared.Data;
+using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CourierHub.Server.Controllers {
+namespace CourierHub.Shared.Controllers {
     [ApiController]
     [Route("[controller]")]
     public class ClientController : ControllerBase {
@@ -23,9 +23,9 @@ namespace CourierHub.Server.Controllers {
             return NotFound();
         }
 
-        // GET: <ClientController>/Client?id=123&email=email@gmail.com
+        // GET: <ClientController>?id=123&email=email@gmail.com
         [HttpGet]
-        public async Task<ActionResult<Shared.Models.Client?>> Get(
+        public async Task<ActionResult<Models.Client?>> Get(
             [FromQuery(Name = "email")] string? email,
             [FromQuery(Name = "id")] int? id) {
 
@@ -44,7 +44,7 @@ namespace CourierHub.Server.Controllers {
 
         // POST <ClientController>/{...}
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Shared.Models.Client? client) {
+        public async Task<ActionResult> Post([FromBody] Models.Client? client) {
             if (client == null) { return BadRequest(); }
             await _context.Users.AddAsync(client);
             ClientData data = client.Data;
@@ -55,7 +55,7 @@ namespace CourierHub.Server.Controllers {
 
         // PUT <ClientController>/123
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Shared.Models.Client? client) {
+        public async Task<ActionResult> Put(int id, [FromBody] Models.Client? client) {
             if (client == null) { return BadRequest(); }
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.Type == (int)UserType.Client);
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == id);

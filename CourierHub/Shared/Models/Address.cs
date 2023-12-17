@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,6 +9,13 @@ namespace CourierHub.Shared.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 >>>>>>> 28296336b69f8456147901bf8b138a44ba40ba84
+=======
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CourierHub.Shared.Models;
+
+>>>>>>> 617ad29b7bf85550604dda58be4ccf9a5f4f6de1
 
 public partial class Address {
     [Key]
@@ -26,6 +34,8 @@ public partial class Address {
     [Required(ErrorMessage = "Kod pocztowy jest wymagany")]
     [RegularExpression(@"^\d{2}-\d{3}$", ErrorMessage = "Kod pocztowy musi być postaci XX-XXX")]
     public string PostalCode { get; set; } = null!;
+
+    public string City { get; set; } = null!;
 
     public virtual ICollection<ClientData> ClientDatumAddresses { get; } = new List<ClientData>();
 

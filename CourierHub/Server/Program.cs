@@ -1,4 +1,4 @@
-using CourierHub.Server.Data;
+using CourierHub.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierHub {
