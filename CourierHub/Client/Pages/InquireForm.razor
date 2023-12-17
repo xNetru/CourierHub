@@ -53,13 +53,13 @@
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="SourceDate">Data wysyłki</label>
-                        <input type="date" class="form-control" id="department" @bind-value="@NewInquire.SourceDate" />
+                        <input type="date" class="form-control" id="src" @bind-value="@NewInquire.SourceDate" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                         <ValidationMessage For="@(()=>NewInquire.SourceDate)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="DestinationDate">Data dostawy</label>
-                        <input type="date" class="form-control" id="department" @bind-value="@NewInquire.DestinationDate" />
+                        <input type="date" class="form-control" id="destDate" @bind-value="@NewInquire.DestinationDate" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                         <ValidationMessage For="@(()=>NewInquire.DestinationDate)" />
                     </div>
                 </div>
@@ -185,6 +185,8 @@
     {
         displayInquireSent = true;
         isButtonDisabled = true;
+
+        NewInquire.Datetime = DateTime.Today;
     }
 
     private void HandleInvalidSubmit(EditContext context)

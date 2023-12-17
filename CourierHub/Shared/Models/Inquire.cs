@@ -1,4 +1,5 @@
 ﻿namespace CourierHub.Shared.Models;
+using CourierHub.Shared.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 public partial class Inquire
@@ -29,11 +30,11 @@ public partial class Inquire
 
     public int DestinationId { get; set; }
 
-    [Required(ErrorMessage = "Data wysyłki jest wymagana")]
-    public DateTime SourceDate { get; set; }
+    [Comparison("DestinationDate", ComparisonType.LessThanOrEqualTo, ErrorMessage = "Data wysyłki nie może być większa niż data dostawy")]
+    public DateTime SourceDate { get; set; } = DateTime.Today;
 
-    [Required(ErrorMessage = "Data dostarczenia jest wymagana")]
-    public DateTime DestinationDate { get; set; }
+    [Comparison("SourceDate", ComparisonType.GreaterThanOrEqualTo, ErrorMessage = "Data dostawy nie może być mniejsza niż data wysyłki")]
+    public DateTime DestinationDate { get; set; } = DateTime.Today;
 
     public DateTime Datetime { get; set; }
 
