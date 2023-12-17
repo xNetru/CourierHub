@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace CourierHub.Shared.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CourierHub.Shared.Models;
-
 public partial class Inquire
 {
     [Key]
@@ -45,13 +43,11 @@ public partial class Inquire
 
     public int Priority { get; set; }
 
-    [ValidateComplexType]
-    public virtual Address Destination { get; set; } = null!;
+    public virtual Address? Destination { get; set; } = null!;
 
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 
-    [ValidateComplexType]
-    public virtual Address Source { get; set; } = null!;
+    public virtual Address? Source { get; set; } = null!;
 
     public virtual User? Client { get; set; }
 }

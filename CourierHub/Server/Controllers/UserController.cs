@@ -1,11 +1,10 @@
-﻿using CourierHub.Server.Data;
+﻿using CourierHub.Shared.Data;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text.Json;
 
-namespace CourierHub.Server.Controllers {
+namespace CourierHub.Shared.Controllers {
     [ApiController]
     [Route("[controller]")]
     public class UserController : ControllerBase {
@@ -39,8 +38,7 @@ namespace CourierHub.Server.Controllers {
 
         // POST <UserController>/{...}
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] string value) {
-            var user = (User?)JsonSerializer.Deserialize(value, typeof(User));
+        public async Task<ActionResult> Post([FromBody] User? user) {
             if (user == null) { return BadRequest(); }
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -49,8 +47,7 @@ namespace CourierHub.Server.Controllers {
 
         // PUT <UserController>/123
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] string value) {
-            var user = (User?)JsonSerializer.Deserialize(value, typeof(User));
+        public async Task<ActionResult> Put(int id, [FromBody] User? user) {
             if (user == null) { return BadRequest(); }
             var entity = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
             if (entity == null) {

@@ -1,11 +1,11 @@
 ﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SM = CourierHub.Shared.Models;
 
-namespace CourierHub.Server.Data;
+namespace CourierHub.Shared.Data;
 
-public partial class CourierHubDbContext : DbContext
-{
+public partial class CourierHubDbContext : DbContext {
     public CourierHubDbContext() { }
 
     public CourierHubDbContext(DbContextOptions<CourierHubDbContext> options) : base(options) { }
@@ -34,16 +34,13 @@ public partial class CourierHubDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
         optionsBuilder.UseSqlServer(connection);
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Address>(entity =>
-        {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<Address>(entity => {
             entity.ToTable("Address");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -63,8 +60,7 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.Street).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<ClientData>(entity =>
-        {
+        modelBuilder.Entity<ClientData>(entity => {
             entity.HasKey(e => e.Id).HasName("PK_Client_data");
 
             entity.ToTable("Client_data");
@@ -95,8 +91,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasConstraintName("FK_Client_data_User");
         });
 
-        modelBuilder.Entity<Evaluation>(entity =>
-        {
+        modelBuilder.Entity<Evaluation>(entity => {
             entity.ToTable("Evaluation");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -112,8 +107,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasConstraintName("FK_Evaluation_User");
         });
 
-        modelBuilder.Entity<Inquire>(entity =>
-        {
+        modelBuilder.Entity<Inquire>(entity => {
             entity.ToTable("Inquire");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -143,8 +137,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasConstraintName("FK_Inquire_User");
         });
 
-        modelBuilder.Entity<Order>(entity =>
-        {
+        modelBuilder.Entity<Order>(entity => {
             entity.ToTable("Order");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -207,8 +200,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasConstraintName("FK_Order_Status");
         });
 
-        modelBuilder.Entity<Parcel>(entity =>
-        {
+        modelBuilder.Entity<Parcel>(entity => {
             entity.ToTable("Parcel");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -229,8 +221,7 @@ public partial class CourierHubDbContext : DbContext
                 .HasConstraintName("FK_Parcel_User");
         });
 
-        modelBuilder.Entity<Review>(entity =>
-        {
+        modelBuilder.Entity<Review>(entity => {
             entity.ToTable("Review");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -238,8 +229,7 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.Description).HasColumnType("ntext");
         });
 
-        modelBuilder.Entity<Rule>(entity =>
-        {
+        modelBuilder.Entity<Rule>(entity => {
             entity.ToTable("Rule");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -250,8 +240,7 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.WidthMax).HasColumnName("Width_max");
         });
 
-        modelBuilder.Entity<Scaler>(entity =>
-        {
+        modelBuilder.Entity<Scaler>(entity => {
             entity.ToTable("Scaler");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -268,8 +257,7 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.Width).HasColumnType("money");
         });
 
-        modelBuilder.Entity<Service>(entity =>
-        {
+        modelBuilder.Entity<Service>(entity => {
             entity.ToTable("Service");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
@@ -280,16 +268,14 @@ public partial class CourierHubDbContext : DbContext
             entity.Property(e => e.Statute).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<Status>(entity =>
-        {
+        modelBuilder.Entity<Status>(entity => {
             entity.ToTable("Status");
 
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<User>(entity =>
-        {
+        modelBuilder.Entity<User>(entity => {
             entity.HasKey(e => e.Id).HasName("PK_User");
 
             entity.ToTable("User");

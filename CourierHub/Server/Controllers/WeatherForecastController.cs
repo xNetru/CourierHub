@@ -1,7 +1,6 @@
-using CourierHub.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CourierHub.Server.Controllers {
+namespace CourierHub.Shared.Controllers {
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase {

@@ -2,6 +2,8 @@
 
 @using CourierHub.Shared.Models
 @using Client = CourierHub.Shared.Models.Client;
+@using System.Text.Json;
+@using System.Text;
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -157,7 +159,7 @@
 
     private async void HandleValidSubmit(EditContext context)
     {
-        var x = await Http.PostAsJsonAsync(new Uri($"{Http.BaseAddress}Client"), NewClient);
+        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
         Console.WriteLine(x.StatusCode + " STATUS");
         Console.WriteLine($"{Http.BaseAddress}Client");
         if (x.IsSuccessStatusCode)
