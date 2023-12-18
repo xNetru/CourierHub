@@ -18,11 +18,12 @@ namespace CourierHub.Shared.ApiModels {
         [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Nazwisko musi się zaczynać od duzej litery")]
         public string ClientSurname { get; set; } = null!;
 
-        [Phone]
+        [Phone(ErrorMessage = "Błędny format numeru telefonu")]
         public string ClientPhone { get; set; } = null!;
 
         public string ClientCompany { get; set; } = null!;
 
+        [ValidateComplexType]
         public ApiAddress ClientAddress { get; set; } = null!;
     }
 }
