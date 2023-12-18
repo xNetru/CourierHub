@@ -1,12 +1,17 @@
 ﻿@page "/inquireForm"
 
 @using CourierHub.Shared.Models
+@using CourierHub.Shared.Data
 @using CourierHub.Shared.Enums
 @using CourierHub.Shared.ApiModels
+@using System.Text.Json;
+@using System.Text;
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
+@inject ApiContainer Api
+@inject InquireContainer UserInquires
 
 <div class="container">
 
@@ -198,16 +203,59 @@
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
 
-    private void HandleValidSubmit(EditContext context)
+    private async void HandleValidSubmit(EditContext context)
     {
-        displayInquireSent = true;
-        isButtonDisabled = true;
-
         NewInquire.Datetime = DateTime.Today;
 
-        // TODO: api communication
+        Address SA = new Address {
+            City = NewInquire.Source.City,
+            Street = NewInquire.Source.Street,
+            Number = NewInquire.Source.Number,
+            Flat = NewInquire.Source.Flat,
+            PostalCode = NewInquire.Source.PostalCode
+        };
 
-        NavigationManager.NavigateTo("/offerList");
+        Address DA = new Address {
+            City = NewInquire.Destination.City,
+            Street = NewInquire.Destination.Street,
+            Number = NewInquire.Destination.Number,
+            Flat = NewInquire.Destination.Flat,
+            PostalCode = NewInquire.Destination.PostalCode
+        };
+
+        Inquire MyInquire = new Inquire {
+            Depth = NewInquire.Depth,
+            Width = NewInquire.Width,
+            Length = NewInquire.Length,
+            Mass = NewInquire.Mass,
+            SourceDate = NewInquire.SourceDate,
+            DestinationDate = NewInquire.DestinationDate,
+            Datetime = NewInquire.Datetime,
+            IsCompany = NewInquire.IsCompany,
+            IsWeekend = NewInquire.IsWeekend,
+            Priority = NewInquire.Priority,
+            Destination = DA,
+            Source = SA,
+            Code = ""
+        };
+
+        UserInquires.Inquires.Add(NewInquire);
+
+        foreach(var api in Api.WebApis)
+        {
+            var res = await api.PostInquireGetOffer(NewInquire);
+            Console.WriteLine(res.Item2);
+        }
+
+        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Inquire", MyInquire);
+        Console.WriteLine(x.StatusCode + " STATUS");
+
+        if (x.IsSuccessStatusCode)
+        {
+            displayInquireSent = true;
+            isButtonDisabled = true;
+            NavigationManager.NavigateTo("/offerList");
+        }
     }
 
     private void HandleInvalidSubmit(EditContext context)

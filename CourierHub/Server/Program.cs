@@ -1,6 +1,8 @@
 using CourierHub.Server.Data;
 using CourierHub.Shared.Abstractions;
+using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierHub {

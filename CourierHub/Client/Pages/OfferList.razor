@@ -3,6 +3,7 @@
 @using CourierHub.Shared.ApiModels
 
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider Provider
 
 <h1>Lista dostępnych ofert</h1>
 
@@ -29,13 +30,21 @@
 </div>
 
 @code {
+    // TODO: from inquireForm
     private ApiOffer Offer = new ApiOffer
         {
             ExpirationDate = new DateTime()
         };
 
-    private void Submit()
+    private async void Submit()
     {
-        NavigationManager.NavigateTo("/offerSubmitForm");
+        var context = await Provider.GetAuthenticationStateAsync();
+        var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
+        string mail = "";
+        if (email != null)
+        {
+            mail = email.Value;
+        }
+        NavigationManager.NavigateTo($"/offerSubmitForm/{mail}");
     }
 }
