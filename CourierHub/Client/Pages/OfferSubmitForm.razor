@@ -4,12 +4,16 @@
 @using Client = CourierHub.Shared.Models.Client;
 @using System.Text.Json;
 @using System.Text;
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
 
 <div class="container">
+    <h1>Dane osobowe</h1>
+    <hr />
     <EditForm Model="NewOrder" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
         <h2>Dane podstawowe</h2>
         <div class="row">
@@ -55,13 +59,213 @@
                 </div>
             </div>
         </div>
+
+        <hr/>
+        <h2>Adres zamieszkania</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="CA_Street" @bind-value="@NewOrder.ClientAddress.Street" placeholder="podaj ulicę..."/>
+                        <ValidationMessage For="@(()=>NewOrder.ClientAddress.Street)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="CA_Number" @bind-value="@NewOrder.ClientAddress.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientAddress.Number)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="CA_Flat" @bind-value="@NewOrder.ClientAddress.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientAddress.Flat)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="CA_PostalCode" @bind-value="@NewOrder.ClientAddress.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientAddress.PostalCode)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+    <hr />
+
+    <div style="margin-bottom: 50px;"></div>
+    <h1>Podsumowanie zamówienia</h1>
+    <hr />
+
+    <EditForm Model="Offer">
+        <h2>Oferta</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="OfferProvider" class="col-form-label">Serwis kurierski</label>
+                        <input type="text" class="form-control" id="OfferProvider" @bind-value="@Service" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Price" class="col-form-label">Cena</label>
+                        <input type="number" class="form-control" id="Price" @bind-value="@Offer.Price" disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+
+    <EditForm Model="Inquire">
+        <hr />
+        <h2>Wymiary paczki</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Width" class="col-form-label">Szerokość</label>
+                        <input type="text" class="form-control" id="Width" @bind-value="@Inquire.Width" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Length" class="col-form-label">Wysokość</label>
+                        <input type="text" class="form-control" id="Length" @bind-value="@Inquire.Length" disabled="true" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Depth" class="col-form-label">Głębokość</label>
+                        <input type="text" class="form-control" id="Depth" @bind-value="@Inquire.Depth" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Mass" class="col-form-label">Masa</label>
+                        <input type="text" class="form-control" id="Mass" @bind-value="@Inquire.Mass" disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Okres wysyłki </h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="SourceDate">Data wysyłki</label>
+                        <input type="date" class="form-control" id="src" @bind-value="@Inquire.SourceDate" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="DestinationDate">Data dostawy</label>
+                        <input type="date" class="form-control" id="destDate" @bind-value="@Inquire.DestinationDate" disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Właściwości przesyłki </h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-4">
+                        <InputCheckbox @bind-Value="Inquire.IsWeekend" disabled="true"/> Możliwość dostawy w weekend
+                    </div>
+
+                    <div class="col-md-4">
+                        <InputCheckbox @bind-Value="Inquire.IsCompany" disabled="true"/> Wysyłka jako pracownik firmy
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Priorytet paczki: @((PriorityTypePL)Inquire.Priority)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Adres wysyłki</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="SA_Street" @bind-value="@Inquire.Source.Street" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="SA_Number" @bind-value="@Inquire.Source.Number" disabled="true" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="SA_Flat" @bind-value="@Inquire.Source.Flat" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="SA_PostalCode" @bind-value="@Inquire.Source.PostalCode" disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Adres docelowy</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="DA_Street" @bind-value="@Inquire.Destination.Street" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="DA_Number" @bind-value="@Inquire.Destination.Number" disabled="true" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="DA_Flat" @bind-value="@Inquire.Destination.Flat" disabled="true" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="DA_PostalCode" @bind-value="@Inquire.Destination.PostalCode" disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </EditForm>
 </div>
 
 @code{
-    private Order NewOrder = new Order {
-            ClientAddress = new Address()
+    private ApiOrder NewOrder = new ApiOrder {
+            ClientAddress = new ApiAddress()
     };
+    // TODO: from offerList
+    private ApiOffer Offer = new ApiOffer {
+        ExpirationDate = new DateTime()
+    };
+    // TODO: from inquireForm
+    private ApiInquire Inquire = new ApiInquire {
+        Source = new ApiAddress(),
+        Destination = new ApiAddress(),
+        Priority = 0
+    };
+    // TODO: from offerList
+    private string Service = "Kurieroinator";
 
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;

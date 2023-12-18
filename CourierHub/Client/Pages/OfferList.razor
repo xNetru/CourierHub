@@ -2,6 +2,8 @@
 
 @using CourierHub.Shared.ApiModels
 
+@inject NavigationManager NavigationManager
+
 <h1>Lista dostępnych ofert</h1>
 
 <div class="container">
@@ -20,15 +22,20 @@
             </div>
 
             <div class="col-md-4">
-                <button type="submit" Style="margin-top:10px">Wybierz</button>
+                <button class="btn btn-primary" @onclick="Submit">Wybierz</button>
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    ApiOffer Offer = new ApiOffer
+    private ApiOffer Offer = new ApiOffer
         {
             ExpirationDate = new DateTime()
         };
+
+    private void Submit()
+    {
+        NavigationManager.NavigateTo("/offerSubmitForm");
+    }
 }
