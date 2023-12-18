@@ -2,6 +2,7 @@
 
 @using CourierHub.Shared.Models
 @using CourierHub.Shared.Enums
+@using CourierHub.Shared.ApiModels
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -173,10 +174,10 @@
 </div>
 
 @code {
-    private Inquire NewInquire = new Inquire
+    private ApiInquire NewInquire = new ApiInquire
     {
-        Source = new Address(),
-        Destination = new Address()
+        Source = new ApiAddress(),
+        Destination = new ApiAddress()
     };
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
@@ -187,6 +188,7 @@
         isButtonDisabled = true;
 
         NewInquire.Datetime = DateTime.Today;
+
     }
 
     private void HandleInvalidSubmit(EditContext context)
