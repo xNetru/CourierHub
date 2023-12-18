@@ -9,21 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 617ad29b7bf85550604dda58be4ccf9a5f4f6de1
     <PackageReference Include="Elasticsearch.Net" Version="7.17.5" />
     <PackageReference Include="ErrorOr" Version="1.3.0" />
     <PackageReference Include="FluentValidation" Version="11.8.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-<<<<<<< HEAD
-=======
     <PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
->>>>>>> 28296336b69f8456147901bf8b138a44ba40ba84
-=======
-    <PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
->>>>>>> 617ad29b7bf85550604dda58be4ccf9a5f4f6de1
+
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

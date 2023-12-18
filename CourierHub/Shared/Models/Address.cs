@@ -1,22 +1,7 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CourierHub.Shared.Models;
-=======
-﻿namespace CourierHub.Shared.Models;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
->>>>>>> 28296336b69f8456147901bf8b138a44ba40ba84
-=======
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CourierHub.Shared.Models;
-
->>>>>>> 617ad29b7bf85550604dda58be4ccf9a5f4f6de1
-
 public partial class Address {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
