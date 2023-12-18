@@ -41,13 +41,11 @@ public class AzureStorage : ICloudStorage {
         BlobClient blobClient = new BlobContainerClient(new Uri(_azure + container + _sas)).GetBlobClient(path + (gzip ? ".gz" : ""));
         using var ms = new MemoryStream();
         if (gzip) {
-            if (!await CheckBlob(path + ".gz", container)) {
-                using var compressor = new GZipStream(ms, CompressionMode.Compress);
-                await compressor.WriteAsync(Encoding.UTF8.GetBytes(blob));
-                await compressor.FlushAsync();
-                ms.Position = 0;
-                await blobClient.UploadAsync(ms);
-            }
+            using var compressor = new GZipStream(ms, CompressionMode.Compress);
+            await compressor.WriteAsync(Encoding.UTF8.GetBytes(blob));
+            await compressor.FlushAsync();
+            ms.Position = 0;
+            await blobClient.UploadAsync(ms, true);
         } else {
             await blobClient.UploadAsync(new BinaryData(blob), true);
         }
