@@ -1,0 +1,34 @@
+﻿@page "/offerList"
+
+@using CourierHub.Shared.ApiModels
+
+<h1>Lista dostępnych ofert</h1>
+
+<div class="container">
+    <h3>Kurieroinator</h3>
+
+    <div class="col-md-12">
+        <div class="row" style="margin-top:10px">
+            <div class="col-md-4">
+                <label class="col-form-label">Cena</label>
+                <p>@Offer.Price</p>
+            </div>
+
+            <div class="col-md-4">
+                <label class="col-form-label">Data ważności oferty</label>
+                <p>@Offer.ExpirationDate.ToString("dd-MM-yyyy")</p>
+            </div>
+
+            <div class="col-md-4">
+                <button type="submit" Style="margin-top:10px">Wybierz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    ApiOffer Offer = new ApiOffer
+        {
+            ExpirationDate = new DateTime()
+        };
+}
