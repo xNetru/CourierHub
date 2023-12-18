@@ -45,13 +45,11 @@ namespace CourierHub.Shared.Controllers {
         [HttpPut("{code}")]
         public async Task<ActionResult> Put(string code, [FromBody] Order? order) {
             if (order == null) { return BadRequest(); }
-            var entities = await _context.Orders.Where(e => e.Inquire.Code == code).ToListAsync();
-            if (entities.IsNullOrEmpty()) {
+            var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (entity == null) {
                 await _context.Orders.AddAsync(order);
             } else {
-                for (int i = 0; i < entities.Count; i++) {
-                    entities[i] = order;
-                }
+                entity = order;
             }
             await _context.SaveChangesAsync();
             return Ok();
@@ -61,12 +59,10 @@ namespace CourierHub.Shared.Controllers {
         [HttpPatch("{code}/status")]
         public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
             if (statusType == null) { return BadRequest(); }
-            var orders = await _context.Orders.Where(e => e.Inquire.Code == code).ToListAsync();
-            if (orders.IsNullOrEmpty()) { return NotFound(); }
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
             var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == (int)statusType);
-            for (int i = 0; i < orders.Count; i++) {
-                orders[i].Status = status;
-            }
+            order.Status = status;
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -75,11 +71,9 @@ namespace CourierHub.Shared.Controllers {
         [HttpPatch("{code}/evaluation")]
         public async Task<ActionResult> PatchEvaluation(string code, [FromBody] Evaluation? evaluation) {
             if (evaluation == null) { return BadRequest(); }
-            var orders = await _context.Orders.Where(e => e.Inquire.Code == code).ToListAsync();
-            if (orders.IsNullOrEmpty()) { return NotFound(); }
-            for (int i = 0; i < orders.Count; i++) {
-                orders[i].Evaluation = evaluation;
-            }
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
+            order.Evaluation = evaluation;
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -88,11 +82,9 @@ namespace CourierHub.Shared.Controllers {
         [HttpPatch("{code}/review")]
         public async Task<ActionResult> PatchReview(string code, [FromBody] Review? review) {
             if (review == null) { return BadRequest(); }
-            var orders = await _context.Orders.Where(e => e.Inquire.Code == code).ToListAsync();
-            if (orders.IsNullOrEmpty()) { return NotFound(); }
-            for (int i = 0; i < orders.Count; i++) {
-                orders[i].Review = review;
-            }
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
+            order.Review = review;
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -101,13 +93,11 @@ namespace CourierHub.Shared.Controllers {
         [HttpPatch("{code}/parcel")]
         public async Task<ActionResult> PatchParcel(string code, [FromBody] Parcel? parcel) {
             if (parcel == null) { return BadRequest(); }
-            var orders = await _context.Orders.Where(e => e.Inquire.Code == code).ToListAsync();
-            if (orders.IsNullOrEmpty()) { return NotFound(); }
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
             var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == (int)StatusType.PickedUp);
-            for (int i = 0; i < orders.Count; i++) {
-                orders[i].Status = status;
-                orders[i].Parcel = parcel;
-            }
+            order.Status = status;
+            order.Parcel = parcel;
             await _context.SaveChangesAsync();
             return Ok();
         }
