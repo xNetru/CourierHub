@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
-@using CourierHub.Shared
-
-@using SM = CourierHub.Shared.Models;
+@using CourierHub.Shared.Models
+@using System.Security.Claims
+@using CourierHub.Shared.Enums;
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
@@ -11,22 +11,17 @@
     <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
         <div class="top-row px-4">
-            <AuthorizeView>
-                <NotAuthorized>
-                    <a class="nav-link btn btn-link" href="authentication/login">Log in</a>
-                </NotAuthorized>
+            <AuthorizeView Roles="NotAuthorized">
+                 <NotAuthorized>
+                     <a class="nav-link btn btn-link" href="authentication/login">Log in</a>
+                 </NotAuthorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Client, OfficeWorker, Courier">
                 <Authorized>
                     <a href="authentication/profile">Hello, @context.User.Identity?.Name</a>
                     <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
-                    @if (present != null && present.IsSuccessStatusCode) {
-
-                    } else
-                    {
-                        
-                    }
                 </Authorized>
             </AuthorizeView>
         </div>
@@ -43,45 +38,47 @@
     }
 
     private HttpResponseMessage? present;
-    private HttpResponseMessage? added;
-    private bool checkNeeded = true;
+    private bool isLogged = false;
 
-    protected override async Task OnAfterRenderAsync(bool _) {
-        if (!checkNeeded)
-        {
-            return;
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (isLogged) { return; }
+        var state = await Provider.GetAuthenticationStateAsync();
+        SetNotAuthorized(state);
+
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null) { return; }
+
+        present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
+        if (!present.IsSuccessStatusCode) {
+            string username = state.User.Identity!.Name!;
+            string[] credentials = username.Split(" ");
+            // register the user
+            Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
+            // we need to verify that user has indeed registred himself, if not he cannot stay "logged", but I don't know how
+            //present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
+            //if(!present.IsSuccessStatusCode) {
+            //    BeginLogOut();
+            //}
+        } else {
+            isLogged = true;
         }
-        Console.WriteLine("IM HERE 0");
-        var context = await Provider.GetAuthenticationStateAsync();
-        if (context != null) {
-            Console.WriteLine("IM HERE 1");
-            var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
-            if (email != null) {
-                var image = context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
-                Console.WriteLine("IMAGE: " + image);
-                checkNeeded = false;
-                Console.WriteLine("IM HERE 2");
-                Console.WriteLine($"{Http.BaseAddress}User/{email.Value}");
-                present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
-                if (present.IsSuccessStatusCode) {
-                    Console.WriteLine("IM HERE 3");
-                } else {
-                    string username = context.User.Identity!.Name!;
-                    string[] credentials = username.Split(" ");
-                    Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
-                    // THIS SHOULD BE DELETED, RIGHT?
-                    //var client = new SM.Client {
-                    //    Id = 0,
-                    //    Email = email.Value,
-                    //    Name = credentials[0],
-                    //    Surname = credentials[1]
-                    //};
-                    //if ((await Http.PostAsJsonAsync("User", client)).IsSuccessStatusCode) {
-                    //    Console.WriteLine("IM HERE 4");
-                    //};
-                    Console.WriteLine("IM HERE 5");
-                }
-            }
-        }  
     }
+
+    private void SetNotAuthorized(AuthenticationState state) {
+        var claim = new Claim(ClaimTypes.Role, "NotAuthorized");
+        var identity = new ClaimsIdentity(new List<Claim> { claim }, "Roles");
+        state.User.AddIdentity(identity);
+    }
+
+    private async Task SetRole(AuthenticationState state) {
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null) { return; }
+        var user = await Http.GetFromJsonAsync<User?>(new Uri($"{Http.BaseAddress}User?email={email.Value}"));
+        if (user == null) { return; }
+        var type = (UserType)Enum.Parse(typeof(UserType), user.Type.ToString());
+        var claim = new Claim(ClaimTypes.Role, type.ToString());
+        var identity = new ClaimsIdentity(new List<Claim> { claim }, "Roles");
+        state.User.AddIdentity(identity);
+    }
+
 }
