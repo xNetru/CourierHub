@@ -2,6 +2,7 @@
 @using CourierHub.Shared.Models
 @using System.Security.Claims
 @using CourierHub.Shared.Enums;
+@using System.Web
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
@@ -14,15 +15,16 @@
     <main>
         <div class="top-row px-4">
             <AuthorizeView Roles="NotAuthorized">
-                 <NotAuthorized>
-                     <a class="nav-link btn btn-link" href="authentication/login">Log in</a>
-                 </NotAuthorized>
-            </AuthorizeView>
-            <AuthorizeView Roles="Client, OfficeWorker, Courier">
+                <NotAuthorized>
+                    <a class="nav-link btn btn-link" href="authentication/login">Log in</a>
+                </NotAuthorized>
                 <Authorized>
-                    <a href="authentication/profile">Hello, @context.User.Identity?.Name</a>
                     <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
                 </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Client, OfficeWorker, Courier">
+                <a href="authentication/profile">Hello, @context.User.Identity?.Name</a>
+                <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
             </AuthorizeView>
         </div>
 
@@ -38,47 +40,53 @@
     }
 
     private HttpResponseMessage? present;
-    private bool isLogged = false;
+    private bool isChecked = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
-        if (isLogged) { return; }
+        if (isChecked) { return; }
+
         var state = await Provider.GetAuthenticationStateAsync();
-        SetNotAuthorized(state);
+        SetRole(state.User, "NotAuthorized");
 
         var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
         if (email == null) { return; }
+        isChecked = true;
+
+        if (state.User.IsInRole("NotAuthorized")) {
+            Console.WriteLine("NOT AUTHORIZED");
+        } else {
+            foreach (var claim in state.User.Claims) {
+                Console.WriteLine(claim.Value);
+            }
+        }
 
         present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
         if (!present.IsSuccessStatusCode) {
             string username = state.User.Identity!.Name!;
             string[] credentials = username.Split(" ");
-            // register the user
             Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
-            // we need to verify that user has indeed registred himself, if not he cannot stay "logged", but I don't know how
-            //present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
-            //if(!present.IsSuccessStatusCode) {
-            //    BeginLogOut();
-            //}
         } else {
-            isLogged = true;
+            // set role
+            var userDB = await Http.GetFromJsonAsync<Client?>(new Uri($"{Http.BaseAddress}User?email={email.Value}"));
+            if (userDB == null) { return; }
+            string role = ((UserType)Enum.Parse(typeof(UserType), userDB.Type.ToString())).ToString();
+            SetRole(state.User, role);
+            if (state.User.IsInRole("Client")) {
+                Console.WriteLine("CLIENT!!!");
+            } else {
+                foreach (var claim in state.User.Claims) {
+                    Console.WriteLine(claim.Value);
+                }
+            }
         }
     }
 
-    private void SetNotAuthorized(AuthenticationState state) {
-        var claim = new Claim(ClaimTypes.Role, "NotAuthorized");
-        var identity = new ClaimsIdentity(new List<Claim> { claim }, "Roles");
-        state.User.AddIdentity(identity);
+    private void SetRole(ClaimsPrincipal user, string roleName) {
+        var indentity = user.Identities.FirstOrDefault();
+        if (indentity == null) {
+            user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Role, roleName) }, "Roles"));
+        } else {
+            indentity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+        }
     }
-
-    private async Task SetRole(AuthenticationState state) {
-        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
-        if (email == null) { return; }
-        var user = await Http.GetFromJsonAsync<User?>(new Uri($"{Http.BaseAddress}User?email={email.Value}"));
-        if (user == null) { return; }
-        var type = (UserType)Enum.Parse(typeof(UserType), user.Type.ToString());
-        var claim = new Claim(ClaimTypes.Role, type.ToString());
-        var identity = new ClaimsIdentity(new List<Claim> { claim }, "Roles");
-        state.User.AddIdentity(identity);
-    }
-
 }

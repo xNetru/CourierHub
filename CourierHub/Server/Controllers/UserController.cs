@@ -22,7 +22,7 @@ namespace CourierHub.Shared.Controllers {
             return NotFound();
         }
 
-        // GET: <UserController>?id=123&email=email@gmail.com
+        // GET: <UserController>/User?id=123&email=email@gmail.com
         [HttpGet]
         public async Task<ActionResult<User?>> Get(
             [FromQuery(Name = "email")] string? email,

@@ -39,7 +39,7 @@ namespace CourierHub.Shared.Controllers {
 
             var data = await _context.ClientDatum.FirstOrDefaultAsync(d => d.ClientId == client.Id);
             if (data == null) { return NotFound(null); }
-            return Ok(new Shared.Models.Client() { Data = data });
+            return Ok(new Models.Client() { Data = data });
         }
 
         // POST <ClientController>/{...}
