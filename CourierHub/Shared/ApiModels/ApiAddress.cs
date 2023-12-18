@@ -15,6 +15,7 @@ namespace CourierHub.Shared.ApiModels {
         [RegularExpression(@"^\d{2}-\d{3}$", ErrorMessage = "Kod pocztowy musi być postaci XX-XXX")]
         public string PostalCode { get; set; } = null!;
 
+        [Required(ErrorMessage = "Miasto jest wymagane")]
         public string City { get; set; } = null!;
     }
 }
