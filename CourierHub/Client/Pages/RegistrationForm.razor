@@ -65,6 +65,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="CA_City" @bind-value="@NewClient.Data.Address.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewClient.Data.Address.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Ulica</label>
                         <input type="text" class="form-control" id="CA_Street" @bind-value="@NewClient.Data.Address.Street" placeholder="podaj ulicę..." />
@@ -99,6 +107,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="SA_City" @bind-value="@NewClient.Data.SourceAddress.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewClient.Data.SourceAddress.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Ulica</label>
                         <input type="text" class="form-control" id="SA_Street" @bind-value="@NewClient.Data.SourceAddress.Street" placeholder="podaj ulicę..." />
@@ -127,11 +143,12 @@
                 </div>
             </div>
         </div>
+        <hr />
 
         @if (displayUserAddedToDB)
         {
             <div class="row bg-success text-white" style="margin-top:10px; height:40px">
-                <label class="p-2">User added to database... </label>
+                <label class="p-2">Zostałeś zarejestrowany </label>
             </div>
         }
 
