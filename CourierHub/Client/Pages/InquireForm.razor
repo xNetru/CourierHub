@@ -198,46 +198,17 @@
     private ApiInquire NewInquire = new ApiInquire
     {
         Source = new ApiAddress(),
-        Destination = new ApiAddress()
+        Destination = new ApiAddress(),
+        Code = "" // from API
     };
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
 
     private async void HandleValidSubmit(EditContext context)
     {
+        var state = await Provider.GetAuthenticationStateAsync();
+
         NewInquire.Datetime = DateTime.Today;
-
-        Address SA = new Address {
-            City = NewInquire.Source.City,
-            Street = NewInquire.Source.Street,
-            Number = NewInquire.Source.Number,
-            Flat = NewInquire.Source.Flat,
-            PostalCode = NewInquire.Source.PostalCode
-        };
-
-        Address DA = new Address {
-            City = NewInquire.Destination.City,
-            Street = NewInquire.Destination.Street,
-            Number = NewInquire.Destination.Number,
-            Flat = NewInquire.Destination.Flat,
-            PostalCode = NewInquire.Destination.PostalCode
-        };
-
-        Inquire MyInquire = new Inquire {
-            Depth = NewInquire.Depth,
-            Width = NewInquire.Width,
-            Length = NewInquire.Length,
-            Mass = NewInquire.Mass,
-            SourceDate = NewInquire.SourceDate,
-            DestinationDate = NewInquire.DestinationDate,
-            Datetime = NewInquire.Datetime,
-            IsCompany = NewInquire.IsCompany,
-            IsWeekend = NewInquire.IsWeekend,
-            Priority = NewInquire.Priority,
-            Destination = DA,
-            Source = SA,
-            Code = ""
-        };
 
         UserInquires.Inquires.Add(NewInquire);
 
@@ -247,7 +218,14 @@
             Console.WriteLine(res.Item2);
         }
 
-        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Inquire", MyInquire);
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null)
+        {
+            Console.WriteLine("NO MAIL");
+            NavigationManager.NavigateTo("");
+        }
+
+        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Inquire/{email?.Value}", NewInquire);
         Console.WriteLine(x.StatusCode + " STATUS");
 
         if (x.IsSuccessStatusCode)
