@@ -2,6 +2,9 @@
 
 @using CourierHub.Shared.ApiModels
 @using CourierHub.Shared.Enums
+@using CourierHub.Shared.Data
+
+@inject OrderContainer Container
 
 <h1>Przegląd oferty</h1>
 
@@ -245,15 +248,28 @@
                 </div>
             </div>
 
+            @if (displayOfferAccepted)
+            {
+                <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+                    <label class="p-2">Oferta zaakceptowana</label>
+                </div>
+            }
+            @if (displayOfferDenied)
+            {
+                <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+                    <label class="p-2">Oferta odrzucona</label>
+                </div>
+            }
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group row" style="margin-top:10px">
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-info" Style="margin-top:10px">Zaakceptuj ofertę</button>
+                            <button type="submit" class="btn btn-info" Style="margin-top:10px" @onclick="Accept" disabled="@buttonDisabled">Zaakceptuj ofertę</button>
                         </div>
 
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-info" Style="margin-top:10px">Odrzuć ofertę</button>
+                            <button type="submit" class="btn btn-info" Style="margin-top:10px" @onclick="Deny" disabled="@buttonDisabled">Odrzuć ofertę</button>
                         </div>
                     </div>
                 </div>
@@ -263,9 +279,7 @@
     </EditForm>
 </div>
 
-
 @code {
-    // TODO: from officeWorkerOrders
     ApiOrder Order = new ApiOrder
         {
             Price = 10,
@@ -283,6 +297,8 @@
                 PostalCode = "00-000"
             }
         };
+    // Need to load Inquire for given Offer
+    // GET Inquire by Code???
     ApiInquire Inquire = new ApiInquire
         {
             Width = 10,
@@ -307,4 +323,26 @@
                 PostalCode = "00-000"
             }
         };
+
+    private bool displayOfferAccepted = false;
+    private bool displayOfferDenied = false;
+    private bool buttonDisabled = false;
+
+    protected override void OnInitialized()
+    {
+        Order = Container.Inquires.Last();
+        // TODO: load Inquire
+    }
+
+    private void Accept()
+    {
+        buttonDisabled = true;
+        displayOfferAccepted = true;
+    }
+
+    private void Deny()
+    {
+        buttonDisabled = true;
+        displayOfferDenied = true;
+    }
 }

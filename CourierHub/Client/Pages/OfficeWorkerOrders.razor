@@ -1,10 +1,12 @@
 ﻿@page "/OfficeWorker/Orders"
 
 @using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Data
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
+@inject OrderContainer Container
 
 <h1>Historia zapytań</h1>
 
@@ -44,14 +46,12 @@
     </table>
 </div>
 
-
-
 @code {
     private IEnumerable<ApiOrder> Orders = new List<ApiOrder>
     {
         new ApiOrder
         {
-            Price = 10,
+            Price = 2137,
             ClientEmail = "bsjkj",
             ClientName = "Skam",
             ClientSurname = "Skam",
@@ -64,12 +64,15 @@
                 Number="1",
                 Flat="1",
                 PostalCode="00-000"
-            }
+            },
+            Code = "MjAyMzEyMTgxOTUwMzg2NDE="
         }
     };
 
     private void Choose(ApiOrder item)
     {
+        Container.Inquires.Clear();
+        Container.Inquires.Add(item);
         NavigationManager.NavigateTo("/OfficeWorker/Orders/Review");
     }
 

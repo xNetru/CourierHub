@@ -24,8 +24,13 @@ namespace CourierHub.Client {
             services.AddSingleton(provider => {
                 return new ApiContainer(new CourierHubApi(), new SzymoHubApi(), new WeraHubApi());
             });
+
             services.AddSingleton(provider => {
                 return new InquireContainer();
+            });
+
+            services.AddSingleton(provider => {
+                return new OrderContainer();
             });
 
             await builder.Build().RunAsync();
