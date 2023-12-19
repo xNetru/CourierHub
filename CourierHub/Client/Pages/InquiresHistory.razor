@@ -2,6 +2,9 @@
 
 @using CourierHub.Shared.ApiModels
 
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
 <h1>Historia zapytań</h1>
 
 <div style="height:600px;overflow-y:scroll;width:1200px;overflow-x:scroll">
@@ -56,7 +59,7 @@
  
 
 @code {
-    private List<ApiInquire> Inquires = new List<ApiInquire>
+    private IEnumerable<ApiInquire> Inquires = new List<ApiInquire>
     {
         new ApiInquire
         {
@@ -105,4 +108,33 @@
             }
         }
     };
+
+    protected async override Task OnInitializedAsync() {
+        var context = await Provider.GetAuthenticationStateAsync();
+        var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
+        string mail = "";
+        if (email != null) {
+            mail = email.Value;
+        }
+        else {
+            Console.WriteLine("BAD MAIL");
+            return;
+        }
+
+        var x = await Http.GetAsync($"{Http.BaseAddress}Client/{mail}/inquires/30");
+        Console.WriteLine(x.StatusCode + " GET USER INQUIRES STATUS");
+
+        if (x.IsSuccessStatusCode) {
+            var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiInquire>>();
+            if (c != null) {
+                Inquires = c;
+            }
+            else {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else {
+            Console.WriteLine("FAIL");
+        }
+    }
 }
