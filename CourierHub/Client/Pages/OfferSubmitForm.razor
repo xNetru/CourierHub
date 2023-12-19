@@ -304,27 +304,8 @@
 
     private void HandleValidSubmit(EditContext context)
     {
-        // Address A = new Address
-        // {
-        //     City = NewOrder.ClientAddress.City,
-        //     Street = NewOrder.ClientAddress.Street,
-        //     Number = NewOrder.ClientAddress.Number,
-        //     Flat = NewOrder.ClientAddress.Flat,
-        //     PostalCode = NewOrder.ClientAddress.PostalCode
-        // };
-
-        // Order MyOrder = new Order {
-        //     Price = NewOrder.Price,
-        //     ClientEmail=NewOrder.ClientEmail,
-        //     ClientName=NewOrder.ClientName,
-        //     ClientSurname=NewOrder.ClientSurname,
-        //     ClientPhone=NewOrder.ClientPhone,
-        //     ClientCompany=NewOrder.ClientCompany,
-        //     ClientAddress = A
-        // };
-
-        // var api = Api.WebApis.First();
-        // var res = api.PostOrder(NewOrder);
+        var api = Api.WebApis.First(); // our API
+        var res = api.PostOrder(NewOrder);
 
         displayOfferConfirmed = true;
         isButtonDisabled = true;
@@ -339,36 +320,36 @@
     {
         Inquire = UserInquires.Inquires.Last();
 
-        // // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
-        // var x = await Http.GetAsync($"{Http.BaseAddress}Client?email={mail}");
-        // Console.WriteLine(x.StatusCode + " STATUS");
+        // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
+        var x = await Http.GetAsync($"{Http.BaseAddress}Client/{mail}");
+        Console.WriteLine(x.StatusCode + " STATUS");
 
-        // if (x.IsSuccessStatusCode)
-        // {
-        //     var c = await x.Content.ReadFromJsonAsync<Client>();
-        //     if (c != null)
-        //     {
-        //         ApiAddress A = new ApiAddress
-        //             {
-        //                 City = c.Data.Address.City,
-        //                 Street = c.Data.Address.Street,
-        //                 Number = c.Data.Address.Number,
-        //                 Flat = c.Data.Address.Flat,
-        //                 PostalCode = c.Data.Address.PostalCode
-        //             };
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<ApiClient>();
+            if (c != null)
+            {
+                ApiAddress A = new ApiAddress
+                    {
+                        City = c.Address.City,
+                        Street = c.Address.Street,
+                        Number = c.Address.Number,
+                        Flat = c.Address.Flat,
+                        PostalCode = c.Address.PostalCode
+                    };
 
-        //         NewOrder.ClientName = c.Name;
-        //         NewOrder.ClientSurname = c.Name;
-        //         NewOrder.ClientPhone = c.Data.Phone;
-        //         NewOrder.ClientAddress = A;
-        //         NewOrder.ClientCompany = c.Data.Company;
-        //         NewOrder.ClientEmail = mail;
-        //     }
-        // }
-        // else
-        // {
-        //     Console.WriteLine("FAIL");
-        // }
+                NewOrder.ClientName = c.Name;
+                NewOrder.ClientSurname = c.Name;
+                NewOrder.ClientPhone = c.Phone;
+                NewOrder.ClientAddress = A;
+                NewOrder.ClientCompany = c.Company;
+                NewOrder.ClientEmail = mail;
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
     }
 
 }
