@@ -1,9 +1,8 @@
-﻿using CourierHub.Shared.Data;
+﻿using CourierHub.Shared.ApiModels;
+using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
-using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CourierHub.Shared.Controllers {
     [ApiController]
@@ -23,18 +22,12 @@ namespace CourierHub.Shared.Controllers {
             return NotFound();
         }
 
-        // GET: <CourierController>/Courier?id=123&email=email@gmail.com
-        [HttpGet]
-        public async Task<ActionResult<Courier?>> Get(
-            [FromQuery(Name = "email")] string? email,
-            [FromQuery(Name = "id")] int? id) {
-
-            if (id != null) {
-                return Ok((Courier?)await _context.Users.FirstOrDefaultAsync(u => u.Id == id));
-            } else if (!email.IsNullOrEmpty()) {
-                return Ok((Courier?)await _context.Users.FirstOrDefaultAsync(u => u.Email == email));
-            }
-            return NotFound(null);
+        // GET: <CourierController>/email@gmail.com
+        [HttpGet("{email}")]
+        public async Task<ActionResult<ApiCourier?>> Get(string email) {
+            var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Courier);
+            if (user == null) { return NotFound(null); }
+            return Ok((ApiCourier)user);
         }
     }
 }

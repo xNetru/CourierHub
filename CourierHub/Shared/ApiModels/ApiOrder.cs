@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CourierHub.Shared.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace CourierHub.Shared.ApiModels {
-    public class ApiOrder {
-        public int ApiInquire { get; set; }
+namespace CourierHub.Shared.ApiModels;
 
-        public decimal Price { get; set; }
+public class ApiOrder {
+    public string Code { get; set; } = null!;
+
+    public decimal Price { get; set; }
 
         [Required(ErrorMessage = "Email jest wymagany")]
         [EmailAddress(ErrorMessage = "Niepoprawny format maila")]
@@ -21,9 +23,33 @@ namespace CourierHub.Shared.ApiModels {
         [Phone(ErrorMessage = "Błędny format numeru telefonu")]
         public string ClientPhone { get; set; } = null!;
 
-        public string ClientCompany { get; set; } = null!;
+    public string ClientCompany { get; set; } = null!;
 
-        [ValidateComplexType]
-        public ApiAddress ClientAddress { get; set; } = null!;
+    [ValidateComplexType]
+    public ApiAddress ClientAddress { get; set; } = null!;
+
+    public static explicit operator ApiOrder(Order order) {
+        return new ApiOrder {
+            Code = order.Inquire.Code,
+            Price = order.Price,
+            ClientEmail = order.ClientEmail,
+            ClientName = order.ClientName,
+            ClientSurname = order.ClientSurname,
+            ClientPhone = order.ClientPhone,
+            ClientCompany = order.ClientCompany,
+            ClientAddress = (ApiAddress)order.ClientAddress
+        };
+    }
+
+    public static explicit operator Order(ApiOrder order) {
+        return new Order {
+            Price = order.Price,
+            ClientEmail = order.ClientEmail,
+            ClientName = order.ClientName,
+            ClientSurname = order.ClientSurname,
+            ClientPhone = order.ClientPhone,
+            ClientCompany = order.ClientCompany,
+            ClientAddress = (Address)order.ClientAddress
+        };
     }
 }

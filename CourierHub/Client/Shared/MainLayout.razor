@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
-@using CourierHub.Shared
-
-@using SM = CourierHub.Shared.Models;
+@using CourierHub.Shared.ApiModels
+@using System.Security.Claims
+@using CourierHub.Shared.Enums;
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
@@ -11,23 +11,19 @@
     <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
         <div class="top-row px-4">
-            <AuthorizeView>
+            <AuthorizeView Roles="NotAuthorized">
                 <NotAuthorized>
                     <a class="nav-link btn btn-link" href="authentication/login">Log in</a>
                 </NotAuthorized>
                 <Authorized>
-                    <a href="authentication/profile">Hello, @context.User.Identity?.Name</a>
                     <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
-                    @if (present != null && present.IsSuccessStatusCode) {
-
-                    } else
-                    {
-                        
-                    }
                 </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Client, OfficeWorker, Courier">
+                <a href="authentication/profile">Hello, @context.User.Identity?.Name</a>
+                <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
             </AuthorizeView>
         </div>
 
@@ -43,45 +39,52 @@
     }
 
     private HttpResponseMessage? present;
-    private HttpResponseMessage? added;
-    private bool checkNeeded = true;
+    private bool isChecked = false;
 
-    protected override async Task OnAfterRenderAsync(bool _) {
-        if (!checkNeeded)
-        {
-            return;
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (isChecked) { return; }
+
+        var state = await Provider.GetAuthenticationStateAsync();
+        SetRole(state.User, "NotAuthorized");
+
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null) { return; }
+        isChecked = true;
+
+        if (state.User.IsInRole("NotAuthorized")) {
+            Console.WriteLine("NOT AUTHORIZED");
+        } else {
+            foreach (var claim in state.User.Claims) {
+                Console.WriteLine(claim.Value);
+            }
         }
-        Console.WriteLine("IM HERE 0");
-        var context = await Provider.GetAuthenticationStateAsync();
-        if (context != null) {
-            Console.WriteLine("IM HERE 1");
-            var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
-            if (email != null) {
-                var image = context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
-                Console.WriteLine("IMAGE: " + image);
-                checkNeeded = false;
-                Console.WriteLine("IM HERE 2");
-                Console.WriteLine($"{Http.BaseAddress}User/{email.Value}");
-                present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
-                if (present.IsSuccessStatusCode) {
-                    Console.WriteLine("IM HERE 3");
-                } else {
-                    string username = context.User.Identity!.Name!;
-                    string[] credentials = username.Split(" ");
-                    Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
-                    // THIS SHOULD BE DELETED, RIGHT?
-                    //var client = new SM.Client {
-                    //    Id = 0,
-                    //    Email = email.Value,
-                    //    Name = credentials[0],
-                    //    Surname = credentials[1]
-                    //};
-                    //if ((await Http.PostAsJsonAsync("User", client)).IsSuccessStatusCode) {
-                    //    Console.WriteLine("IM HERE 4");
-                    //};
-                    Console.WriteLine("IM HERE 5");
+
+        present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
+        if (!present.IsSuccessStatusCode) {
+            string username = state.User.Identity!.Name!;
+            string[] credentials = username.Split(" ");
+            Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
+        } else {
+            // set role
+            var type = await Http.GetFromJsonAsync<UserType?>(new Uri($"{Http.BaseAddress}User/{email.Value}"));
+            if (type == null) { return; }
+            SetRole(state.User, type.ToString()!);
+            if (state.User.IsInRole("Client")) {
+                Console.WriteLine("CLIENT!!!");
+            } else {
+                foreach (var claim in state.User.Claims) {
+                    Console.WriteLine(claim.Value);
                 }
             }
-        }  
+        }
+    }
+
+    private void SetRole(ClaimsPrincipal user, string roleName) {
+        var indentity = user.Identities.FirstOrDefault();
+        if (indentity == null) {
+            user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Role, roleName) }, "Roles"));
+        } else {
+            indentity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+        }
     }
 }

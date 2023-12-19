@@ -12,11 +12,13 @@ namespace CourierHubWebApi.Controllers {
     [ApiController]
     public class InquireController : ControllerBase {
         private IInquireService _inquireService;
+        private static readonly string _serviceIdItemsIndex = "ServiceIdIndex";
         public InquireController(IInquireService inquireService) {
             _inquireService = inquireService;
         }
         [HttpPost]
-        public IActionResult CreateInquire(CreateInquireRequest request, [FromServices] IValidator<CreateInquireRequest> validator) {
+        public IActionResult CreateInquire(CreateInquireRequest request,
+            [FromServices] IValidator<CreateInquireRequest> validator) {
             ValidationResult validationResult = validator.Validate(request);
             if (!validationResult.IsValid) {
                 ModelStateDictionary modelStateDictionary = new();
@@ -30,12 +32,28 @@ namespace CourierHubWebApi.Controllers {
                 return ValidationProblem(modelStateDictionary);
             }
 
-            return _inquireService.CreateInquire(request).Result.Match(
-                inquire => CreatedAtAction(
-                    actionName: nameof(CreateInquire),
-                    routeValues: new { id = inquire.Id },
-                    value: new CreateInquireResponse(inquire.Id)),
-                errors => Problem());
+            string? serviceIdItemsIndex = HttpContext.RequestServices.GetRequiredService<IConfiguration>().GetValue<string>(_serviceIdItemsIndex);
+            if (serviceIdItemsIndex != null) {
+                if (HttpContext.Items.TryGetValue(serviceIdItemsIndex, out object? stringServiceId)) {
+                    if (stringServiceId is string s) {
+                        if (int.TryParse(s, out int serviceId)) {
+                            // In case of errors inside _inquireService the information about them is not passed
+                            // TODO: passing errors
+                            return _inquireService.CreateInquire(request, serviceId).Result.Match(
+                                response => CreatedAtAction(
+                                    actionName: nameof(CreateInquire),
+                                    routeValues: new { id = response.Code },
+                                    value: response),
+                                errors => Problem());
+                        }
+                    }
+
+                }
+
+            }
+
+            return Problem();
+
 
         }
     }

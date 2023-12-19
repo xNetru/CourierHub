@@ -1,5 +1,6 @@
 
 using CourierHub.Shared.Data;
+using CourierHubWebApi.Middleware;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
 using CourierHubWebApi.Services.Contracts;
@@ -19,6 +20,9 @@ namespace CourierHubWebApi {
 
             builder.Services.AddControllers();
             builder.Services.AddScoped<IInquireService, InquireService>();
+            builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+            builder.Services.AddScoped<IPriceCacheService, PriceCacheService>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -26,9 +30,6 @@ namespace CourierHubWebApi {
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
 
             builder.Services.AddScoped<IValidator<CreateInquireRequest>, CreateInquireRequestValidator>();
-            // auto validation 
-            //builder.Services.AddFluentValidation();
-            //builder.Services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 
             var app = builder.Build();
 
@@ -42,12 +43,15 @@ namespace CourierHubWebApi {
 
             app.UseHttpsRedirection();
 
+            app.UseApiKeyMiddleware();
+
             app.UseAuthorization();
 
 
             app.MapControllers();
 
             app.Run();
+            Console.WriteLine("Koniec");
         }
     }
 }
