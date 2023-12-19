@@ -37,10 +37,16 @@
                 </div>
 
                 <div class="form-group row" style="margin-top:10px">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <label for="Email" class="col-form-label">Email</label>
                         <input type="text" class="form-control" id="Email" @bind-value="@NewOrder.ClientEmail" placeholder="podaj email..." />
                         <ValidationMessage For="@(()=>NewOrder.ClientEmail)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Phone" class="col-form-label">Numer telefonu</label>
+                        <input type="text" class="form-control" id="Phone" @bind-value="@NewOrder.ClientPhone" placeholder="podaj numer telefonu..." />
+                        <ValidationMessage For="@(()=>NewOrder.ClientPhone)" />
                     </div>
                 </div>
             </div>
@@ -51,13 +57,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group row" style="margin-top:10px">
-                    <div class="col-md-6">
-                        <label for="Phone" class="col-form-label">Numer telefonu</label>
-                        <input type="text" class="form-control" id="Phone" @bind-value="@NewOrder.ClientPhone" placeholder="podaj numer telefonu..." />
-                        <ValidationMessage For="@(()=>NewOrder.ClientPhone)" />
-                    </div>
-
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label for="Company" class="col-form-label">Firma</label>
                         <input type="text" class="form-control" id="Company" @bind-value="@NewOrder.ClientCompany" placeholder="podaj nazwę firmy..." />
                     </div>
@@ -287,12 +287,14 @@
     public string? mail { get; set; }
 
     private ApiOrder NewOrder = new ApiOrder {
-            ClientAddress = new ApiAddress()
+            ClientAddress = new ApiAddress(),
+            Code = "", // from Offer
+            ClientCompany = ""
     };
-    private ApiOffer Offer = new ApiOffer {
+    private ApiOffer Offer = new ApiOffer { // from inquireForm
         ExpirationDate = new DateTime()
     };
-    private ApiInquire Inquire = new ApiInquire {
+    private ApiInquire Inquire = new ApiInquire { // from inquireForm
         Source = new ApiAddress(),
         Destination = new ApiAddress(),
         Priority = 0
@@ -302,13 +304,18 @@
     private bool displayOfferConfirmed = false;
     private bool isButtonDisabled = false;
 
-    private void HandleValidSubmit(EditContext context)
+    private async void HandleValidSubmit(EditContext context)
     {
         var api = Api.WebApis.First(); // our API
         var res = api.PostOrder(NewOrder);
 
-        displayOfferConfirmed = true;
-        isButtonDisabled = true;
+        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Order", NewOrder);
+        Console.WriteLine(x.StatusCode + " STATUS");
+
+        if (x.IsSuccessStatusCode) {
+            displayOfferConfirmed = true;
+            isButtonDisabled = true;
+        }
     }
 
     private void HandleInvalidSubmit(EditContext context)
@@ -320,7 +327,6 @@
     {
         Inquire = UserInquires.Inquires.Last();
 
-        // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
         var x = await Http.GetAsync($"{Http.BaseAddress}Client/{mail}");
         Console.WriteLine(x.StatusCode + " STATUS");
 
@@ -329,19 +335,10 @@
             var c = await x.Content.ReadFromJsonAsync<ApiClient>();
             if (c != null)
             {
-                ApiAddress A = new ApiAddress
-                    {
-                        City = c.Address.City,
-                        Street = c.Address.Street,
-                        Number = c.Address.Number,
-                        Flat = c.Address.Flat,
-                        PostalCode = c.Address.PostalCode
-                    };
-
                 NewOrder.ClientName = c.Name;
-                NewOrder.ClientSurname = c.Name;
+                NewOrder.ClientSurname = c.Surname;
                 NewOrder.ClientPhone = c.Phone;
-                NewOrder.ClientAddress = A;
+                NewOrder.ClientAddress = c.Address;
                 NewOrder.ClientCompany = c.Company;
                 NewOrder.ClientEmail = mail;
             }
