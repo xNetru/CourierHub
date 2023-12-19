@@ -1,7 +1,6 @@
 ﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SM = CourierHub.Shared.Models;
 
 namespace CourierHub.Shared.Data;
 
@@ -234,7 +233,7 @@ public partial class CourierHubDbContext : DbContext {
         modelBuilder.Entity<Rule>(entity => {
             entity.ToTable("Rule");
 
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.DepthMax).HasColumnName("Depth_max");
             entity.Property(e => e.LengthMax).HasColumnName("Length_max");
             entity.Property(e => e.MassMax).HasColumnName("Mass_max");
@@ -245,7 +244,7 @@ public partial class CourierHubDbContext : DbContext {
         modelBuilder.Entity<Scaler>(entity => {
             entity.ToTable("Scaler");
 
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Company).HasColumnType("money");
             entity.Property(e => e.Depth).HasColumnType("money");
             entity.Property(e => e.Distance).HasColumnType("money");
@@ -262,7 +261,7 @@ public partial class CourierHubDbContext : DbContext {
         modelBuilder.Entity<Service>(entity => {
             entity.ToTable("Service");
 
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.ApiKey)
                 .HasMaxLength(100)
                 .HasColumnName("Api_key");
@@ -273,7 +272,7 @@ public partial class CourierHubDbContext : DbContext {
         modelBuilder.Entity<Status>(entity => {
             entity.ToTable("Status");
 
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name).HasMaxLength(50);
         });
 
@@ -288,18 +287,6 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Surname).HasMaxLength(50);
 
         });
-
-        modelBuilder.Entity<User>().HasDiscriminator<int>("Type")
-            .HasValue<SM.Client>(0)
-            .HasValue<OfficeWorker>(1)
-            .HasValue<Courier>(2);
-
-        modelBuilder.Entity<SM.Client>().HasBaseType<User>();
-        modelBuilder.Entity<OfficeWorker>().HasBaseType<User>();
-        modelBuilder.Entity<Courier>().HasBaseType<User>();
-
-        modelBuilder.Entity<SM.Client>().HasOne(c => c.Data).WithOne().HasForeignKey<ClientData>(c => c.ClientId);
-
         OnModelCreatingPartial(modelBuilder);
     }
 

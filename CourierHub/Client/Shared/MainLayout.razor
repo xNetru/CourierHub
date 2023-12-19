@@ -69,16 +69,6 @@
                     string username = context.User.Identity!.Name!;
                     string[] credentials = username.Split(" ");
                     Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
-                    // THIS SHOULD BE DELETED, RIGHT?
-                    //var client = new SM.Client {
-                    //    Id = 0,
-                    //    Email = email.Value,
-                    //    Name = credentials[0],
-                    //    Surname = credentials[1]
-                    //};
-                    //if ((await Http.PostAsJsonAsync("User", client)).IsSuccessStatusCode) {
-                    //    Console.WriteLine("IM HERE 4");
-                    //};
                     Console.WriteLine("IM HERE 5");
                 }
             }
