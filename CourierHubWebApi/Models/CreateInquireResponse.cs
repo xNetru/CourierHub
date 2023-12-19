@@ -1,5 +1,6 @@
 ﻿namespace CourierHubWebApi.Models {
     public record CreateInquireResponse(
-        int Id);
-
+        decimal Price,
+        string Code,
+        DateTime ExpirationDate);
 }
