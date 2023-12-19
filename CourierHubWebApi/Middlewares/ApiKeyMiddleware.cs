@@ -1,5 +1,6 @@
 ﻿using CourierHubWebApi.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Primitives;
 
 namespace CourierHubWebApi.Middleware {
@@ -7,6 +8,7 @@ namespace CourierHubWebApi.Middleware {
     public class ApiKeyMiddleware {
         private readonly RequestDelegate _next;
         private static readonly string _apiKeyName = "X-Api-Key";
+        private static readonly string _serviceId = "ServiceIdIndex";
         public ApiKeyMiddleware(RequestDelegate next) {
             _next = next;
         }
@@ -16,12 +18,15 @@ namespace CourierHubWebApi.Middleware {
                 context.Response.StatusCode = 401;
                 return context.Response.WriteAsync("Api Key was not provided");
             }
+            string? serviceIdIndex = context.RequestServices.GetRequiredService<IConfiguration>().GetValue<string>(_serviceId);
             string? key = extractedApiKey.First();
             if (key == null || !apiKeyService.TryGetServiceId(key, out int serviceId)) {
                 context.Response.StatusCode = 401;
                 return context.Response.WriteAsync("Unauthorized client");
             }
-            context.Items[_apiKeyName] = serviceId;
+            
+            if(serviceIdIndex != null)
+                context.Items[serviceIdIndex] = serviceId.ToString();
 
             return _next(context);
            

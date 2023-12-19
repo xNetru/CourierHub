@@ -15,6 +15,7 @@ namespace CourierHubWebApi.Controllers
     public class InquireController : ControllerBase
     {
         private IInquireService _inquireService;
+        private static readonly string _serviceIdItemsIndex = "ServiceIdIndex";
         public InquireController(IInquireService inquireService)
         {
             _inquireService = inquireService;
@@ -38,15 +39,32 @@ namespace CourierHubWebApi.Controllers
                 return ValidationProblem(modelStateDictionary);
             }
 
-            
+            string? serviceIdItemsIndex = HttpContext.RequestServices.GetRequiredService<IConfiguration>().GetValue<string>(_serviceIdItemsIndex);
+            if(serviceIdItemsIndex != null)
+            {
+                if(HttpContext.Items.TryGetValue(serviceIdItemsIndex, out object? stringServiceId))
+                {
+                    if(stringServiceId is string s)
+                    {
+                        if(int.TryParse(s, out int serviceId))
+                        {
+                            // In case of errors inside _inquireService the information about them is not passed
+                            // TODO: passing errors
+                            return _inquireService.CreateInquire(request, serviceId).Result.Match(
+                                response => CreatedAtAction(
+                                    actionName: nameof(CreateInquire),
+                                    routeValues: new { id = response.Code },
+                                    value: response),
+                                errors => Problem());
+                        }
+                    }
 
-            // In case of errors inside _inquireService they are not passed further
-            return _inquireService.CreateInquire(request).Result.Match(
-                response => CreatedAtAction(
-                    actionName: nameof(CreateInquire),
-                    routeValues: new { id = response.Code },
-                    value: response),
-                errors => Problem());
+                }
+
+            }
+
+            return Problem();
+
 
         }
     }
