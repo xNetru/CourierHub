@@ -5,8 +5,7 @@ namespace CourierHubWebApi.Extensions {
     public static class InquireExtensions {
         public static Inquire CreateInquire(this CreateInquireRequest request) {
             Inquire inquire = new();
-            // inquire.Id = 0;
-            inquire.ClientId = request.ClientId;
+            // inquire.ClientId = request.ClientId;
             inquire.Depth = request.Depth;
             inquire.Width = request.Width;
             inquire.Length = request.Length;
@@ -21,7 +20,7 @@ namespace CourierHubWebApi.Extensions {
         }
         public static Address CreateSourceAddress(this CreateInquireRequest request) {
             Address sourceAddress = new();
-            // sourceAddress.Id = 0;   
+            sourceAddress.City = request.SourceCity;
             sourceAddress.Street = request.SourceStreet;
             sourceAddress.Number = request.SourceNumber;
             sourceAddress.Flat = request.SourceFlat;
@@ -30,7 +29,7 @@ namespace CourierHubWebApi.Extensions {
         }
         public static Address CreateDestinationAddress(this CreateInquireRequest request) {
             Address destinationAddress = new();
-            // destinationAddress.Id = 0;
+            destinationAddress.City = request.DestinationCity;
             destinationAddress.Street = request.DestinationStreet;
             destinationAddress.Number = request.DestinationNumber;
             destinationAddress.Flat = request.DestinationFlat;

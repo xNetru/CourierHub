@@ -1,8 +1,7 @@
 ﻿@inherits LayoutComponentBase
-@using CourierHub.Shared.Models
+@using CourierHub.Shared.ApiModels
 @using System.Security.Claims
 @using CourierHub.Shared.Enums;
-@using System.Web
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
@@ -67,10 +66,9 @@
             Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
         } else {
             // set role
-            var userDB = await Http.GetFromJsonAsync<Client?>(new Uri($"{Http.BaseAddress}User?email={email.Value}"));
-            if (userDB == null) { return; }
-            string role = ((UserType)Enum.Parse(typeof(UserType), userDB.Type.ToString())).ToString();
-            SetRole(state.User, role);
+            var type = await Http.GetFromJsonAsync<UserType?>(new Uri($"{Http.BaseAddress}User/{email.Value}"));
+            if (type == null) { return; }
+            SetRole(state.User, type.ToString()!);
             if (state.User.IsInRole("Client")) {
                 Console.WriteLine("CLIENT!!!");
             } else {

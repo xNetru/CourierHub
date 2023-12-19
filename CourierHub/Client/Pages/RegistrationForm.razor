@@ -1,8 +1,8 @@
 ﻿@page "/registrationForm/{name}/{surname}/{email}"
 
-@using CourierHub.Shared.Models
-@using Client = CourierHub.Shared.Models.Client;
-@using CourierHub.Shared.Enums;
+@using CourierHub.Shared.ApiModels;
+@using System.Text.Json;
+@using System.Text;
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -48,13 +48,13 @@
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Phone" class="col-form-label">Numer telefonu</label>
-                        <input type="text" class="form-control" id="Phone" @bind-value="@NewClient.Data.Phone" placeholder="podaj numer telefonu..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.Phone)" />
+                        <input type="text" class="form-control" id="Phone" @bind-value="@NewClient.Phone" placeholder="podaj numer telefonu..." />
+                        <ValidationMessage For="@(()=>NewClient.Phone)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="Company" class="col-form-label">Firma</label>
-                        <input type="text" class="form-control" id="Company" @bind-value="@NewClient.Data.Company" placeholder="podaj nazwę firmy..." />
+                        <input type="text" class="form-control" id="Company" @bind-value="@NewClient.Company" placeholder="podaj nazwę firmy..." />
                     </div>
                 </div>
             </div>
@@ -67,36 +67,36 @@
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-12">
                         <label for="City" class="col-form-label">Miasto</label>
-                        <input type="text" class="form-control" id="CA_City" @bind-value="@NewClient.Data.Address.City" placeholder="podaj miasto..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.Address.City)" />
+                        <input type="text" class="form-control" id="CA_City" @bind-value="@NewClient.Address.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.City)" />
                     </div>
                 </div>
 
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Ulica</label>
-                        <input type="text" class="form-control" id="CA_Street" @bind-value="@NewClient.Data.Address.Street" placeholder="podaj ulicę..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.Address.Street)" />
+                        <input type="text" class="form-control" id="CA_Street" @bind-value="@NewClient.Address.Street" placeholder="podaj ulicę..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.Street)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="Number" class="col-form-label">Numer budynku</label>
-                        <input type="text" class="form-control" id="CA_Number" @bind-value="@NewClient.Data.Address.Number" placeholder="podaj numer budynku..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.Address.Number)" />
+                        <input type="text" class="form-control" id="CA_Number" @bind-value="@NewClient.Address.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.Number)" />
                     </div>
                 </div>
 
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Numer lokalu</label>
-                        <input type="text" class="form-control" id="CA_Flat" @bind-value="@NewClient.Data.Address.Flat" placeholder="podaj numer lokalu..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.Address.Flat)" />
+                        <input type="text" class="form-control" id="CA_Flat" @bind-value="@NewClient.Address.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.Flat)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
-                        <input type="text" class="form-control" id="CA_PostalCode" @bind-value="@NewClient.Data.Address.PostalCode" placeholder="podaj kod pocztowy..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.Address.PostalCode)" />
+                        <input type="text" class="form-control" id="CA_PostalCode" @bind-value="@NewClient.Address.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.PostalCode)" />
                     </div>
                 </div>
             </div>
@@ -109,36 +109,36 @@
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-12">
                         <label for="City" class="col-form-label">Miasto</label>
-                        <input type="text" class="form-control" id="SA_City" @bind-value="@NewClient.Data.SourceAddress.City" placeholder="podaj miasto..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.SourceAddress.City)" />
+                        <input type="text" class="form-control" id="SA_City" @bind-value="@NewClient.SourceAddress.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.City)" />
                     </div>
                 </div>
 
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Ulica</label>
-                        <input type="text" class="form-control" id="SA_Street" @bind-value="@NewClient.Data.SourceAddress.Street" placeholder="podaj ulicę..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.SourceAddress.Street)" />
+                        <input type="text" class="form-control" id="SA_Street" @bind-value="@NewClient.SourceAddress.Street" placeholder="podaj ulicę..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.Street)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="Number" class="col-form-label">Numer budynku</label>
-                        <input type="text" class="form-control" id="SA_Number" @bind-value="@NewClient.Data.SourceAddress.Number" placeholder="podaj numer budynku..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.SourceAddress.Number)" />
+                        <input type="text" class="form-control" id="SA_Number" @bind-value="@NewClient.SourceAddress.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.Number)" />
                     </div>
                 </div>
 
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Numer lokalu</label>
-                        <input type="text" class="form-control" id="SA_Flat" @bind-value="@NewClient.Data.SourceAddress.Flat" placeholder="podaj numer lokalu..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.SourceAddress.Flat)" />
+                        <input type="text" class="form-control" id="SA_Flat" @bind-value="@NewClient.SourceAddress.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.Flat)" />
                     </div>
 
                     <div class="col-md-6">
                         <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
-                        <input type="text" class="form-control" id="SA_PostalCode" @bind-value="@NewClient.Data.SourceAddress.PostalCode" placeholder="podaj kod pocztowy..." />
-                        <ValidationMessage For="@(()=>NewClient.Data.SourceAddress.PostalCode)" />
+                        <input type="text" class="form-control" id="SA_PostalCode" @bind-value="@NewClient.SourceAddress.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.PostalCode)" />
                     </div>
                 </div>
             </div>
@@ -156,14 +156,11 @@
 </div>
 
 @code {
-    private Client NewClient = new Client
-        {
-            Data = new ClientData
-            {
-                Address = new Address(),
-                SourceAddress = new Address()
-            }
-        };
+    private ApiClient NewClient = new ApiClient {
+        Address = new ApiAddress(),
+        SourceAddress = new ApiAddress()
+    };
+
     private bool displayUserAddedToDB = false;
     private bool isButtonDisabled = false;
     [Parameter]
@@ -184,12 +181,7 @@
             isButtonDisabled = true;
 
             // set role
-            var state = await Provider.GetAuthenticationStateAsync();
-            var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
-            var userDB = await Http.GetFromJsonAsync<Client?>(new Uri($"{Http.BaseAddress}User?email={email!.Value}"));
-            if (userDB == null) { return; }
-            string role = ((UserType)Enum.Parse(typeof(UserType), userDB.Type.ToString())).ToString();
-            CustomProvider.SetRole(state.User, role);
+            // TODO
         }
         else
         {
@@ -207,7 +199,6 @@
         NewClient.Name = name!;
         NewClient.Surname = surname!;
         NewClient.Email = email!;
-        NewClient.Type = 0;
 
         return base.OnInitializedAsync();
     }
@@ -218,7 +209,7 @@
         {
             var context = await Provider.GetAuthenticationStateAsync();
             string? image = context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
-            NewClient.Data.Photo = await Http.GetByteArrayAsync(image);
+            NewClient.Photo = await Http.GetByteArrayAsync(image);
         }
     }
 }
