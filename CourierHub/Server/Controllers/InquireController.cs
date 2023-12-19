@@ -21,5 +21,14 @@ namespace CourierHub.Shared.Controllers {
             if (inquires.IsNullOrEmpty()) { return NotFound(Array.Empty<Inquire>()); }
             return Ok(inquires);
         }
+
+        // POST: <InquireController>/{...}
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody] Inquire? inquire) {
+            if (inquire == null) { return BadRequest(); }
+            await _context.Inquires.AddAsync(inquire);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

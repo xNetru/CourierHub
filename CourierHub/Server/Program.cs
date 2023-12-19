@@ -1,3 +1,5 @@
+using CourierHub.Server.Data;
+using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +16,16 @@ namespace CourierHub {
             IConfiguration configuration = builder.Configuration.AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
+
+            builder.Services.AddSingleton<ICloudStorage>(provider => {
+                string azure = configuration.GetSection("AzureStorage")["ConnectionString"] ?? throw new NullReferenceException("Azure connection string could not be loaded!");
+                string sas = configuration.GetSection("AzureStorage")["SasToken"] ?? throw new NullReferenceException("Azure SAS token could not be loaded!");
+                return new AzureStorage(azure, sas);
+            });
+
+            builder.Services.AddSingleton(provider => {
+                return new ApiContainer(new CourierHubApi(), new SzymoHubApi(), new WeraHubApi());
+            });
 
             var app = builder.Build();
 
