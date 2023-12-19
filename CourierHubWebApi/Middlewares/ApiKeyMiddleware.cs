@@ -1,6 +1,5 @@
 ﻿using CourierHubWebApi.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Primitives;
 
 namespace CourierHubWebApi.Middleware {
@@ -24,15 +23,14 @@ namespace CourierHubWebApi.Middleware {
                 context.Response.StatusCode = 401;
                 return context.Response.WriteAsync("Unauthorized client");
             }
-            
-            if(serviceIdIndex != null)
+
+            if (serviceIdIndex != null)
                 context.Items[serviceIdIndex] = serviceId.ToString();
 
             return _next(context);
-           
+
         }
-        public static async Task<string> GetRequestBody(HttpContext context)
-        {
+        public static async Task<string> GetRequestBody(HttpContext context) {
             var bodyStream = new StreamReader(context.Request.Body);
             var bodyText = await bodyStream.ReadToEndAsync();
             return bodyText;

@@ -9,7 +9,6 @@ public partial class ClientData {
 
     public byte[]? Photo { get; set; }
 
-    [Phone]
     public string? Phone { get; set; }
 
     public string? Company { get; set; }
@@ -20,11 +19,9 @@ public partial class ClientData {
 
     public int ClientId { get; set; }
 
-    [ValidateComplexType]
-    public virtual Address? Address { get; set; } = null!;
+    public virtual Address Address { get; set; } = null!;
 
-    [ValidateComplexType]
-    public virtual Address? SourceAddress { get; set; } = null!;
+    public virtual Address SourceAddress { get; set; } = null!;
 
     public virtual User? Client { get; set; } = null!;
 }

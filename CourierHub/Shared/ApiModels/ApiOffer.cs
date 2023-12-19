@@ -1,9 +1,9 @@
-﻿namespace CourierHub.Shared.ApiModels {
-    public class ApiOffer {
-        public decimal Price { get; set; }
+﻿namespace CourierHub.Shared.ApiModels;
 
-        public string Code { get; set; } = null!;
+public class ApiOffer {
+    public decimal Price { get; set; }
 
-        public DateTime ExpirationDate { get; set; }
-    }
+    public string Code { get; set; } = null!;
+
+    public DateTime ExpirationDate { get; set; }
 }

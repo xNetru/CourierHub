@@ -1,10 +1,11 @@
 ﻿namespace CourierHub.Shared.Enums;
+
 public enum StatusType {
-    NotConfirmed,
-    Confirmed,
-    Cancelled,
-    Denied,
-    PickedUp,
-    Delivered,
-    CouldNotDeliver
+    NotConfirmed = 1,
+    Confirmed = 2,
+    Cancelled = 3,
+    Denied = 4,
+    PickedUp = 5,
+    Delivered = 6,
+    CouldNotDeliver = 7
 }

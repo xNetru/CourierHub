@@ -2,7 +2,6 @@
 using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using CourierHubWebApi.Models;
-using ErrorOr;
 using FluentValidation;
 using System.Data.SqlTypes;
 
@@ -51,8 +50,7 @@ namespace CourierHubWebApi.Validations {
             return time >= (DateTime)SqlDateTime.MinValue &&
                    time <= (DateTime)SqlDateTime.MaxValue;
         }
-        private async Task<bool> BeNullOrExistInDatabaseAsync(int? ClientId)
-        {
+        private async Task<bool> BeNullOrExistInDatabaseAsync(int? ClientId) {
             if (ClientId == null)
                 return true;
             User? result = await _dbContext.Users.FindAsync(ClientId);
@@ -62,8 +60,7 @@ namespace CourierHubWebApi.Validations {
                 return true;
             return false;
         }
-        private bool BeValidPriorityType(int Priority)
-        {
+        private bool BeValidPriorityType(int Priority) {
             return Priority == (int)PriorityType.Low ||
                    Priority == (int)PriorityType.Medium ||
                    Priority == (int)PriorityType.High;
