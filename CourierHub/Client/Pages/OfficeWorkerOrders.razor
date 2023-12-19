@@ -2,6 +2,10 @@
 
 @using CourierHub.Shared.ApiModels
 
+@inject NavigationManager NavigationManager
+
+<button type="submit" class="btn btn-info" Style="margin-top:10px">Zatwierdź ofertę</button>
+
 <h1>Historia zapytań</h1>
 
 <div style="height:600px;overflow-y:scroll;width:1200px;overflow-x:scroll">
@@ -66,6 +70,6 @@
 
     private void Choose(ApiOrder item)
     {
-        
+        NavigationManager.NavigateTo("/OfficeWorker/Orders/Review");
     }
 }
