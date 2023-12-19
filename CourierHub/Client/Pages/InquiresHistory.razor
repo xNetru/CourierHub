@@ -1,0 +1,108 @@
+﻿@page "/history"
+
+@using CourierHub.Shared.ApiModels
+
+<h1>Historia zapytań</h1>
+
+<div style="height:600px;overflow-y:scroll;width:1200px;overflow-x:scroll">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Szerokość</th>
+                <th>Długość</th>
+                <th>Głębokość</th>
+                <th>Data zapytania</th>
+                <th>Miasto</th>
+                <th>Ulica</th>
+                <th>Numer</th>
+                <th>Lokal</th>
+                <th>Kod</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Inquires)
+            {
+                <tr>
+                    <td>@item.Width</td>
+                    <td>@item.Length</td>
+                    <td>@item.Depth</td>
+                    <td>@item.Datetime.ToString("dd-MM-yyyy")</td>
+                    <td>
+                        <p>z: &nbsp;&nbsp;@item.Source.City</p>
+                        <p>do: @item.Destination.City</p>
+                    </td>
+                    <td>
+                        <p>z: &nbsp;&nbsp;@item.Source.Street</p>
+                        <p>do: @item.Destination.Street</p>
+                    </td>
+                    <td>
+                        <p>z: &nbsp;&nbsp;@item.Source.Number</p>
+                        <p>do: @item.Destination.Number</p>
+                    </td>
+                    <td>
+                        <p>z: &nbsp;&nbsp;@item.Source.Flat</p>
+                        <p>do: @item.Destination.Flat</p>
+                    </td>
+                    <td>
+                        <p>z: &nbsp;&nbsp;@item.Source.PostalCode</p>
+                        <p>do: @item.Destination.PostalCode</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+ 
+
+@code {
+    private List<ApiInquire> Inquires = new List<ApiInquire>
+    {
+        new ApiInquire
+        {
+            Width=10,
+            Length=20,
+            Depth=30,
+            Datetime=DateTime.Today,
+            Source = new ApiAddress
+            {
+                City="abdsguyusuksc",
+                Street="abdjgdkc",
+                Number="1",
+                Flat="1",
+                PostalCode="00-000"
+            },
+            Destination = new ApiAddress
+            {
+                City="abddjkvhkjdhkc",
+                Street="abxzhjjvkjfc",
+                Number="1",
+                Flat="1",
+                PostalCode="00-000"
+            }
+        },
+                new ApiInquire
+        {
+            Width=10,
+            Length=20,
+            Depth=30,
+            Datetime=DateTime.Today,
+            Source = new ApiAddress
+            {
+                City="abdsguyusuksc",
+                Street="abdjgdkc",
+                Number="1",
+                Flat="1",
+                PostalCode="00-000"
+            },
+            Destination = new ApiAddress
+            {
+                City="abddjkvhkjdhkc",
+                Street="abxzhjjvkjfc",
+                Number="1",
+                Flat="1",
+                PostalCode="00-000"
+            }
+        }
+    };
+}
