@@ -4,6 +4,7 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 
 namespace CourierHub.Shared.Controllers {
     [ApiController]
@@ -88,29 +89,64 @@ namespace CourierHub.Shared.Controllers {
 
         // GET: <ClientController>/email@gmail.com/inquires
         [HttpGet("{email}/inquires/{days}")]
-        public async Task<ActionResult<IEnumerable<Inquire>>> GetInquires(string email, int days) {
+        public async Task<ActionResult<IEnumerable<ApiInquire>>> GetInquires(string email, int days) {
             DateTime today = DateTime.Now;
             DateTime before = today.AddDays(-days);
 
             var client = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
-            if (client == null) { return NotFound(Array.Empty<Inquire>()); }
-            return Ok(await _context.Inquires.Where(e => e.ClientId == client.Id && e.Datetime >= before).ToListAsync());
-            // System.Text.Json.JsonException: A possible object cycle was detected.
-            // This can either be due to a cycle or if the object depth is larger than the maximum allowed depth of 32.
-            // Consider using ReferenceHandler.Preserve on JsonSerializerOptions to support cycles.
-            // Path: $.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Id.
+            if (client == null) { return NotFound(Array.Empty<ApiInquire>()); }
+            var inquires = await _context.Inquires.Where(e => e.ClientId == client.Id && e.Datetime >= before).ToListAsync();
+
+            var apiInquires = new List<ApiInquire>();
+            foreach (var inquire in inquires) {
+                apiInquires.Add((ApiInquire)inquire);
+            }
+            return Ok(apiInquires);
         }
 
         // GET: <ClientController>/email@gmail.com/orders
         [HttpGet("{email}/orders/{days}")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders(string email, int days) {
+        public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrders(string email, int days) {
             DateTime today = DateTime.Now;
             DateTime before = today.AddDays(-days);
 
             var client = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
-            if (client == null) { return NotFound(Array.Empty<Order>()); }
-            return Ok(await _context.Orders.Where(e => e.Inquire.ClientId == client.Id && e.Inquire.Datetime >= before).ToListAsync());
+            if (client == null) { return NotFound(Array.Empty<ApiOrder>()); }
+            var orders = await _context.Orders.Where(e => e.Inquire.ClientId == client.Id && e.Inquire.Datetime >= before).ToListAsync();
+            
+            var apiOrders = new List<ApiOrder>();
+            foreach (var order in orders) {
+                apiOrders.Add((ApiOrder)order);
+            }
+            return Ok(apiOrders);
         }
+
+        /*
+        // PATCH: <ClientController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
+        [HttpPatch("{email}/order/{code}/review")]
+        public async Task<ActionResult> PatchEvaluation(string email, string code, [FromBody] ApiReview? review) {
+            if (review == null) { return BadRequest(); }
+
+            var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
+            if (user == null) { return NotFound(); }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
+
+            var reviewDB = (Review)review;
+            reviewDB.ClientId = user.Id; // not present?
+            await _context.Reviews.AddAsync(reviewDB);
+            await _context.SaveChangesAsync();
+
+            var reviewDB2 = await _context.Reviews.FirstOrDefaultAsync(e => 
+                e.ClientId == user.Id && // not present?
+                e.Datetime = reviewDB.Datetime);
+
+            order.ReviewId = reviewDB2.Id;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        */
 
         private async Task<ActionResult> AddClient(ApiClient? client) {
             if (client == null) { return BadRequest(); }

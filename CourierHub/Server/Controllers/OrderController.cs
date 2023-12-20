@@ -34,10 +34,11 @@ namespace CourierHub.Shared.Controllers {
             return Ok(apiOrders);
         }
 
-        // GET: <OrderController>/{...}
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ApiOrder>>> GetConfirmed([FromBody] StatusType? statusType) {
-            if (statusType == null) { return BadRequest(); }
+        // GET: <OrderController>/1/status
+        [HttpGet("{status}/status")]
+        public async Task<ActionResult<IEnumerable<ApiOrder>>> GetConfirmed(int status) {
+            if (status < 1 || status > 7) { return BadRequest(); }
+            var statusType = (StatusType)Enum.Parse(typeof(StatusType), status.ToString());
             var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == (int)statusType).ToListAsync();
             if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
 
@@ -46,12 +47,73 @@ namespace CourierHub.Shared.Controllers {
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
-            // GET with body???
         }
 
         // POST: <OrderController>/{...}
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
+            return await AddOrder(order);
+            // The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Order_Status".
+            // The conflict occurred in database "CourierHubDB", table "dbo.Status", column 'Id'
+            // => Trzeba dodać rekordy do tabeli Status
+        }
+
+        
+        // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
+        [HttpPut("{code}")]
+        public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
+            if (order == null) { return BadRequest(); }
+            var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (entity == null) {
+                return await AddOrder(order);
+            } else {
+                entity.Price = order.Price;
+                entity.ClientEmail = order.ClientEmail;
+                entity.ClientName = order.ClientName;
+                entity.ClientSurname = order.ClientSurname;
+                entity.ClientPhone = order.ClientPhone;
+                entity.ClientCompany = order.ClientCompany;
+                entity.ClientAddress.Street = order.ClientAddress.Street;
+                entity.ClientAddress.Number = order.ClientAddress.Number;
+                entity.ClientAddress.Flat = order.ClientAddress.Flat;
+                entity.ClientAddress.PostalCode = order.ClientAddress.PostalCode;
+                entity.ClientAddress.City = order.ClientAddress.City;  
+            }
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
+        [HttpPatch("{code}/status")]
+        public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
+            if (statusType == null) { return BadRequest(); }
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
+            var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == (int)statusType);
+            order.StatusId = (int)statusType;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
+        [HttpPatch("{code}/review")]
+        public async Task<ActionResult> PatchReview(string email, string code, [FromBody] ApiReview? review) {
+            if (review == null) { return BadRequest(); }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+            if (order == null) { return NotFound(); }
+
+            var reviewDB = (Review)review;
+            await _context.Reviews.AddAsync(reviewDB);
+            await _context.SaveChangesAsync();
+
+            order.ReviewId = reviewDB.Id;
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+
+        private async Task<ActionResult> AddOrder(ApiOrder? order) {
             if (order == null) { return BadRequest(); }
             var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
             if (inquire == null) { return NotFound(); }
@@ -66,76 +128,6 @@ namespace CourierHub.Shared.Controllers {
             await _context.Orders.AddAsync(orderDB);
             await _context.SaveChangesAsync();
             return Ok();
-            // The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Order_Status".
-            // The conflict occurred in database "CourierHubDB", table "dbo.Status", column 'Id'
         }
-
-        /*
-        // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
-        [HttpPut("{code}")]
-        public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
-            if (order == null) { return BadRequest(); }
-            var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-            if (entity == null) {
-                await _context.Orders.AddAsync(order);
-            } else {
-                entity = order;
-            }
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-        */
-
-
-        // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
-        [HttpPatch("{code}/status")]
-        public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
-            if (statusType == null) { return BadRequest(); }
-            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-            if (order == null) { return NotFound(); }
-            var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == (int)statusType);
-            order.StatusId = (int)statusType;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-
-        /*
-        // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/evaluation/{...}
-        [HttpPatch("{code}/evaluation")]
-        public async Task<ActionResult> PatchEvaluation(string code, [FromBody] ApiEvaluation? evaluation) {
-            if (evaluation == null) { return BadRequest(); }
-            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-            if (order == null) { return NotFound(); }
-
-            order.Evaluation = evaluation;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-
-        // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
-        [HttpPatch("{code}/review")]
-        public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
-            if (review == null) { return BadRequest(); }
-            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-            if (order == null) { return NotFound(); }
-            order.Review = review;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-
-        // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/parcel/{...}
-        [HttpPatch("{code}/parcel")]
-        public async Task<ActionResult> PatchParcel(string code, [FromBody] ApiParcel? parcel) {
-            if (parcel == null) { return BadRequest(); }
-            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-            if (order == null) { return NotFound(); }
-            var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == (int)StatusType.PickedUp);
-            order.StatusId = (int)StatusType.PickedUp;
-            order.Status = status;
-            order.Parcel = parcel;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-        */
     }
 }
