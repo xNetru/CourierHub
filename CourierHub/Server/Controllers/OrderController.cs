@@ -46,6 +46,7 @@ namespace CourierHub.Shared.Controllers {
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
+            // GET with body???
         }
 
         // POST: <OrderController>/{...}
@@ -65,6 +66,8 @@ namespace CourierHub.Shared.Controllers {
             await _context.Orders.AddAsync(orderDB);
             await _context.SaveChangesAsync();
             return Ok();
+            // The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Order_Status".
+            // The conflict occurred in database "CourierHubDB", table "dbo.Status", column 'Id'
         }
 
         /*

@@ -1,0 +1,50 @@
+﻿@page "/offerList"
+
+@using CourierHub.Shared.ApiModels
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider Provider
+
+<h1>Lista dostępnych ofert</h1>
+
+<div class="container">
+    <h3>Kurieroinator</h3>
+
+    <div class="col-md-12">
+        <div class="row" style="margin-top:10px">
+            <div class="col-md-4">
+                <label class="col-form-label">Cena</label>
+                <p>@Offer.Price</p>
+            </div>
+
+            <div class="col-md-4">
+                <label class="col-form-label">Data ważności oferty</label>
+                <p>@Offer.ExpirationDate.ToString()</p>
+            </div>
+
+            <div class="col-md-4">
+                <button class="btn btn-primary" @onclick="Submit">Wybierz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // TODO: from inquireForm
+    private ApiOffer Offer = new ApiOffer
+        {
+            ExpirationDate = new DateTime()
+        };
+
+    private async void Submit()
+    {
+        var context = await Provider.GetAuthenticationStateAsync();
+        var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
+        string mail = "";
+        if (email != null)
+        {
+            mail = email.Value;
+        }
+        NavigationManager.NavigateTo($"/offerSubmitForm/{mail}");
+    }
+}

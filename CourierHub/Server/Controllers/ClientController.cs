@@ -95,6 +95,10 @@ namespace CourierHub.Shared.Controllers {
             var client = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
             if (client == null) { return NotFound(Array.Empty<Inquire>()); }
             return Ok(await _context.Inquires.Where(e => e.ClientId == client.Id && e.Datetime >= before).ToListAsync());
+            // System.Text.Json.JsonException: A possible object cycle was detected.
+            // This can either be due to a cycle or if the object depth is larger than the maximum allowed depth of 32.
+            // Consider using ReferenceHandler.Preserve on JsonSerializerOptions to support cycles.
+            // Path: $.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Id.
         }
 
         // GET: <ClientController>/email@gmail.com/orders
