@@ -58,7 +58,7 @@ namespace CourierHub.Shared.Controllers {
             // => Trzeba dodać rekordy do tabeli Status
         }
 
-        
+
         // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
         [HttpPut("{code}")]
         public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
@@ -77,7 +77,7 @@ namespace CourierHub.Shared.Controllers {
                 entity.ClientAddress.Number = order.ClientAddress.Number;
                 entity.ClientAddress.Flat = order.ClientAddress.Flat;
                 entity.ClientAddress.PostalCode = order.ClientAddress.PostalCode;
-                entity.ClientAddress.City = order.ClientAddress.City;  
+                entity.ClientAddress.City = order.ClientAddress.City;
             }
             await _context.SaveChangesAsync();
             return Ok();

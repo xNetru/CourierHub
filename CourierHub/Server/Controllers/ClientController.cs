@@ -4,7 +4,6 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 
 namespace CourierHub.Shared.Controllers {
     [ApiController]
@@ -113,40 +112,13 @@ namespace CourierHub.Shared.Controllers {
             var client = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
             if (client == null) { return NotFound(Array.Empty<ApiOrder>()); }
             var orders = await _context.Orders.Where(e => e.Inquire.ClientId == client.Id && e.Inquire.Datetime >= before).ToListAsync();
-            
+
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
         }
-
-        /*
-        // PATCH: <ClientController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
-        [HttpPatch("{email}/order/{code}/review")]
-        public async Task<ActionResult> PatchEvaluation(string email, string code, [FromBody] ApiReview? review) {
-            if (review == null) { return BadRequest(); }
-
-            var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
-            if (user == null) { return NotFound(); }
-
-            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-            if (order == null) { return NotFound(); }
-
-            var reviewDB = (Review)review;
-            reviewDB.ClientId = user.Id; // not present?
-            await _context.Reviews.AddAsync(reviewDB);
-            await _context.SaveChangesAsync();
-
-            var reviewDB2 = await _context.Reviews.FirstOrDefaultAsync(e => 
-                e.ClientId == user.Id && // not present?
-                e.Datetime = reviewDB.Datetime);
-
-            order.ReviewId = reviewDB2.Id;
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-        */
 
         private async Task<ActionResult> AddClient(ApiClient? client) {
             if (client == null) { return BadRequest(); }
