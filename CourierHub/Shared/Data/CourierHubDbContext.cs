@@ -35,7 +35,7 @@ public partial class CourierHubDbContext : DbContext {
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        string connection = Base64Coder.Decode(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AzureSQLDatabase")["ConnectionString"] ?? 
+        string connection = Base64Coder.Decode(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AzureSQLDatabase")["ConnectionString"] ??
             throw new NullReferenceException("Database connection string could not be loaded!"));
         optionsBuilder.UseSqlServer(connection);
     }

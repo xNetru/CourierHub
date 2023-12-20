@@ -17,7 +17,7 @@ namespace CourierHub {
             IConfiguration configuration = builder.Configuration.AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
             builder.Services.AddDbContext<CourierHubDbContext>(options =>
-                options.UseSqlServer(Base64Coder.Decode(configuration.GetSection("ConnectionStrings")["DefaultConnection"] ??
+                options.UseSqlServer(Base64Coder.Decode(configuration.GetSection("AzureSQLDatabase")["ConnectionString"] ??
                     throw new NullReferenceException("Database connection string could not be loaded!"))));
 
             builder.Services.AddSingleton<ICloudStorage>(provider => {
@@ -28,8 +28,12 @@ namespace CourierHub {
                 return new AzureStorage(azure, sas);
             });
 
-            builder.Services.AddSingleton(provider => {
-                return new ApiContainer(new CourierHubApi(), new SzymoHubApi(), new WeraHubApi());
+            builder.Services.AddSingleton<ICloudCommunicationService>(provider => {
+                string connection = configuration.GetSection("AzureCommunicationService")["ConnectionString"] ??
+                    throw new NullReferenceException("Communication Service connection string could not be loaded!");
+                string sender = configuration.GetSection("AzureCommunicationService")["Sender"] ??
+                    throw new NullReferenceException("Communication Service sender could not be loaded!");
+                return new AzureCommunicationService(connection, sender);
             });
 
             var app = builder.Build();

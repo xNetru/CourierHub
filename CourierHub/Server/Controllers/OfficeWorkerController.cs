@@ -47,11 +47,7 @@ namespace CourierHub.Shared.Controllers {
             await _context.Evaluations.AddAsync(evaluationDB);
             await _context.SaveChangesAsync();
 
-            var evaluationDB2 = await _context.Evaluations.FirstOrDefaultAsync(e =>
-                e.OfficeWorkerId == evaluationDB.OfficeWorkerId &&
-                e.Datetime == evaluationDB.Datetime);
-
-            order.EvaluationId = evaluationDB2.Id;
+            order.EvaluationId = evaluationDB.Id;
             await _context.SaveChangesAsync();
             return Ok();
         }
