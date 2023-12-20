@@ -1,6 +1,7 @@
 using CourierHub.Server.Data;
 using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierHub {
@@ -15,11 +16,15 @@ namespace CourierHub {
 
             IConfiguration configuration = builder.Configuration.AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
 
-            builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
+            builder.Services.AddDbContext<CourierHubDbContext>(options =>
+                options.UseSqlServer(Base64Coder.Decode(configuration.GetSection("ConnectionStrings")["DefaultConnection"] ??
+                    throw new NullReferenceException("Database connection string could not be loaded!"))));
 
             builder.Services.AddSingleton<ICloudStorage>(provider => {
-                string azure = configuration.GetSection("AzureStorage")["ConnectionString"] ?? throw new NullReferenceException("Azure connection string could not be loaded!");
-                string sas = configuration.GetSection("AzureStorage")["SasToken"] ?? throw new NullReferenceException("Azure SAS token could not be loaded!");
+                string azure = configuration.GetSection("AzureStorage")["ConnectionString"] ??
+                    throw new NullReferenceException("Storage connection string could not be loaded!");
+                string sas = configuration.GetSection("AzureStorage")["SasToken"] ??
+                    throw new NullReferenceException("Storage SAS token could not be loaded!");
                 return new AzureStorage(azure, sas);
             });
 

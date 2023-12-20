@@ -1,4 +1,5 @@
 ﻿using CourierHub.Shared.Models;
+using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -34,7 +35,8 @@ public partial class CourierHubDbContext : DbContext {
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        string? connection = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["DefaultConnection"];
+        string connection = Base64Coder.Decode(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AzureSQLDatabase")["ConnectionString"] ?? 
+            throw new NullReferenceException("Database connection string could not be loaded!"));
         optionsBuilder.UseSqlServer(connection);
     }
 
