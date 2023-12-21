@@ -19,18 +19,18 @@ namespace CourierHubWebApi.Controllers {
         [HttpPost]
         public IActionResult CreateInquire(CreateInquireRequest request,
             [FromServices] IValidator<CreateInquireRequest> validator) {
-            ValidationResult validationResult = validator.Validate(request);
-            if (!validationResult.IsValid) {
-                ModelStateDictionary modelStateDictionary = new();
+            //ValidationResult validationResult = validator.Validate(request);
+            //if (!validationResult.IsValid) {
+            //    ModelStateDictionary modelStateDictionary = new();
 
-                foreach (ValidationFailure failure in validationResult.Errors) {
-                    modelStateDictionary.AddModelError(
-                        failure.PropertyName,
-                        failure.ErrorMessage);
-                }
+            //    foreach (ValidationFailure failure in validationResult.Errors) {
+            //        modelStateDictionary.AddModelError(
+            //            failure.PropertyName,
+            //            failure.ErrorMessage);
+            //    }
 
-                return ValidationProblem(modelStateDictionary);
-            }
+            //    return ValidationProblem(modelStateDictionary);
+            //}
 
             string? serviceIdItemsIndex = HttpContext.RequestServices.GetRequiredService<IConfiguration>().GetValue<string>(_serviceIdItemsIndex);
             if (serviceIdItemsIndex != null) {

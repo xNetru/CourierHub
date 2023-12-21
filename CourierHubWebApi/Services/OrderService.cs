@@ -17,7 +17,7 @@ namespace CourierHubWebApi.Services
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
         }
-        public ErrorOr<CreateOrderResponse> CreateOrder(CreateOrderRequest request, int serviceId)
+        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId)
         {
             Order order = request.CreateOrder();
             Address clientAddress = request.CreateClientAddress();
@@ -98,7 +98,7 @@ namespace CourierHubWebApi.Services
                 // TODO: rollback changes
                 return Error.Failure();
             }
-            return new CreateOrderResponse("Sus");
+            return StatusCodes.Status200OK;
         }
     }
 }

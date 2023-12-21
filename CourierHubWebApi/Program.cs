@@ -30,6 +30,8 @@ namespace CourierHubWebApi {
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
 
             builder.Services.AddScoped<IValidator<CreateInquireRequest>, CreateInquireRequestValidator>();
+            builder.Services.AddScoped<IValidator<CreateOrderRequest>, CreateOrderRequestValidator>();
+            builder.Services.AddScoped<IValidator<ApiSideAddress>, ApiSideAddressValidator>();  
 
             var app = builder.Build();
 
