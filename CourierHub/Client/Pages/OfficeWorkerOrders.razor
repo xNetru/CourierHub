@@ -74,27 +74,27 @@
         NavigationManager.NavigateTo("/OfficeWorker/Orders/Review");
     }
 
-    // protected async override Task OnInitializedAsync()
-    // {
-    //     var x = await Http.GetAsync($"{Http.BaseAddress}Order");
-    //     Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+    protected async override Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/1/status");
+        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
 
-    //     if (x.IsSuccessStatusCode)
-    //     {
-    //         var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiOrder>>();
-    //         if (c != null)
-    //         {
-    //             Orders = c;
-    //         }
-    //         else
-    //         {
-    //             Console.WriteLine("BAD DESERIALIZATION");
-    //         }
-    //     }
-    //     else
-    //     {
-    //         Console.WriteLine("FAIL");
-    //     }
-    // }
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiOrder>>();
+            if (c != null)
+            {
+                Orders = c;
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
 
 }

@@ -31,6 +31,10 @@ namespace CourierHub.Client {
                 return new OrderContainer();
             });
 
+            services.AddSingleton(provider => {
+                return new RoleContainer();
+            });
+
             await builder.Build().RunAsync();
         }
     }
