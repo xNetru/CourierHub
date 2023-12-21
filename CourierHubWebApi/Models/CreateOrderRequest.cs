@@ -7,10 +7,6 @@
         string ClientEmail,
         string ClientPhoneNumber,
         string ClientCompany,
-        string ClientCity,
-        string ClientPostalCode,    
-        string ClientStreet,
-        string ClientAddressBuildingNumber,
-        string? ClientFlat);
+        ApiSideAddress ClientAddress);
         
 }
