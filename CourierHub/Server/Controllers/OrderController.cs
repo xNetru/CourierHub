@@ -29,6 +29,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
+                _ = order.ClientAddress;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -37,6 +38,7 @@ namespace CourierHub.Shared.Controllers {
         // GET: <OrderController>/1/status
         [HttpGet("{status}/status")]
         public async Task<ActionResult<IEnumerable<ApiOrder>>> GetConfirmed(int status) {
+            // hardcoded
             if (status < 1 || status > 7) { return BadRequest(); }
             var statusType = (StatusType)Enum.Parse(typeof(StatusType), status.ToString());
             var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == (int)statusType).ToListAsync();
@@ -44,6 +46,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
+                _ = order.ClientAddress;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -97,7 +100,7 @@ namespace CourierHub.Shared.Controllers {
 
         // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
         [HttpPatch("{code}/review")]
-        public async Task<ActionResult> PatchReview(string email, string code, [FromBody] ApiReview? review) {
+        public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
             if (review == null) { return BadRequest(); }
 
             var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
@@ -117,8 +120,6 @@ namespace CourierHub.Shared.Controllers {
             if (order == null) { return BadRequest(); }
             var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
             if (inquire == null) { return NotFound(); }
-
-            var apiOrders = new List<ApiOrder>();
 
             var orderDB = (Order)order;
             orderDB.InquireId = inquire.Id;

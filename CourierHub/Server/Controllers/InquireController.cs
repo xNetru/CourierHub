@@ -35,6 +35,7 @@ namespace CourierHub.Shared.Controllers {
         [HttpPost("{email}")]
         public async Task<ActionResult<int>> Post(string email, [FromBody] ApiInquire? inquire) {
             if (inquire == null) { return BadRequest(0); }
+
             var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email);
             if (user == null) { return NotFound(0); }
 
@@ -43,7 +44,7 @@ namespace CourierHub.Shared.Controllers {
             await _context.Inquires.AddAsync(inquireDB);
 
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(inquireDB.Id);
         }
     }
 }

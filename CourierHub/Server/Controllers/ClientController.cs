@@ -32,9 +32,6 @@ namespace CourierHub.Shared.Controllers {
             var data = await _context.ClientDatum.FirstOrDefaultAsync(e => e.ClientId == user.Id);
             if (data == null) { return NotFound(null); }
 
-            var address = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.AddressId);
-            var sourceAddress = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.SourceAddressId);
-
             return Ok(new ApiClient() {
                 Email = user.Email,
                 Name = user.Name,
@@ -42,8 +39,8 @@ namespace CourierHub.Shared.Controllers {
                 Photo = data.Photo,
                 Phone = data.Phone,
                 Company = data.Company,
-                Address = (ApiAddress)address,
-                SourceAddress = (ApiAddress)sourceAddress
+                Address = (ApiAddress)data.Address,
+                SourceAddress = (ApiAddress)data.SourceAddress
             });
         }
 
@@ -98,6 +95,10 @@ namespace CourierHub.Shared.Controllers {
 
             var apiInquires = new List<ApiInquire>();
             foreach (var inquire in inquires) {
+                // zobaczyć czy pomogło
+                _ = inquire.Source;
+                _ = inquire.Destination;
+
                 apiInquires.Add((ApiInquire)inquire);
             }
             return Ok(apiInquires);
@@ -115,6 +116,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
+                _ = order.ClientAddress;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -125,10 +127,10 @@ namespace CourierHub.Shared.Controllers {
 
             var user = (User)client;
             await _context.Users.AddAsync(user);
-            var userDB = _context.Users.FirstOrDefaultAsync(e => e.Email == user.Email);
+            await _context.SaveChangesAsync();
 
             var data = (ClientData)client;
-            data.ClientId = userDB.Id;
+            data.ClientId = user.Id;
             await _context.ClientDatum.AddAsync(data);
 
             await _context.SaveChangesAsync();

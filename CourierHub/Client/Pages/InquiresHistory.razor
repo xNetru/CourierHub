@@ -125,6 +125,7 @@
         Console.WriteLine(x.StatusCode + " GET USER INQUIRES STATUS");
 
         if (x.IsSuccessStatusCode) {
+            // tu się wywala, błędna deserializacja
             var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiInquire>>();
             if (c != null) {
                 Inquires = c;
