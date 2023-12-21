@@ -1,11 +1,17 @@
 ﻿@page "/inquireForm"
 
 @using CourierHub.Shared.Models
+@using CourierHub.Shared.Data
 @using CourierHub.Shared.Enums
+@using CourierHub.Shared.ApiModels
+@using System.Text.Json;
+@using System.Text;
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
+@inject ApiContainer Api
+@inject InquireContainer UserInquires
 
 <div class="container">
 
@@ -98,6 +104,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="SA_City" @bind-value="@NewInquire.Source.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewInquire.Source.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Ulica</label>
                         <input type="text" class="form-control" id="SA_Street" @bind-value="@NewInquire.Source.Street" placeholder="podaj ulicę..." />
@@ -132,6 +146,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="DA_City" @bind-value="@NewInquire.Destination.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewInquire.Destination.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="Street" class="col-form-label">Ulica</label>
                         <input type="text" class="form-control" id="DA_Street" @bind-value="@NewInquire.Destination.Street" placeholder="podaj ulicę..." />
@@ -164,7 +186,7 @@
         @if (displayInquireSent)
         {
             <div class="row bg-success text-white" style="margin-top:10px; height:40px">
-                <label class="p-2">Zapytanie wysłane... </label>
+                <label class="p-2">Zapytanie wysłane </label>
             </div>
         }
 
@@ -173,20 +195,46 @@
 </div>
 
 @code {
-    private Inquire NewInquire = new Inquire
+    private ApiInquire NewInquire = new ApiInquire
     {
-        Source = new Address(),
-        Destination = new Address()
+        Source = new ApiAddress(),
+        Destination = new ApiAddress(),
+        Code = "" // from API
     };
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
 
-    private void HandleValidSubmit(EditContext context)
+    private async void HandleValidSubmit(EditContext context)
     {
-        displayInquireSent = true;
-        isButtonDisabled = true;
+        var state = await Provider.GetAuthenticationStateAsync();
 
         NewInquire.Datetime = DateTime.Today;
+
+        UserInquires.Inquires.Clear();
+        UserInquires.Inquires.Add(NewInquire);
+
+        foreach(var api in Api.WebApis)
+        {
+            var res = await api.PostInquireGetOffer(NewInquire);
+            Console.WriteLine(res.Item2);
+        }
+
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null)
+        {
+            Console.WriteLine("NO MAIL");
+            NavigationManager.NavigateTo("");
+        }
+
+        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Inquire/{email?.Value}", NewInquire);
+        Console.WriteLine(x.StatusCode + " STATUS");
+
+        if (x.IsSuccessStatusCode)
+        {
+            displayInquireSent = true;
+            isButtonDisabled = true;
+            NavigationManager.NavigateTo("/offerList");
+        }
     }
 
     private void HandleInvalidSubmit(EditContext context)
