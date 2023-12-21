@@ -18,8 +18,7 @@ namespace CourierHub.Shared.Controllers {
             _context = context;
             _serviceName = config.GetValue<string>("ServiceName") ??
                 throw new NullReferenceException("Service name could not be loaded!");
-            // najpierw musimy dodać do bazy danych
-            //_serviceId = _context.Services.Where(s => s.Name == _serviceName).Select(s => s.Id).FirstOrDefault();
+            _serviceId = _context.Services.Where(s => s.Name == _serviceName).Select(s => s.Id).FirstOrDefault();
         }
 
         // GET: <OrderController>/30
@@ -33,6 +32,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
+                order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -41,13 +41,14 @@ namespace CourierHub.Shared.Controllers {
         // GET: <OrderController>/1/status
         [HttpGet("{status}/status")]
         public async Task<ActionResult<IEnumerable<ApiOrder>>> GetConfirmed(int status) {
+            // hardcoded
             if (status < 1 || status > 7) { return BadRequest(); }
-            var statusType = (StatusType)Enum.Parse(typeof(StatusType), status.ToString());
-            var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == (int)statusType).ToListAsync();
+            var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == status).ToListAsync();
             if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
+                order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -57,11 +58,7 @@ namespace CourierHub.Shared.Controllers {
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
             return await AddOrder(order);
-            // The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Order_Status".
-            // The conflict occurred in database "CourierHubDB", table "dbo.Status", column 'Id'
-            // => Trzeba dodać rekordy do tabeli Status
         }
-
 
         // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
         [HttpPut("{code}")]
@@ -71,17 +68,19 @@ namespace CourierHub.Shared.Controllers {
             if (entity == null) {
                 return await AddOrder(order);
             } else {
+                var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == entity.ClientAddressId))!;
+
                 entity.Price = order.Price;
                 entity.ClientEmail = order.ClientEmail;
                 entity.ClientName = order.ClientName;
                 entity.ClientSurname = order.ClientSurname;
                 entity.ClientPhone = order.ClientPhone;
                 entity.ClientCompany = order.ClientCompany;
-                entity.ClientAddress.Street = order.ClientAddress.Street;
-                entity.ClientAddress.Number = order.ClientAddress.Number;
-                entity.ClientAddress.Flat = order.ClientAddress.Flat;
-                entity.ClientAddress.PostalCode = order.ClientAddress.PostalCode;
-                entity.ClientAddress.City = order.ClientAddress.City;
+                entity.ClientAddress.Street = address.Street;
+                entity.ClientAddress.Number = address.Number;
+                entity.ClientAddress.Flat = address.Flat;
+                entity.ClientAddress.PostalCode = address.PostalCode;
+                entity.ClientAddress.City = address.City;
             }
             await _context.SaveChangesAsync();
             return Ok();
@@ -101,7 +100,7 @@ namespace CourierHub.Shared.Controllers {
 
         // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
         [HttpPatch("{code}/review")]
-        public async Task<ActionResult> PatchReview(string email, string code, [FromBody] ApiReview? review) {
+        public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
             if (review == null) { return BadRequest(); }
 
             var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
@@ -116,13 +115,10 @@ namespace CourierHub.Shared.Controllers {
             return Ok();
         }
 
-
         private async Task<ActionResult> AddOrder(ApiOrder? order) {
             if (order == null) { return BadRequest(); }
             var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
             if (inquire == null) { return NotFound(); }
-
-            var apiOrders = new List<ApiOrder>();
 
             var orderDB = (Order)order;
             orderDB.InquireId = inquire.Id;

@@ -121,11 +121,13 @@
             return;
         }
 
+
+        // trzeba chyba zdefiniować, że ma być json, bo przychodzi text/html
         var x = await Http.GetAsync($"{Http.BaseAddress}Client/{mail}/inquires/30");
         Console.WriteLine(x.StatusCode + " GET USER INQUIRES STATUS");
 
         if (x.IsSuccessStatusCode) {
-            var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiInquire>>();
+            var c = await x.Content.ReadFromJsonAsync<ApiInquire[]>();
             if (c != null) {
                 Inquires = c;
             }
