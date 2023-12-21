@@ -50,20 +50,20 @@ namespace CourierHubWebApi.Services
             Inquire inquiry = inquiryIdQuery.First();
 
             // in case of request from our hub checking whether client is registerded
-            if(serviceId == 1)
-            {
-                IQueryable<int> clientIdQuery = from users
-                                                in _dbContext.Users
-                                                where users.Email == order.ClientEmail &&
-                                                users.Type == (int)UserType.Client
-                                                select users.Id;
+            //if(serviceId == 1)
+            //{
+            //    IQueryable<int> clientIdQuery = from users
+            //                                    in _dbContext.Users
+            //                                    where users.Email == order.ClientEmail &&
+            //                                    users.Type == (int)UserType.Client
+            //                                    select users.Id;
 
-                if (clientIdQuery.Count() == 1)
-                {
-                    int clientId = clientIdQuery.First();
-                    inquiry.ClientId = clientId;
-                }
-            }
+            //    if (clientIdQuery.Count() == 1)
+            //    {
+            //        int clientId = clientIdQuery.First();
+            //        inquiry.ClientId = clientId;
+            //    }
+            //}
 
             order.InquireId = inquiry.Id;
             order.ServiceId = serviceId;
@@ -89,8 +89,16 @@ namespace CourierHubWebApi.Services
                 return Error.Failure();
             }
 
-            _dbContext.SaveChanges();
-
+            try
+            {
+                _dbContext.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                // TODO: rollback changes
+                return Error.Failure();
+            }
+            return new CreateOrderResponse("Sus");
         }
     }
 }

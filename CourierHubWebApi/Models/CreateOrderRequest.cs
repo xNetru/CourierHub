@@ -3,7 +3,7 @@
     public record CreateOrderRequest(
         string InquireCode,
         string ClientName,
-        string ClienSurname,
+        string ClientSurname,
         string ClientEmail,
         string ClientPhoneNumber,
         string ClientCompany,
