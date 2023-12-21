@@ -88,28 +88,36 @@ namespace CourierHub.Shared.Controllers {
 
         // GET: <ClientController>/email@gmail.com/inquires
         [HttpGet("{email}/inquires/{days}")]
-        public async Task<ActionResult<IEnumerable<Inquire>>> GetInquires(string email, int days) {
+        public async Task<ActionResult<IEnumerable<ApiInquire>>> GetInquires(string email, int days) {
             DateTime today = DateTime.Now;
             DateTime before = today.AddDays(-days);
 
             var client = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
-            if (client == null) { return NotFound(Array.Empty<Inquire>()); }
-            return Ok(await _context.Inquires.Where(e => e.ClientId == client.Id && e.Datetime >= before).ToListAsync());
-            // System.Text.Json.JsonException: A possible object cycle was detected.
-            // This can either be due to a cycle or if the object depth is larger than the maximum allowed depth of 32.
-            // Consider using ReferenceHandler.Preserve on JsonSerializerOptions to support cycles.
-            // Path: $.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Client.Inquires.Id.
+            if (client == null) { return NotFound(Array.Empty<ApiInquire>()); }
+            var inquires = await _context.Inquires.Where(e => e.ClientId == client.Id && e.Datetime >= before).ToListAsync();
+
+            var apiInquires = new List<ApiInquire>();
+            foreach (var inquire in inquires) {
+                apiInquires.Add((ApiInquire)inquire);
+            }
+            return Ok(apiInquires);
         }
 
         // GET: <ClientController>/email@gmail.com/orders
         [HttpGet("{email}/orders/{days}")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders(string email, int days) {
+        public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrders(string email, int days) {
             DateTime today = DateTime.Now;
             DateTime before = today.AddDays(-days);
 
             var client = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Client);
-            if (client == null) { return NotFound(Array.Empty<Order>()); }
-            return Ok(await _context.Orders.Where(e => e.Inquire.ClientId == client.Id && e.Inquire.Datetime >= before).ToListAsync());
+            if (client == null) { return NotFound(Array.Empty<ApiOrder>()); }
+            var orders = await _context.Orders.Where(e => e.Inquire.ClientId == client.Id && e.Inquire.Datetime >= before).ToListAsync();
+
+            var apiOrders = new List<ApiOrder>();
+            foreach (var order in orders) {
+                apiOrders.Add((ApiOrder)order);
+            }
+            return Ok(apiOrders);
         }
 
         private async Task<ActionResult> AddClient(ApiClient? client) {
