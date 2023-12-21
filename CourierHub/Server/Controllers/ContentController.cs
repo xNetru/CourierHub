@@ -51,7 +51,22 @@ namespace CourierHub.Shared.Controllers {
             if (content == null) { return BadRequest(); }
 
             EmailContent body = _creator.CreateMailContent(content);
-            var result = await _communicationService.SendEmailAsync(content.Recipient, body);
+
+            var attachments = new List<EmailAttachment>();
+
+            if (content.Contract != null) {
+                string contract = _creator.CreateContract(content.Contract);
+                EmailAttachment attach = _creator.CreateMailAttachment("contract.txt", contract);
+                attachments.Add(attach);
+            }
+
+            if (content.Receipt != null) {
+                string receipt = _creator.CreateReceipt(content.Receipt);
+                EmailAttachment attach = _creator.CreateMailAttachment("receipt.txt", receipt);
+                attachments.Add(attach);
+            }
+
+            var result = await _communicationService.SendEmailAsync(content.Recipient, body, attachments);
             if (result == null || result.Status == EmailSendStatus.Failed) {
                 return StatusCode(503);
             }

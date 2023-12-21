@@ -32,7 +32,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
-                order.ClientAddress = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId);
+                order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -48,7 +48,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
-                order.ClientAddress = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId);
+                order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);
@@ -68,17 +68,19 @@ namespace CourierHub.Shared.Controllers {
             if (entity == null) {
                 return await AddOrder(order);
             } else {
+                var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == entity.ClientAddressId))!;
+
                 entity.Price = order.Price;
                 entity.ClientEmail = order.ClientEmail;
                 entity.ClientName = order.ClientName;
                 entity.ClientSurname = order.ClientSurname;
                 entity.ClientPhone = order.ClientPhone;
                 entity.ClientCompany = order.ClientCompany;
-                entity.ClientAddress.Street = order.ClientAddress.Street;
-                entity.ClientAddress.Number = order.ClientAddress.Number;
-                entity.ClientAddress.Flat = order.ClientAddress.Flat;
-                entity.ClientAddress.PostalCode = order.ClientAddress.PostalCode;
-                entity.ClientAddress.City = order.ClientAddress.City;
+                entity.ClientAddress.Street = address.Street;
+                entity.ClientAddress.Number = address.Number;
+                entity.ClientAddress.Flat = address.Flat;
+                entity.ClientAddress.PostalCode = address.PostalCode;
+                entity.ClientAddress.City = address.City;
             }
             await _context.SaveChangesAsync();
             return Ok();

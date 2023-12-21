@@ -1,12 +1,18 @@
 ﻿using Azure.Communication.Email;
 using CourierHub.Shared.ApiModels;
+using System.Net.Mime;
 
 namespace CourierHub.Server.Data {
     public class ContentCreator {
-        private readonly ApiService _service; // podejrzewam, że się przyda
+        private readonly ApiService _service;
 
         public ContentCreator(ApiService service) {
             _service = service;
+        }
+
+        public EmailAttachment CreateMailAttachment(string title, string content) {
+            var binaryContent = new BinaryData(content);
+            return new EmailAttachment(title, MediaTypeNames.Text.Plain, binaryContent);
         }
 
         public EmailContent CreateMailContent(ApiMailContent content) {

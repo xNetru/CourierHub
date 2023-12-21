@@ -14,15 +14,14 @@ namespace CourierHub.Server.Data {
             _sender = sender;
         }
 
-        public async Task<EmailSendResult?> SendEmailAsync(string recipient, EmailContent content) {
+        public async Task<EmailSendResult?> SendEmailAsync(string recipient, EmailContent content, IEnumerable<EmailAttachment> attachments) {
             EmailSendResult? result = null;
+            var message = new EmailMessage(_sender, recipient, content);
+            foreach (var attachment in attachments) {
+                message.Attachments.Add(attachment);
+            }
             try {
-                EmailSendOperation emailSendOperation = await _emailClient.SendAsync(
-                    WaitUntil.Completed,
-                    _sender,
-                    recipient,
-                    content.Subject,
-                    content.Html);
+                EmailSendOperation emailSendOperation = await _emailClient.SendAsync(WaitUntil.Completed, message);
                 result = emailSendOperation.Value;
             } catch (RequestFailedException ex) {
                 Console.WriteLine($"Email send operation failed with error code: {ex.ErrorCode}, message: {ex.Message}");
