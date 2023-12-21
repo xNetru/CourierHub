@@ -32,8 +32,8 @@ namespace CourierHub.Shared.Controllers {
             var data = await _context.ClientDatum.FirstOrDefaultAsync(e => e.ClientId == user.Id);
             if (data == null) { return NotFound(null); }
 
-            var address = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.AddressId);
-            var sourceAddress = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.SourceAddressId);
+            var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.AddressId))!;
+            var sourceAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.SourceAddressId))!;
 
             return Ok(new ApiClient() {
                 Email = user.Email,
@@ -42,8 +42,8 @@ namespace CourierHub.Shared.Controllers {
                 Photo = data.Photo,
                 Phone = data.Phone,
                 Company = data.Company,
-                Address = (ApiAddress)address!,
-                SourceAddress = (ApiAddress)sourceAddress!
+                Address = (ApiAddress)address,
+                SourceAddress = (ApiAddress)sourceAddress
             });
         }
 
