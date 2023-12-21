@@ -20,7 +20,7 @@ public interface ICloudStorage {
     /// <typeparamref name="TResult"/> is <see cref="bool"/>
     /// </para>
     /// </returns>
-    Task<bool> CheckBlob(string path, string container);
+    Task<bool> CheckBlobAsync(string path, string container);
 
     /// <summary>
     /// Gets the content of a blob from the specified container.
@@ -38,7 +38,7 @@ public interface ICloudStorage {
     /// <typeparamref name="TResult"/> is <see langword="string"/>
     /// </para>
     /// </returns>
-    Task<string> GetBlob(string path, string container);
+    Task<string> GetBlobAsync(string path, string container);
 
     /// <summary>
     /// Uploads a blob to the specified container.
@@ -46,9 +46,9 @@ public interface ICloudStorage {
     /// <param name="path">The path to the blob.</param>
     /// <param name="container">The name of the container.</param>
     /// <param name="blob">The content of the blob as a string.</param>
-    /// <param name="zip">A flag specifying whether to gzip the file.</param> 
+    /// <param name="gzip">A flag specifying whether to gzip the file.</param> 
     /// <returns>
     /// An asynchronous <see cref="Task"/> representing the operation.
     /// </returns>
-    Task PutBlob(string path, string container, string blob, bool gzip);
+    Task PutBlobAsync(string path, string container, string blob, bool gzip);
 }

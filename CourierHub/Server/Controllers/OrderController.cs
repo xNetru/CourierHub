@@ -11,11 +11,15 @@ namespace CourierHub.Shared.Controllers {
     [Route("[controller]")]
     public class OrderController : ControllerBase {
         private readonly CourierHubDbContext _context;
-        private readonly string _serviceName = "OUR_SERVICE"; // to be readen from some memory
-        private readonly int _serviceId = 1; // to be readen from some memory
+        private readonly string _serviceName;
+        private readonly int _serviceId = 1;
 
-        public OrderController(CourierHubDbContext context) {
+        public OrderController(CourierHubDbContext context, IConfiguration config) {
             _context = context;
+            _serviceName = config.GetValue<string>("ServiceName") ??
+                throw new NullReferenceException("Service name could not be loaded!");
+            // najpierw musimy dodać do bazy danych
+            //_serviceId = _context.Services.Where(s => s.Name == _serviceName).Select(s => s.Id).FirstOrDefault();
         }
 
         // GET: <OrderController>/30
