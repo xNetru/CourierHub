@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CourierHubWebApi.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierHubWebApi.Controllers
@@ -7,6 +8,12 @@ namespace CourierHubWebApi.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
+        [HttpPost]
+
+        CreateOrderResponse CreateOrder(CreateOrderRequest request)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }
