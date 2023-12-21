@@ -1,4 +1,5 @@
 ﻿using CourierHub.Shared.Data;
+using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
@@ -16,7 +17,7 @@ namespace CourierHubWebApi.Services
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
         }
-        public ErrorOr<CreateOrderResponse> CreateOrder(CreateOrderRequest request)
+        public ErrorOr<CreateOrderResponse> CreateOrder(CreateOrderRequest request, int serviceId)
         {
             Order order = request.CreateOrder();
             Address clientAddress = request.CreateClientAddress();
@@ -34,8 +35,39 @@ namespace CourierHubWebApi.Services
 
             order.Price = (decimal)price;
 
-            int? Cli
+            // taking matching inquiry from database 
+            IQueryable<Inquire> inquiryIdQuery = from inquires
+                             in _dbContext.Inquires
+                             where inquires.Code == inquiryCode
+                             select inquires;
 
+            if(inquiryIdQuery.Count() != 1)
+            {
+                // TODO: return valid error
+                return Error.Failure();
+            }
+
+            Inquire inquiry = inquiryIdQuery.First();
+
+            // in case of request from our hub checking whether client is registerded
+            if(serviceId == 1)
+            {
+                IQueryable<int> clientIdQuery = from users
+                                                in _dbContext.Users
+                                                where users.Email == order.ClientEmail &&
+                                                users.Type == (int)UserType.Client
+                                                select users.Id;
+
+                if (clientIdQuery.Count() == 1)
+                {
+                    int clientId = clientIdQuery.First();
+                    inquiry.ClientId = clientId;
+                }
+            }
+
+            order.InquireId = inquiry.Id;
+            order.ServiceId = serviceId;
+            
             try
             {
                 _dbContext.Addresses.Add(clientAddress);
@@ -45,7 +77,20 @@ namespace CourierHubWebApi.Services
                 return Error.Failure();
             }
 
-            
+            order.ClientAddressId = clientAddress.Id;
+
+            try
+            {
+                _dbContext.Orders.Add(order);
+            }
+            catch(Exception ex)
+            {
+                // TODO: rollback changes
+                return Error.Failure();
+            }
+
+            _dbContext.SaveChanges();
+
         }
     }
 }
