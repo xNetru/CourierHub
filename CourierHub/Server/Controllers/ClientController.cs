@@ -32,6 +32,9 @@ namespace CourierHub.Shared.Controllers {
             var data = await _context.ClientDatum.FirstOrDefaultAsync(e => e.ClientId == user.Id);
             if (data == null) { return NotFound(null); }
 
+            var address = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.AddressId);
+            var sourceAddress = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.SourceAddressId);
+
             return Ok(new ApiClient() {
                 Email = user.Email,
                 Name = user.Name,
@@ -39,8 +42,8 @@ namespace CourierHub.Shared.Controllers {
                 Photo = data.Photo,
                 Phone = data.Phone,
                 Company = data.Company,
-                Address = (ApiAddress)data.Address,
-                SourceAddress = (ApiAddress)data.SourceAddress
+                Address = (ApiAddress)address!,
+                SourceAddress = (ApiAddress)sourceAddress!
             });
         }
 
@@ -59,6 +62,10 @@ namespace CourierHub.Shared.Controllers {
                 return await AddClient(client);
             } else {
                 var data = await _context.ClientDatum.FirstOrDefaultAsync(e => e.ClientId == user.Id);
+                if (data == null) { return NotFound(); }
+
+                var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.AddressId))!;
+                var sourceAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == data.SourceAddressId))!;
 
                 user.Email = client.Email;
                 user.Name = client.Name;
@@ -67,23 +74,23 @@ namespace CourierHub.Shared.Controllers {
                 data.Phone = client.Phone;
                 data.Company = client.Company;
 
-                data.Address.Street = client.Address.Street;
-                data.Address.Number = client.Address.Number;
-                data.Address.Flat = client.Address.Flat;
-                data.Address.PostalCode = client.Address.PostalCode;
-                data.Address.City = client.Address.City;
+                data.Address.Street = address.Street;
+                data.Address.Number = address.Number;
+                data.Address.Flat = address.Flat;
+                data.Address.PostalCode = address.PostalCode;
+                data.Address.City = address.City;
 
-                data.SourceAddress.Street = client.SourceAddress.Street;
-                data.SourceAddress.Number = client.SourceAddress.Number;
-                data.SourceAddress.Flat = client.SourceAddress.Flat;
-                data.SourceAddress.PostalCode = client.SourceAddress.PostalCode;
-                data.SourceAddress.City = client.SourceAddress.City;
+                data.SourceAddress.Street = sourceAddress.Street;
+                data.SourceAddress.Number = sourceAddress.Number;
+                data.SourceAddress.Flat = sourceAddress.Flat;
+                data.SourceAddress.PostalCode = sourceAddress.PostalCode;
+                data.SourceAddress.City = sourceAddress.City;
             }
             await _context.SaveChangesAsync();
             return Ok();
         }
 
-        // GET: <ClientController>/email@gmail.com/inquires
+        // GET: <ClientController>/email@gmail.com/inquires/30
         [HttpGet("{email}/inquires/{days}")]
         public async Task<ActionResult<IEnumerable<ApiInquire>>> GetInquires(string email, int days) {
             DateTime today = DateTime.Now;
@@ -95,16 +102,14 @@ namespace CourierHub.Shared.Controllers {
 
             var apiInquires = new List<ApiInquire>();
             foreach (var inquire in inquires) {
-                // zobaczyć czy pomogło
-                _ = inquire.Source;
-                _ = inquire.Destination;
-
+                inquire.Source = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.SourceId))!;
+                inquire.Destination = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.DestinationId))!;
                 apiInquires.Add((ApiInquire)inquire);
             }
             return Ok(apiInquires);
         }
 
-        // GET: <ClientController>/email@gmail.com/orders
+        // GET: <ClientController>/email@gmail.com/orders/30
         [HttpGet("{email}/orders/{days}")]
         public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrders(string email, int days) {
             DateTime today = DateTime.Now;
@@ -116,7 +121,7 @@ namespace CourierHub.Shared.Controllers {
 
             var apiOrders = new List<ApiOrder>();
             foreach (var order in orders) {
-                _ = order.ClientAddress;
+                order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
                 apiOrders.Add((ApiOrder)order);
             }
             return Ok(apiOrders);

@@ -13,7 +13,8 @@ namespace CourierHub.Shared.Controllers {
         private readonly ICloudCommunicationService _communicationService;
         private readonly ContentCreator _creator;
 
-        public ContentController(CourierHubDbContext context, IConfiguration config, ICloudStorage storage, ICloudCommunicationService communicationService) {
+        public ContentController(CourierHubDbContext context, IConfiguration config,
+            ICloudStorage storage, ICloudCommunicationService communicationService) {
             _storage = storage;
             _communicationService = communicationService;
             string serviceName = config.GetValue<string>("ServiceName") ??
