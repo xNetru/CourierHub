@@ -24,7 +24,7 @@ public class ApiOrder {
     [Phone(ErrorMessage = "Błędny format numeru telefonu")]
     public string ClientPhone { get; set; } = null!;
 
-    public string ClientCompany { get; set; } = null!; // chyba niewymagane?
+    public string? ClientCompany { get; set; }
 
     [ValidateComplexType]
     public ApiAddress ClientAddress { get; set; } = null!;

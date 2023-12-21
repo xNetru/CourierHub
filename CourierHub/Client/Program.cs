@@ -1,9 +1,7 @@
 using CourierHub.Server.Data;
 using CourierHub.Shared.Data;
-using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using CourierHub.Shared.ApiModels;
 
 namespace CourierHub.Client {
     public class Program {
