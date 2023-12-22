@@ -4,25 +4,38 @@ using CourierHub.Shared.Enums;
 
 namespace CourierHub.Server.Data {
     public class CourierHubApi : IWebApi {
+<<<<<<< HEAD
 
         public async Task<(StatusType?, string)> GetOrderStatus(string code) {
+=======
+        private readonly ApiService _service;
+
+        public string ServiceName { get; set; }
+
+        public CourierHubApi(ApiService service) {
+            _service = service;
+            ServiceName = _service.Name;
+        }
+
+        public async Task<(StatusType?, int)> GetOrderStatus(string code) {
+>>>>>>> 684ecac674ca0a0b33e6fde0aea21b22c62d23c7
             Console.WriteLine("GetOrderStatus was invoked in CourierHubApi.");
-            return (null, "400");
+            return (null, 400);
         }
 
-        public async Task<(ApiOffer?, string)> PostInquireGetOffer(ApiInquire inquire) {
+        public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
             Console.WriteLine("PostInquireGetOffer was invoked in CourierHubApi.");
-            return (null, "400");
+            return (null, 400);
         }
 
-        public async Task<string> PostOrder(ApiOrder order) {
+        public async Task<int> PostOrder(ApiOrder order) {
             Console.WriteLine("PostOrder was invoked in CourierHubApi.");
-            return "400";
+            return 400;
         }
 
-        public async Task<string> PutOrderWithrawal(string code) {
+        public async Task<int> PutOrderWithrawal(string code) {
             Console.WriteLine("PutOrderWithrawal was invoked in CourierHubApi.");
-            return "400";
+            return 400;
         }
     }
 }
