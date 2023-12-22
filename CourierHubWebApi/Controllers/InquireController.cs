@@ -6,6 +6,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,7 +23,7 @@ namespace CourierHubWebApi.Controllers
         public IActionResult CreateInquire(CreateInquireRequest request,
             [FromServices] IValidator<CreateInquireRequest> validator) {
 
-            
+
             ModelStateDictionary? errors = this.Validate<CreateInquireRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
@@ -36,7 +37,21 @@ namespace CourierHubWebApi.Controllers
 
         }
 
-        [HttpPost("/mail")]
-        public IActionResult CreateInquireEmail()
+        [HttpPost("Email")]
+        public IActionResult CreateInquireEmail(CreateInquireWithEmailRequest request,
+            [FromServices] IValidator<CreateInquireWithEmailRequest> validator)
+        {
+
+            ModelStateDictionary? errors = this.Validate<CreateInquireWithEmailRequest>(validator, request);
+            if (errors != null)
+                return ValidationProblem(errors);
+
+            return this.ExtractServiceIdFromContext().Match(serviceId => _inquireService.CreateInquireWithEmail(request, serviceId).Result.Match(
+                                response => CreatedAtAction(
+                                    actionName: nameof(CreateInquire),
+                                    routeValues: new { id = response.Code },
+                                    value: response),
+                                errors => Problem()), errors => Problem());
+        }
     }
 }
