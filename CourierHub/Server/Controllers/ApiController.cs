@@ -12,7 +12,7 @@ namespace CourierHub.Shared.Controllers {
 
         public ApiController(CourierHubDbContext context, IConfiguration config) {
             // w przyszłości z bazy danych, na czas testów z configa
-            string adres = config.GetValue<string>("BartekBaseAddress") ??
+            string adres = config.GetValue<string>("KamilBaseAddress") ??
                 throw new NullReferenceException("Base address could not be loaded!");
             var service = new ApiService {
                 Name = "CourierHub",
