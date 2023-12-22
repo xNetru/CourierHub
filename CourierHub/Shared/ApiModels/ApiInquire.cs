@@ -44,6 +44,8 @@ public class ApiInquire {
     [ValidateComplexType]
     public ApiAddress Source { get; set; } = null!;
 
+    public string? Email { get; set; }
+
     public static explicit operator ApiInquire(Inquire inquire) {
         return new ApiInquire {
             Depth = inquire.Depth,

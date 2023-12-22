@@ -104,7 +104,9 @@ namespace CourierHub.Shared.Controllers {
             foreach (var inquire in inquires) {
                 inquire.Source = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.SourceId))!;
                 inquire.Destination = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.DestinationId))!;
-                apiInquires.Add((ApiInquire)inquire);
+                var apiInquire = (ApiInquire)inquire;
+                apiInquire.Email = email;
+                apiInquires.Add(apiInquire);
             }
             return Ok(apiInquires);
         }
