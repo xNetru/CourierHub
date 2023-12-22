@@ -10,7 +10,7 @@ namespace CourierHubWebApi.Extensions
         {
             Order order = new Order();
             order.ClientName = request.ClientName;
-            order.ClientSurname = request.ClienSurname;
+            order.ClientSurname = request.ClientSurname;
             order.ClientEmail = request.ClientEmail;
             order.ClientPhone = request.ClientPhoneNumber;
             order.ClientCompany = request.ClientCompany;
