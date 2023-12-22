@@ -10,7 +10,6 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
-@inject ApiContainer Api
 @inject InquireContainer UserInquires
 @inject OfferContainer UserOffers
 @inject RoleContainer Role
@@ -215,42 +214,34 @@
         UserInquires.Inquires.Clear();
         UserInquires.Inquires.Add(NewInquire);
 
-        if (Role.Roles["Client"])
-        {
+        if (Role.Roles["Client"]) {
             var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
             if (email == null)
             {
                 Console.WriteLine("NO MAIL");
-                NavigationManager.NavigateTo("");
+                NavigationManager.NavigateTo(""); // interesting...
             }
             NewInquire.Email = email?.Value;
         }
-
         UserOffers.Offers.Clear();
 
-        displayInquireSent = true;
-        isButtonDisabled = true;
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/inquire/", NewInquire);
+        Console.WriteLine("POST INQUIRE STATUS : " + response.StatusCode);
 
-        foreach(var api in Api.WebApis) // PostInquireGetOffer for all apis
-        {
-            var res = await api.PostInquireGetOffer(NewInquire);
-            Console.WriteLine(res.Item2);
-            if (res.Item1 != null)
-            {
-                UserOffers.Offers.Add(res.Item1);
+        if (response.IsSuccessStatusCode) {
+            var offers = await response.Content.ReadFromJsonAsync<ApiOffer[]>();
+
+            if (offers != null) {
+                foreach (var offer in offers) {
+                    UserOffers.Offers.Add(offer);
+                }
+                displayInquireSent = true;
+                isButtonDisabled = true;
+                NavigationManager.NavigateTo("/offerList");
+            } else {
+                Console.WriteLine("GET INQUIRE FAILED");
             }
         }
-
-        NavigationManager.NavigateTo("/offerList");
-        // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Inquire/{email?.Value}", NewInquire);
-        // Console.WriteLine(x.StatusCode + " STATUS");
-
-        // if (x.IsSuccessStatusCode)
-        // {
-        //     displayInquireSent = true;
-        //     isButtonDisabled = true;
-        //     NavigationManager.NavigateTo("/offerList");
-        // }
     }
 
     private void HandleInvalidSubmit(EditContext context)

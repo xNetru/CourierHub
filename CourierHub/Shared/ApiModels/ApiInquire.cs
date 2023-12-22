@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations;
 namespace CourierHub.Shared.ApiModels;
 
 public class ApiInquire {
+    public string? Email { get; set; }
+
     [Required(ErrorMessage = "Głębokość paczki jest wymagana")]
     [RegularExpression(@"^[1-9]\d*$", ErrorMessage = "Głębokość musi być liczbą bez wiodących 0")]
     public int Depth { get; set; }
@@ -43,8 +45,6 @@ public class ApiInquire {
 
     [ValidateComplexType]
     public ApiAddress Source { get; set; } = null!;
-
-    public string? Email { get; set; }
 
     public static explicit operator ApiInquire(Inquire inquire) {
         return new ApiInquire {

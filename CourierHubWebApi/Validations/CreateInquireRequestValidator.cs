@@ -8,6 +8,8 @@ using System.Data.SqlTypes;
 namespace CourierHubWebApi.Validations {
     public class CreateInquireRequestValidator : AbstractValidator<CreateInquireRequest> {
         private CourierHubDbContext _dbContext;
+        private static ApiSideAddressValidator _apiSideAddressValidator = new ApiSideAddressValidator();
+
         public CreateInquireRequestValidator(CourierHubDbContext CourierHubDbContext) {
             _dbContext = CourierHubDbContext;
 
@@ -23,18 +25,10 @@ namespace CourierHubWebApi.Validations {
             // TODO: Maximal values of dimensions
 
             // Source address validation
-            RuleFor(x => x.SourceStreet).Matches("[a-zA-Z0-9]").MaximumLength(50);
-            RuleFor(x => x.SourceNumber).Matches("[a-zA-Z0-9]").MaximumLength(5);
-            RuleFor(x => x.SourceFlat).Matches("[a-zA-Z0-9]").MaximumLength(5);
-            RuleFor(x => x.SourcePostalCode).Matches("[0-9]").Length(5);
-            RuleFor(x => x.SourceCity).Matches("[a-zA-Z]").MaximumLength(50);
+            RuleFor(x => x.SourceAddress).SetValidator(_apiSideAddressValidator);
 
             // Destination address validation 
-            RuleFor(x => x.DestinationStreet).Matches("[a-zA-Z0-9]").MaximumLength(50);
-            RuleFor(x => x.DestinationNumber).Matches("[a-zA-Z0-9]").MaximumLength(5);
-            RuleFor(x => x.DestinationFlat).Matches("[a-zA-Z0-9]").MaximumLength(5);
-            RuleFor(x => x.DestinationPostalCode).Matches("[0-9]").Length(5);
-            RuleFor(x => x.DestinationCity).Matches("[a-zA-Z]").MaximumLength(50);
+            RuleFor(x => x.DestinationAddress).SetValidator(_apiSideAddressValidator);
 
             // DateTime validation
             RuleFor(x => x.Datetime).Must(BeInSqlDateTimeRange);

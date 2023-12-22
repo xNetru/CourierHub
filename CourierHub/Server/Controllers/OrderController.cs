@@ -12,7 +12,7 @@ namespace CourierHub.Shared.Controllers {
     public class OrderController : ControllerBase {
         private readonly CourierHubDbContext _context;
         private readonly string _serviceName;
-        private readonly int _serviceId = 1;
+        private readonly int _serviceId;
 
         public OrderController(CourierHubDbContext context, IConfiguration config) {
             _context = context;

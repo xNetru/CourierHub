@@ -49,8 +49,7 @@
         NavigationManager.NavigateTo($"/offerSubmitForm/{mail}");
     }
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         Offer = UserOffers.Offers.First(); // TODO: load for all APIs, for now it is just our API
     }
 }

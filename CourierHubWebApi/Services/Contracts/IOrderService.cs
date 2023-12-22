@@ -5,6 +5,6 @@ namespace CourierHubWebApi.Services.Contracts
 {
     public interface IOrderService
     {
-        ErrorOr<CreateOrderResponse> CreateOrder(CreateOrderRequest request, int serviceId);
+        ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId);
     }
 }

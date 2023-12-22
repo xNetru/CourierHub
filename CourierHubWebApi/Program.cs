@@ -22,6 +22,7 @@ namespace CourierHubWebApi {
             builder.Services.AddScoped<IInquireService, InquireService>();
             builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
             builder.Services.AddScoped<IPriceCacheService, PriceCacheService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +31,9 @@ namespace CourierHubWebApi {
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
 
             builder.Services.AddScoped<IValidator<CreateInquireRequest>, CreateInquireRequestValidator>();
+            builder.Services.AddScoped<IValidator<CreateOrderRequest>, CreateOrderRequestValidator>();
+            builder.Services.AddScoped<IValidator<ApiSideAddress>, ApiSideAddressValidator>();  
+            builder.Services.AddScoped<IValidator<CreateInquireWithEmailRequest>,CreateInquireWithEmailRequestValidator>();
 
             var app = builder.Build();
 

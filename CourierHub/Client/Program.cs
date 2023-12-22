@@ -1,4 +1,3 @@
-using CourierHub.Server.Data;
 using CourierHub.Shared.Data;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -20,10 +19,6 @@ namespace CourierHub.Client {
             });
 
             services.AddSingleton(provider => {
-                return new ApiContainer(new CourierHubApi(), new SzymoHubApi(), new WeraHubApi());
-            });
-
-            services.AddSingleton(provider => {
                 return new InquireContainer();
             });
 
@@ -33,6 +28,10 @@ namespace CourierHub.Client {
 
             services.AddSingleton(provider => {
                 return new OrderContainer();
+            });
+
+            services.AddSingleton(provider => {
+                return new OfferContainer();
             });
 
             services.AddSingleton(provider => {

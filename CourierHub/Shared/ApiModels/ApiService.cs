@@ -9,6 +9,8 @@ public class ApiService {
 
     public string Statute { get; set; } = null!;
 
+    public string BaseAddress { get; set; } = null!;
+
     public static explicit operator ApiService(Service service) {
         return new ApiService {
             Name = service.Name,

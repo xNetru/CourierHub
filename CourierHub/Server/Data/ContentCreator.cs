@@ -22,7 +22,7 @@ namespace CourierHub.Server.Data {
         }
 
         public string CreateContract(ApiContract contract) {
-            string text = 
+            string text =
                 "----------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n" +
                 "                                                        CONTRACT\r\n" +
                $"                                       {contract.Code}\r\n" +
@@ -69,9 +69,49 @@ namespace CourierHub.Server.Data {
         }
 
         public string CreateReceipt(ApiReceipt receipt) {
-            string text = "";
-
-
+            string text =
+               $"Order code: {receipt.Code}\r\n" +
+               $"Date: {receipt.DateTime:dd.MM.YYYY}\r\n" +
+                "\r\n" +
+                "Order details:\r\n" +
+               $"  Depth: {receipt.Inquire.Depth}\r\n" +
+               $"  Width: {receipt.Inquire.Width}\r\n" +
+               $"  Length: {receipt.Inquire.Length}\r\n" +
+               $"  Mass: {receipt.Inquire.Mass}\r\n" +
+               $"  Source Date: {receipt.Inquire.SourceDate:dd.MM.YYYY}\r\n" +
+               $"  Destination Date: {receipt.Inquire.DestinationDate:dd.MM.YYYY}\r\n" +
+               $"  Is Company: {receipt.Inquire.IsCompany}\r\n" +
+               $"  Is Weekend: {receipt.Inquire.IsWeekend}\r\n" +
+               $"  Priority: {receipt.Inquire.Priority}\r\n" +
+                "\r\n" +
+                " Destination Address:\r\n" +
+               $"   Street: {receipt.Inquire.Destination.Street}\r\n" +
+               $"   Number: {receipt.Inquire.Destination.Number}\r\n" +
+               $"   Flat: {receipt.Inquire.Destination.Flat}\r\n" +
+               $"   City: {receipt.Inquire.Destination.City}\r\n" +
+               $"   Postal Code: {receipt.Inquire.Destination.PostalCode}\r\n" +
+                "\r\n" +
+               $" Source Address:\r\n" +
+               $"   Street: {receipt.Inquire.Source.Street}\r\n" +
+               $"   Number: {receipt.Inquire.Source.Number}\r\n" +
+               $"   Flat: {receipt.Inquire.Destination.Flat}\r\n" +
+               $"   City: {receipt.Inquire.Source.City}\r\n" +
+               $"   Postal Code: {receipt.Inquire.Source.PostalCode}\r\n" +
+                "\r\n" +
+                "Client details:\r\n" +
+               $"  Email: {receipt.Order.ClientEmail}\r\n" +
+               $"  Name: {receipt.Order.ClientName}\r\n" +
+               $"  Surname: {receipt.Order.ClientSurname}\r\n" +
+               $"  Phone: {receipt.Order.ClientPhone}\r\n" +
+               $"  Company: {receipt.Order.ClientCompany}\r\n" +
+               $"  Address:\r\n" +
+               $"    Street: {receipt.Order.ClientAddress.Street}\r\n" +
+               $"    Number: {receipt.Order.ClientAddress.Number}\r\n" +
+               $"    Flat: {receipt.Order.ClientAddress.Flat}\r\n" +
+               $"    City: {receipt.Order.ClientAddress.City}\r\n" +
+               $"    Postal Code: {receipt.Order.ClientAddress.PostalCode}\r\n" +
+                "\r\n" +
+               $"Price: {receipt.Order.Price}";
             return text;
         }
     }
