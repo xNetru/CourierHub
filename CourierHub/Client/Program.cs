@@ -28,6 +28,10 @@ namespace CourierHub.Client {
             });
 
             services.AddSingleton(provider => {
+                return new OfferContainer();
+            });
+
+            services.AddSingleton(provider => {
                 return new OrderContainer();
             });
 
