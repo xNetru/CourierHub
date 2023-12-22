@@ -223,11 +223,15 @@
                 Console.WriteLine("NO MAIL");
                 NavigationManager.NavigateTo("");
             }
-            // NewInquire.mail = email?.Value
+            NewInquire.Email = email?.Value;
         }
 
         UserOffers.Offers.Clear();
-        foreach(var api in Api.WebApis)
+
+        displayInquireSent = true;
+        isButtonDisabled = true;
+
+        foreach(var api in Api.WebApis) // PostInquireGetOffer for all apis
         {
             var res = await api.PostInquireGetOffer(NewInquire);
             Console.WriteLine(res.Item2);
@@ -237,6 +241,7 @@
             }
         }
 
+        NavigationManager.NavigateTo("/offerList");
         // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Inquire/{email?.Value}", NewInquire);
         // Console.WriteLine(x.StatusCode + " STATUS");
 
