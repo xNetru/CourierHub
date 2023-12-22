@@ -4,6 +4,7 @@ using CourierHub.Shared.Enums;
 
 namespace CourierHub.Server.Data {
     public class CourierHubApi : IWebApi {
+
         public async Task<(StatusType?, string)> GetOrderStatus(string code) {
             Console.WriteLine("GetOrderStatus was invoked in CourierHubApi.");
             return (null, "400");

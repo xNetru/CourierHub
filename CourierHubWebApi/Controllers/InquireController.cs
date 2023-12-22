@@ -35,5 +35,8 @@ namespace CourierHubWebApi.Controllers
                                 errors => Problem()), errors => Problem());
 
         }
+
+        [HttpPost("/mail")]
+        public IActionResult CreateInquireEmail()
     }
 }
