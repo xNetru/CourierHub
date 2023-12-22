@@ -16,6 +16,9 @@ namespace CourierHubWebApi.Extensions {
             inquire.IsCompany = request.IsCompany;
             inquire.IsWeekend = request.IsWeekend;
             inquire.Priority = request.Priority;
+            inquire.Source = request.CreateSourceAddress();
+            inquire.Destination = request.CreateDestinationAddress();
+
             return inquire;
         }
         public static Address CreateSourceAddress(this CreateInquireRequest request) {
