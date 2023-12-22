@@ -1,9 +1,11 @@
 ﻿@page "/offerList"
 
 @using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Data
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider Provider
+@inject OfferContainer UserOffers
 
 <h1>Lista dostępnych ofert</h1>
 
@@ -30,7 +32,6 @@
 </div>
 
 @code {
-    // TODO: from inquireForm
     private ApiOffer Offer = new ApiOffer
         {
             ExpirationDate = new DateTime()
@@ -46,5 +47,9 @@
             mail = email.Value;
         }
         NavigationManager.NavigateTo($"/offerSubmitForm/{mail}");
+    }
+
+    protected override void OnInitialized() {
+        Offer = UserOffers.Offers.First(); // TODO: load for all APIs, for now it is just our API
     }
 }

@@ -16,7 +16,7 @@ namespace CourierHub.Shared.Controllers {
                 throw new NullReferenceException("Base address could not be loaded!");
             var service = new ApiService {
                 Name = "CourierHub",
-                ApiKey = "",
+                ApiKey = "1fbbdd4f48fb4c87890cef420d865b86",
                 BaseAddress = adres
             };
             var webApis = new List<IWebApi> {
