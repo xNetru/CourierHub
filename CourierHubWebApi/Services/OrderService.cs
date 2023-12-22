@@ -67,21 +67,12 @@ namespace CourierHubWebApi.Services
 
             order.InquireId = inquiry.Id;
             order.ServiceId = serviceId;
-            
-            try
-            {
-                _dbContext.Addresses.Add(clientAddress);
-            }
-            catch (Exception ex) 
-            {
-                return Error.Failure();
-            }
 
-            order.ClientAddressId = clientAddress.Id;
+            order.ClientAddress = clientAddress;
 
             try
             {
-                _dbContext.Orders.Add(order);
+                _dbContext.Add(order);
             }
             catch(Exception ex)
             {

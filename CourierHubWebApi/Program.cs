@@ -22,6 +22,7 @@ namespace CourierHubWebApi {
             builder.Services.AddScoped<IInquireService, InquireService>();
             builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
             builder.Services.AddScoped<IPriceCacheService, PriceCacheService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

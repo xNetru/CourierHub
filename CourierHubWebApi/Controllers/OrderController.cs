@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using FluentValidation.Results;
+using CourierHubWebApi.Extensions;
 
 namespace CourierHubWebApi.Controllers
 {
@@ -21,22 +22,15 @@ namespace CourierHubWebApi.Controllers
         public IActionResult CreateOrder(CreateOrderRequest request,
             [FromServices] IValidator<CreateOrderRequest> validator)
         {
-            ValidationResult validationResult = validator.Validate(request);
-            if (!validationResult.IsValid)
-            {
-                ModelStateDictionary modelStateDictionary = new();
+            ModelStateDictionary? errors = this.Validate<CreateOrderRequest>(validator, request);
+            if (errors != null)
+                return ValidationProblem(errors);
 
-                foreach (ValidationFailure failure in validationResult.Errors)
-                {
-                    modelStateDictionary.AddModelError(
-                        failure.PropertyName,
-                        failure.ErrorMessage);
-                }
-
-                return ValidationProblem(modelStateDictionary);
-            }
-
-
+            return this.ExtractServiceIdFromContext().Match(
+                serviceId => _orderService.CreateOrder(request, serviceId).Match(
+                    statusCode => Ok(statusCode), errors => Problem(detail: errors.First().Description,
+                    statusCode: errors.First().NumericType)),
+                errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
 
     }
