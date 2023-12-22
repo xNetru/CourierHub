@@ -11,7 +11,6 @@
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
 @inject InquireContainer UserInquires
-@inject ApiContainer Api
 
 <div class="container">
     <h1>Dane osobowe</h1>
@@ -306,8 +305,8 @@
 
     private async void HandleValidSubmit(EditContext context)
     {
-        var api = Api.WebApis.First(); // our API
-        var res = api.PostOrder(NewOrder);
+        //var api = Api.WebApis.First(); // our API
+        //var res = api.PostOrder(NewOrder);
 
         var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Order", NewOrder);
         Console.WriteLine(x.StatusCode + " STATUS");
