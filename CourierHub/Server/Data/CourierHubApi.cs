@@ -52,7 +52,14 @@ namespace CourierHub.Server.Data {
                 inquire.IsWeekend,
                 inquire.Priority);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire);
+            HttpResponseMessage response;
+            if (inquire.Email != null) {
+                var apiInquireWithMail = new CreateInquireWithEmailRequest(apiInquire, inquire.Email);
+                response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquireWithMail);
+            } else {
+                response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire);
+            }
+
             if (response.IsSuccessStatusCode) {
                 var inquireResponse = await response.Content.ReadFromJsonAsync<CreateInquireResponse>();
                 if (inquireResponse != null) {
