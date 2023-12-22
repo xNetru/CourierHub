@@ -173,12 +173,13 @@
     private async void HandleValidSubmit(EditContext context)
     {
         var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
-        Console.WriteLine(x.StatusCode + " STATUS");
+        Console.WriteLine(x.StatusCode + " STATUS " + x.IsSuccessStatusCode);
         Console.WriteLine($"{Http.BaseAddress}Client");
         if (x.IsSuccessStatusCode)
         {
             displayUserAddedToDB = true;
             isButtonDisabled = true;
+            StateHasChanged();
 
             // set role
             // TODO

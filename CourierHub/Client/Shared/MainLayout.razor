@@ -55,12 +55,13 @@
         if (isChecked) { return; }
 
         var state = await Provider.GetAuthenticationStateAsync();
-        SetRole(state.User, "NotAuthorized");
-        Role.Roles["NotAuthorized"] = true;
-        Role.Roles["Client"] = false;
-        Role.Roles["OfficeWorker"] = false;
-        Role.Roles["Courier"] = false;
-        Menu.RefreshMe();
+        // SetRole(state.User, "NotAuthorized");
+        // Role.Roles["NotAuthorized"] = true;
+        // Role.Roles["Client"] = false;
+        // Role.Roles["OfficeWorker"] = false;
+        // Role.Roles["Courier"] = false;
+        // Menu.RefreshMe();
+        // StateHasChanged();
 
         var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
         if (email == null) { return; }
