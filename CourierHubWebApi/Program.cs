@@ -33,6 +33,7 @@ namespace CourierHubWebApi {
             builder.Services.AddScoped<IValidator<CreateInquireRequest>, CreateInquireRequestValidator>();
             builder.Services.AddScoped<IValidator<CreateOrderRequest>, CreateOrderRequestValidator>();
             builder.Services.AddScoped<IValidator<ApiSideAddress>, ApiSideAddressValidator>();  
+            builder.Services.AddScoped<IValidator<CreateInquireWithEmailRequest>,CreateInquireWithEmailRequestValidator>();
 
             var app = builder.Build();
 

@@ -1,4 +1,6 @@
-﻿namespace CourierHubWebApi.Models {
+﻿using CourierHubWebApi.Models.Contracts;
+
+namespace CourierHubWebApi.Models {
     public record CreateInquireRequest(
         int Depth,
         int Width,

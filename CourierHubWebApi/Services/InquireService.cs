@@ -1,10 +1,13 @@
 ﻿using CourierHub.Shared.Data;
+using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace CourierHubWebApi.Services {
@@ -16,102 +19,42 @@ namespace CourierHubWebApi.Services {
             _priceCacheService = priceCacheService;
         }
         public async Task<ErrorOr<CreateInquireResponse>> CreateInquire(CreateInquireRequest request, int serviceId) {
-
-            //if (serviceId == 1) // change it checking in database
-            //{
-            //    return CreateInquireForHub(request);
-            //} else {
-            //    return await CreateInquireForOther(request);
-            //}
-            return await CreateInquireForOther(request);
-
-        }
-        private async Task<ErrorOr<CreateInquireResponse>> CreateInquireForOther(CreateInquireRequest request) {
-            Address sourceAddress = request.CreateSourceAddress();
-            Address destinationAddress = request.CreateDestinationAddress();
             Inquire inquire = request.CreateInquire();
 
-            EntityEntry<Address> sourceAddressEntity;
-            EntityEntry<Address> destinationAddressEntity;
-            try {
-                sourceAddressEntity = await _dbContext.Addresses.AddAsync(sourceAddress);
-                destinationAddressEntity = await _dbContext.Addresses.AddAsync(destinationAddress);
-            } catch (Exception ex) {
-                return Error.Failure();
-            }
-
-            int writtenToDatabase;
-            try {
-                writtenToDatabase = await _dbContext.SaveChangesAsync();
-            } catch (Exception ex) {
-                // TODO: rollback changes
-                return Error.Failure();
-            }
-
-            PropertyValues? sourceAddressValues = await sourceAddressEntity.GetDatabaseValuesAsync();
-            PropertyValues? destinationAddressValues = await destinationAddressEntity.GetDatabaseValuesAsync();
-            if (sourceAddressValues == null || destinationAddressValues == null) {
-                // TODO: rollback changes
-                return Error.Failure();
-            }
-
-            int sourceAddressId, destinationAddressId;
-            if (!sourceAddressValues.TryGetValue("Id", out sourceAddressId) ||
-                !sourceAddressValues.TryGetValue("Id", out destinationAddressId)) {
-                // TODO: rollback changes
-                return Error.Failure();
-            }
-
-            inquire.SourceId = sourceAddressId;
-            inquire.DestinationId = destinationAddressId;
             SetOrderCode(inquire);
 
-            EntityEntry<Inquire> inquireEntity = _dbContext.Inquires.Add(inquire);
-            try {
-                writtenToDatabase = await _dbContext.SaveChangesAsync();
-            } catch (Exception ex) {
-                // TODO: rollback changes
-                return Error.Failure();
+            Error? error = await AddInquireToDataBase(inquire);
+            if (error != null)
+            {
+                return error.Value;
             }
 
-            PropertyValues? inquirePropertyValues = await inquireEntity.GetDatabaseValuesAsync();
-
-            if (inquirePropertyValues == null) {
-                // TODO: rollback changes
-                return Error.Failure();
-            }
-
-            int inquireId;
-            if (!inquirePropertyValues.TryGetValue("Id", out inquireId)) {
-                // TODO: rollback changes
-                return Error.Failure();
-            }
-
-            decimal calculatedPrice = CalculatePrice(inquire);
-            ErrorOr<DateTime> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
-
-            DateTime? expirationTime = null;
-            cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
-            if (expirationTime != null) {
-                return new CreateInquireResponse(CalculatePrice(inquire), inquire.Code, DateTime.Now.AddMinutes(15));
-            } else {
-                return cacheResult.Errors;
-            }
+            return CreateResponse(inquire);
         }
-        private ErrorOr<CreateInquireResponse> CreateInquireForHub(CreateInquireRequest request) {
+
+
+        public async Task<ErrorOr<CreateInquireResponse>> CreateInquireWithEmail(CreateInquireWithEmailRequest request, int serviceId)
+        {
             Inquire inquire = request.CreateInquire();
-            SetOrderCode(inquire);
-            decimal calculatedPrice = CalculatePrice(inquire);
-            ErrorOr<DateTime> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
 
-            DateTime? expirationTime = null;
-            cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
-            if (expirationTime != null) {
-                return new CreateInquireResponse(CalculatePrice(inquire), inquire.Code, DateTime.Now.AddMinutes(15));
-            } else {
-                return cacheResult.Errors;
+            SetOrderCode(inquire);
+
+            if(!TryGetUserId(request.Email, out var userId))
+            {
+                return Error.NotFound();
             }
+
+            inquire.ClientId = userId;
+
+            Error? error = await AddInquireToDataBase(inquire);
+            if (error != null)
+            {
+                return error.Value;
+            }
+
+            return CreateResponse(inquire);
         }
+
         private void SetOrderCode(Inquire inquire) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(DateTime.Now.Date.Year);
@@ -128,5 +71,58 @@ namespace CourierHubWebApi.Services {
             // TODO: implement price calculation
             return 0m;
         }
+
+        private async Task<Error?> AddInquireToDataBase(Inquire inquire)
+        {
+            try
+            {
+                await _dbContext.AddAsync(inquire);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return Error.Failure();
+            }
+            return default;
+        }
+        private ErrorOr<CreateInquireResponse> CreateResponse(Inquire inquire)
+        {
+            decimal calculatedPrice = CalculatePrice(inquire);
+            ErrorOr<DateTime> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
+
+            DateTime? expirationTime = null;
+            cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
+            if (expirationTime != null)
+            {
+                return new CreateInquireResponse(CalculatePrice(inquire), inquire.Code, DateTime.Now.AddMinutes(15));
+            }
+            else
+            {
+                return cacheResult.Errors;
+            }
+        }
+
+        private bool TryGetUserId(string email, out int id)
+        {
+            id = 0;
+            IQueryable<int> idQuery = from users
+                                    in _dbContext.Users
+                                    where users.Email == email &&
+                                    users.Type == (int)UserType.Client
+                                    select users.Id;
+            if (!idQuery.Any())
+                return false;
+            try 
+            {
+                id = idQuery.First();
+                return true;
+            }
+            catch
+            { 
+                return false; 
+            }
+        }
+        
+
     }
 }

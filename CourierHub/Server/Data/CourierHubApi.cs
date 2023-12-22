@@ -4,6 +4,7 @@ using CourierHub.Shared.Enums;
 
 namespace CourierHub.Server.Data {
     public class CourierHubApi : IWebApi {
+
         private readonly ApiService _service;
 
         public string ServiceName { get; set; }
