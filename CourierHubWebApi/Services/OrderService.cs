@@ -65,6 +65,7 @@ namespace CourierHubWebApi.Services
             //    }
             //}
 
+            order.StatusId = (int)StatusType.NotConfirmed;
             order.InquireId = inquiry.Id;
             order.ServiceId = serviceId;
 
@@ -76,7 +77,6 @@ namespace CourierHubWebApi.Services
             }
             catch(Exception ex)
             {
-                // TODO: rollback changes
                 return Error.Failure();
             }
 
