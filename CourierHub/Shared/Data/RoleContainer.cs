@@ -10,7 +10,7 @@ namespace CourierHub.Shared.Data
     {
         public Dictionary<string, bool> Roles { get; set; } = new Dictionary<string, bool>
         {
-            { "NotAuthorized", false},
+            { "NotAuthorized", true},
             { "Client", false},
             { "OfficeWorker", false},
             { "Courier", false}
