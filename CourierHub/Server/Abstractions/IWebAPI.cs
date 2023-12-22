@@ -3,16 +3,18 @@ using CourierHub.Shared.Enums;
 
 namespace CourierHub.Shared.Abstractions {
     public interface IWebApi {
-        // client sends inquire and gets an offer and message
-        Task<(ApiOffer?, string)> PostInquireGetOffer(ApiInquire inquire);
+        public string ServiceName { get; set; }
 
-        // client creates and sends an order, receives message
-        Task<string> PostOrder(ApiOrder order);
+        // client sends inquire and gets an offer and status
+        Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire);
 
-        // client withraws the order, receives message
-        Task<string> PutOrderWithrawal(string code);
+        // client creates and sends an order, receives status
+        Task<int> PostOrder(ApiOrder order);
 
-        // client checks the status of order, receives message
-        Task<(StatusType?, string)> GetOrderStatus(string code);
+        // client withraws the order, receives status
+        Task<int> PutOrderWithrawal(string code);
+
+        // client checks the status of order, receives status
+        Task<(StatusType?, int)> GetOrderStatus(string code);
     }
 }

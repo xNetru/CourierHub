@@ -22,7 +22,7 @@ namespace CourierHub.Server.Data {
         }
 
         public string CreateContract(ApiContract contract) {
-            string text = 
+            string text =
                 "----------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n" +
                 "                                                        CONTRACT\r\n" +
                $"                                       {contract.Code}\r\n" +
@@ -69,7 +69,7 @@ namespace CourierHub.Server.Data {
         }
 
         public string CreateReceipt(ApiReceipt receipt) {
-            string text = 
+            string text =
                $"Order code: {receipt.Code}\r\n" +
                $"Date: {receipt.DateTime:dd.MM.YYYY}\r\n" +
                 "\r\n" +
