@@ -10,7 +10,6 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
-@inject ApiContainer Api
 @inject InquireContainer UserInquires
 
 <div class="container">
@@ -213,11 +212,11 @@
         UserInquires.Inquires.Clear();
         UserInquires.Inquires.Add(NewInquire);
 
-        foreach(var api in Api.WebApis)
-        {
-            var res = await api.PostInquireGetOffer(NewInquire);
-            Console.WriteLine(res.Item2);
-        }
+        //foreach(var api in Api.WebApis)
+        //{
+        //    var res = await api.PostInquireGetOffer(NewInquire);
+        //    Console.WriteLine(res.Item2);
+        //}
 
         var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
         if (email == null)

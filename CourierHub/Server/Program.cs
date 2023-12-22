@@ -1,6 +1,7 @@
 using CourierHub.Server.Data;
 using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Models;
 using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,10 @@ namespace CourierHub {
                 string sender = configuration.GetSection("AzureCommunicationService")["Sender"] ??
                     throw new NullReferenceException("Communication Service sender could not be loaded!");
                 return new AzureCommunicationService(connection, sender);
+            });
+
+            builder.Services.AddSingleton(provider => {
+                return new ApiContainer(new CourierHubApi(), new SzymoHubApi(), new WeraHubApi());
             });
 
             var app = builder.Build();

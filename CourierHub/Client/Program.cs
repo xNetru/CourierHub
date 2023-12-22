@@ -1,4 +1,3 @@
-using CourierHub.Server.Data;
 using CourierHub.Shared.Data;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -17,10 +16,6 @@ namespace CourierHub.Client {
             services.AddOidcAuthentication(options => {
                 configuration.Bind(key: "Auth", options.ProviderOptions);
                 options.ProviderOptions.DefaultScopes.Add(item: "email");
-            });
-
-            services.AddSingleton(provider => {
-                return new ApiContainer(new CourierHubApi(), new SzymoHubApi(), new WeraHubApi());
             });
 
             services.AddSingleton(provider => {
