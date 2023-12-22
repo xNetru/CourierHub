@@ -307,20 +307,16 @@
 
     private async void HandleValidSubmit(EditContext context)
     {
-        //var api = Api.WebApis.First(); // our API
-        //var res = await api.PostOrder(NewOrder);
-        //Console.WriteLine(res);
-        // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Order", NewOrder);
-        // Console.WriteLine(x.StatusCode + " STATUS");
+        const string SERVICENAME = "CourierHub"; // needs to be readen from form, service chosen by client
 
-        // if (x.IsSuccessStatusCode) {
-        //     displayOfferConfirmed = true;
-        //     isButtonDisabled = true;
-        // }
-        //if (res == "400") {
-        //    displayOfferConfirmed = true;
-        //    isButtonDisabled = true;
-        //}
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/{SERVICENAME}/order/", NewOrder);
+        Console.WriteLine("POST ORDER STATUS : " + response.StatusCode);
+        if (response.IsSuccessStatusCode) {
+            displayOfferConfirmed = true;
+            isButtonDisabled = true;
+        } else {
+            Console.WriteLine("POST ORDER FAILED");
+        }
     }
 
     private void HandleInvalidSubmit(EditContext context)
