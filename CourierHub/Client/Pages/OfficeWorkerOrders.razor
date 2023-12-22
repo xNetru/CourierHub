@@ -10,41 +10,39 @@
 
 <h1>Historia zapytań</h1>
 
-<div style="height:600px;overflow-y:scroll;width:1200px;overflow-x:scroll">
-    <table class="table">
-        <thead>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mail</th>
+            <th>Firma</th>
+            <th>Cena</th>
+            <th>Miasto</th>
+            <th>Ulica</th>
+            <th>Numer</th>
+            <th>Lokal</th>
+            <th>Kod</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Orders)
+        {
             <tr>
-                <th>Mail</th>
-                <th>Firma</th>
-                <th>Cena</th>
-                <th>Miasto</th>
-                <th>Ulica</th>
-                <th>Numer</th>
-                <th>Lokal</th>
-                <th>Kod</th>
-                <th></th>
+                <td style="white-space:nowrap">@item.ClientEmail</td>
+                <td style="white-space:nowrap">@item.ClientCompany</td>
+                <td style="white-space:nowrap">@item.Price</td>
+                <td style="white-space:nowrap">@item.ClientAddress.City</td>
+                <td style="white-space:nowrap">@item.ClientAddress.Street</td>
+                <td style="white-space:nowrap">@item.ClientAddress.Number</td>
+                <td style="white-space:nowrap">@item.ClientAddress.Flat</td>
+                <td style="white-space:nowrap">@item.ClientAddress.PostalCode</td>
+                <td style="white-space:nowrap">
+                    <button class="btn btn-primary" @onclick="() => Choose(item)">Wybierz</button>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Orders)
-            {
-                <tr>
-                    <td>@item.ClientEmail</td>
-                    <td>@item.ClientCompany</td>
-                    <td>@item.Price</td>
-                    <td>@item.ClientAddress.City</td>
-                    <td>@item.ClientAddress.Street</td>
-                    <td>@item.ClientAddress.Number</td>
-                    <td>@item.ClientAddress.Flat</td>
-                    <td>@item.ClientAddress.PostalCode</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="() => Choose(item)">Wybierz</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+        }
+    </tbody>
+</table>
 
 @code {
     private IEnumerable<ApiOrder> Orders = new List<ApiOrder>
@@ -76,27 +74,27 @@
         NavigationManager.NavigateTo("/OfficeWorker/Orders/Review");
     }
 
-    // protected async override Task OnInitializedAsync()
-    // {
-    //     var x = await Http.GetAsync($"{Http.BaseAddress}Order");
-    //     Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+    protected async override Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/1/status");
+        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
 
-    //     if (x.IsSuccessStatusCode)
-    //     {
-    //         var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiOrder>>();
-    //         if (c != null)
-    //         {
-    //             Orders = c;
-    //         }
-    //         else
-    //         {
-    //             Console.WriteLine("BAD DESERIALIZATION");
-    //         }
-    //     }
-    //     else
-    //     {
-    //         Console.WriteLine("FAIL");
-    //     }
-    // }
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<IEnumerable<ApiOrder>>();
+            if (c != null)
+            {
+                Orders = c;
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
 
 }

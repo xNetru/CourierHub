@@ -2,28 +2,25 @@
 @using CourierHub.Shared.ApiModels
 @using System.Security.Claims
 @using CourierHub.Shared.Enums;
+@using CourierHub.Shared.Data
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
 @inject NavigationManager Navigation
+@inject RoleContainer Role
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu @ref="Menu" />
     </div>
     <main>
         <div class="top-row px-4">
-            <AuthorizeView Roles="NotAuthorized">
-                <NotAuthorized>
-                    <a class="nav-link btn btn-link" href="authentication/login">Log in</a>
-                </NotAuthorized>
+            <a class="nav-link btn btn-link" @onclick="BeginLogIn" hidden="@(!Role.Roles["NotAuthorized"])">Log in</a>
+            <AuthorizeView>
                 <Authorized>
-                    <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
+                    <a href="authentication/profile" hidden="@(Role.Roles["NotAuthorized"])">Hello, @context.User.Identity?.Name</a>
+                    <button class="nav-link btn btn-link" @onclick="BeginLogOut" hidden="@(Role.Roles["NotAuthorized"])">Log out</button>
                 </Authorized>
-            </AuthorizeView>
-            <AuthorizeView Roles="Client, OfficeWorker, Courier">
-                <a href="authentication/profile">Hello, @context.User.Identity?.Name</a>
-                <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
             </AuthorizeView>
         </div>
 
@@ -34,18 +31,36 @@
 </div>
 
 @code {
-    private void BeginLogOut() {
+    private void BeginLogIn() {
+        StateHasChanged();
+        Navigation.NavigateToLogout("authentication/login");
+    }
+
+    private async void BeginLogOut() {
+        var state = await Provider.GetAuthenticationStateAsync();
+        SetRole(state.User, "NotAuthorized");
+        Role.Roles["NotAuthorized"] = true;
+        Role.Roles["Client"] = false;
+        Role.Roles["OfficeWorker"] = false;
+        Role.Roles["Courier"] = false;
+        Menu.RefreshMe();
         Navigation.NavigateToLogout("authentication/logout");
     }
 
     private HttpResponseMessage? present;
     private bool isChecked = false;
+    private NavMenu Menu;
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
         if (isChecked) { return; }
 
         var state = await Provider.GetAuthenticationStateAsync();
         SetRole(state.User, "NotAuthorized");
+        Role.Roles["NotAuthorized"] = true;
+        Role.Roles["Client"] = false;
+        Role.Roles["OfficeWorker"] = false;
+        Role.Roles["Courier"] = false;
+        Menu.RefreshMe();
 
         var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
         if (email == null) { return; }
@@ -71,11 +86,26 @@
             SetRole(state.User, type.ToString()!);
             if (state.User.IsInRole("Client")) {
                 Console.WriteLine("CLIENT!!!");
-            } else {
-                foreach (var claim in state.User.Claims) {
-                    Console.WriteLine(claim.Value);
-                }
+                Role.Roles["NotAuthorized"] = false;
+                Role.Roles["Client"] = true;
+                Role.Roles["OfficeWorker"] = false;
+                Role.Roles["Courier"] = false;
             }
+            else if (state.User.IsInRole("OfficeWorker"))
+            {
+                Role.Roles["NotAuthorized"] = false;
+                Role.Roles["Client"] = false;
+                Role.Roles["OfficeWorker"] = true;
+                Role.Roles["Courier"] = false;
+            }
+            else if (state.User.IsInRole("Courier")){
+                Role.Roles["NotAuthorized"] = false;
+                Role.Roles["Client"] = false;
+                Role.Roles["OfficeWorker"] = false;
+                Role.Roles["Courier"] = true;
+            }
+            Menu.RefreshMe();
+            StateHasChanged();
         }
     }
 
