@@ -11,6 +11,8 @@
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
 @inject InquireContainer UserInquires
+@inject OfferContainer UserOffers
+@inject RoleContainer Role
 
 <div class="container">
     <h1>Dane osobowe</h1>
@@ -306,15 +308,19 @@
     private async void HandleValidSubmit(EditContext context)
     {
         //var api = Api.WebApis.First(); // our API
-        //var res = api.PostOrder(NewOrder);
+        //var res = await api.PostOrder(NewOrder);
+        //Console.WriteLine(res);
+        // var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Order", NewOrder);
+        // Console.WriteLine(x.StatusCode + " STATUS");
 
-        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Order", NewOrder);
-        Console.WriteLine(x.StatusCode + " STATUS");
-
-        if (x.IsSuccessStatusCode) {
-            displayOfferConfirmed = true;
-            isButtonDisabled = true;
-        }
+        // if (x.IsSuccessStatusCode) {
+        //     displayOfferConfirmed = true;
+        //     isButtonDisabled = true;
+        // }
+        //if (res == "400") {
+        //    displayOfferConfirmed = true;
+        //    isButtonDisabled = true;
+        //}
     }
 
     private void HandleInvalidSubmit(EditContext context)
@@ -325,26 +331,32 @@
     protected async override Task OnInitializedAsync()
     {
         Inquire = UserInquires.Inquires.Last();
+        Offer = UserOffers.Offers.First(); // for now as we have only our API
+        NewOrder.Code = Offer.Code;
+        NewOrder.Price = Offer.Price;
 
-        var x = await Http.GetAsync($"{Http.BaseAddress}Client/{mail}");
-        Console.WriteLine(x.StatusCode + " STATUS");
-
-        if (x.IsSuccessStatusCode)
+        if (Role.Roles["Client"])
         {
-            var c = await x.Content.ReadFromJsonAsync<ApiClient>();
-            if (c != null)
+            var x = await Http.GetAsync($"{Http.BaseAddress}Client/{mail}");
+            Console.WriteLine(x.StatusCode + " STATUS");
+
+            if (x.IsSuccessStatusCode)
             {
-                NewOrder.ClientName = c.Name;
-                NewOrder.ClientSurname = c.Surname;
-                NewOrder.ClientPhone = c.Phone;
-                NewOrder.ClientAddress = c.Address;
-                NewOrder.ClientCompany = c.Company;
-                NewOrder.ClientEmail = mail;
+                var c = await x.Content.ReadFromJsonAsync<ApiClient>();
+                if (c != null)
+                {
+                    NewOrder.ClientName = c.Name;
+                    NewOrder.ClientSurname = c.Surname;
+                    NewOrder.ClientPhone = c.Phone;
+                    NewOrder.ClientAddress = c.Address;
+                    NewOrder.ClientCompany = c.Company;
+                    NewOrder.ClientEmail = mail;
+                }
             }
-        }
-        else
-        {
-            Console.WriteLine("FAIL");
+            else
+            {
+                Console.WriteLine("FAIL");
+            }
         }
     }
 
