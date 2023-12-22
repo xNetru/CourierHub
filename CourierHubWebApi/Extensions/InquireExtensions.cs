@@ -19,22 +19,10 @@ namespace CourierHubWebApi.Extensions {
             return inquire;
         }
         public static Address CreateSourceAddress(this CreateInquireRequest request) {
-            Address sourceAddress = new();
-            sourceAddress.City = request.SourceCity;
-            sourceAddress.Street = request.SourceStreet;
-            sourceAddress.Number = request.SourceNumber;
-            sourceAddress.Flat = request.SourceFlat;
-            sourceAddress.PostalCode = request.SourcePostalCode;
-            return sourceAddress;
+            return request.SourceAddress.CreateEntityAddress();
         }
         public static Address CreateDestinationAddress(this CreateInquireRequest request) {
-            Address destinationAddress = new();
-            destinationAddress.City = request.DestinationCity;
-            destinationAddress.Street = request.DestinationStreet;
-            destinationAddress.Number = request.DestinationNumber;
-            destinationAddress.Flat = request.DestinationFlat;
-            destinationAddress.PostalCode = request.DestinationPostalCode;
-            return destinationAddress;
+            return request.DestinationAddress.CreateEntityAddress();
         }
     }
 }

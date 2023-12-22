@@ -17,12 +17,13 @@ namespace CourierHubWebApi.Services {
         }
         public async Task<ErrorOr<CreateInquireResponse>> CreateInquire(CreateInquireRequest request, int serviceId) {
 
-            if (serviceId == 1) // change it checking in database
-            {
-                return CreateInquireForHub(request);
-            } else {
-                return await CreateInquireForOther(request);
-            }
+            //if (serviceId == 1) // change it checking in database
+            //{
+            //    return CreateInquireForHub(request);
+            //} else {
+            //    return await CreateInquireForOther(request);
+            //}
+            return await CreateInquireForOther(request);
 
         }
         private async Task<ErrorOr<CreateInquireResponse>> CreateInquireForOther(CreateInquireRequest request) {

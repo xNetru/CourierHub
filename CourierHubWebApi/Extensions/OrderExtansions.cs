@@ -18,13 +18,7 @@ namespace CourierHubWebApi.Extensions
         }
         public static Address CreateClientAddress(this CreateOrderRequest request)
         {
-            Address clientAddress = new Address();
-            clientAddress.City = request.ClientCity;
-            clientAddress.Street = request.ClientStreet;
-            clientAddress.Number = request.ClientAddressBuildingNumber;
-            clientAddress.Flat = request.ClientFlat;
-            clientAddress.PostalCode = request.ClientPostalCode;
-            return clientAddress;
+            return request.ClientAddress.CreateEntityAddress();
         }
     }
 }
