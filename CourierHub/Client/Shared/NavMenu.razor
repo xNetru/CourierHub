@@ -14,8 +14,13 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"])">
-            <NavLink class="nav-link" href="/history" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Historia
+            <NavLink class="nav-link" href="/history/inquires" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Historia zapytań
+            </NavLink>
+        </div>
+        <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"])">
+            <NavLink class="nav-link" href="/history/orders" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Historia zamówień
             </NavLink>
         </div>
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"] && !Role.Roles["NotAuthorized"])">
