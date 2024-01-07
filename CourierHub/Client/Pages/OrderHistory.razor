@@ -4,6 +4,7 @@
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
+@inject NavigationManager NavigationManager
 
 <h1>Historia zamówień</h1>
 
@@ -72,6 +73,6 @@
 
     private void Choose(ApiOrder item)
     {
-
+        NavigationManager.NavigateTo("/order/status/" + item.Code);
     }
 }

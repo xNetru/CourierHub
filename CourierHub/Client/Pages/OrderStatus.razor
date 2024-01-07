@@ -1,0 +1,48 @@
+﻿@page "/order/status/{orderCode}"
+
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<h1>Status zamówienia</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kod</th>
+            <th>Status</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="white-space:nowrap">@orderCode</td>
+            <td style="white-space:nowrap">@statusName</td>
+        </tr>
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string? orderCode { get; set; }
+    private ApiStatus status = new ApiStatus
+        {
+            Name = "CouldNotDeliver",
+            IsCancelable = false
+        };
+    private string? statusName;
+
+    protected async override Task OnInitializedAsync()
+    {
+        // get order status by code
+        StatusType statusType;
+        Enum.TryParse(status.Name, out statusType);
+        int type = (int)statusType;
+        StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
+        statusName = Enum.GetName(typeof(StatusTypePL), statusTypePL);
+        statusName = statusName?.Replace('_', ' ');
+    }
+}
