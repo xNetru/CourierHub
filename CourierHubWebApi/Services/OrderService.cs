@@ -10,17 +10,22 @@ namespace CourierHubWebApi.Services {
     public class OrderService : IOrderService {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService;
-        public OrderService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService) {
+        private IApiKeyService _apiKeyService;
+        public OrderService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService)
+        {
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
+            _apiKeyService = apiKeyService;
         }
-        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId) {
+        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId)
+        {
+            if (_apiKeyService.IsOurServiceRequest(serviceId))
+                return StatusCodes.Status200OK;
             Order order = request.CreateOrder();
             Address clientAddress = request.CreateClientAddress();
             string inquiryCode = request.InquireCode;
 
             // checking whether offer is not expired
-
             ErrorOr<decimal> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
             decimal? price = result.Match(x => x, x => default);
             if (price == default) {
@@ -43,22 +48,6 @@ namespace CourierHubWebApi.Services {
 
             Inquire inquiry = inquiryIdQuery.First();
 
-            // in case of request from our hub checking whether client is registerded
-            //if(serviceId == 1)
-            //{
-            //    IQueryable<int> clientIdQuery = from users
-            //                                    in _dbContext.Users
-            //                                    where users.Email == order.ClientEmail &&
-            //                                    users.Type == (int)UserType.Client
-            //                                    select users.Id;
-
-            //    if (clientIdQuery.Count() == 1)
-            //    {
-            //        int clientId = clientIdQuery.First();
-            //        inquiry.ClientId = clientId;
-            //    }
-            //}
-
             order.StatusId = (int)StatusType.NotConfirmed;
             order.InquireId = inquiry.Id;
             order.ServiceId = serviceId;
@@ -67,17 +56,57 @@ namespace CourierHubWebApi.Services {
 
             try {
                 _dbContext.Add(order);
-            } catch (Exception ex) {
-                return Error.Failure();
-            }
-
-            try {
                 _dbContext.SaveChanges();
-            } catch (Exception ex) {
+            }
+            catch
+            {
                 // TODO: rollback changes
                 return Error.Failure();
             }
             return StatusCodes.Status200OK;
+        }
+        
+        public async Task<ErrorOr<int>> WithdrawOrder(WithdrawOrderRequest request, int serviceId)
+        {
+            IQueryable<Order> orders = _dbContext.Orders.Where(x => x.ServiceId == serviceId && x.Inquire.Code == request.Code);
+            if(orders.Count() != 1)
+            {
+                // TODO: pass valid error
+                return Error.Failure();
+            }
+            Order order = orders.First();
+            Status? status = _dbContext.Statuses.Where(x => x.Id == order.StatusId).FirstOrDefault();
+            if (status != null && status.IsCancelable)
+            {
+                try
+                {
+                    order.StatusId = (int)StatusType.Cancelled;
+                    await _dbContext.SaveChangesAsync();
+                    return StatusCodes.Status200OK;
+                }
+                catch (Exception ex)
+                {
+                    // TODO: pass valid error
+                    return Error.Failure();
+                }
+            }
+            else
+            {
+                // TODO: pass valid error
+                return Error.Failure();
+            }
+
+        }
+
+        public ErrorOr<StatusType> GetOrderStatus(GetOrderStatusRequest request, int serviceId)
+        {
+            IQueryable<Order> orders = _dbContext.Orders.Where(x => x.Inquire.Code == request.Code && x.ServiceId == serviceId);
+            Order? order = orders.FirstOrDefault();
+            if (orders.Count() != 1 || order == null)
+            {
+                return Error.Conflict();
+            }
+            return (StatusType)order.StatusId;
         }
     }
 }
