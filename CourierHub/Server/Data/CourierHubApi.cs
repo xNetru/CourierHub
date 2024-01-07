@@ -80,6 +80,7 @@ public class CourierHubApi : IWebApi {
                 var offer = new ApiOffer {
                     Price = inquireResponse.Price,
                     Code = inquireResponse.Code,
+                    ServiceName = ServiceName,
                     ExpirationDate = inquireResponse.ExpirationDate
                 };
                 return (offer, (int)response.StatusCode);
