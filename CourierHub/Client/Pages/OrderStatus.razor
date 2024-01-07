@@ -2,6 +2,7 @@
 
 @using CourierHub.Shared.ApiModels
 @using CourierHub.Shared.Enums
+@using Radzen.Blazor
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
@@ -26,19 +27,37 @@
 </table>
 
 <div class="row">
-    <div class="col">
+    <div class="col" style="text-align: center;">
         <button class="btn btn-primary" @onclick="() => Cancel()">Odwołaj zamówienie</button>
     </div>
-    <div class="col">
+    <div class="col" style="text-align: center;">
         <button class="btn btn-primary">Oceń serwis</button>
     </div>
 </div>
+
+<div style="text-align: center; padding-top: 20px;">
+    <textarea id="reviewTextArea" rows="4" cols="50" placeholder="Napisz swoją recenzję..."></textarea>
+
+    <br />
+        <div class="rz-p-12 rz-text-align-center">
+            <RadzenRating @bind-Value=@rating />
+        </div>
+    <br />
+
+    <button class="btn btn-primary">Zatwierdź ocenę</button>
+</div>
+
+@code {
+    int value = 33;
+}
 
 @code {
     [Parameter]
     public string? orderCode { get; set; }
     private string? statusName;
     private string? service;
+    private bool[] isGold = new bool[5];
+    private int rating = 0;
 
     protected async override Task OnInitializedAsync()
     {
