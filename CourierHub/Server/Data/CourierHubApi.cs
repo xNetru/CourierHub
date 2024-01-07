@@ -19,8 +19,20 @@ public class CourierHubApi : IWebApi {
 
     public async Task<(StatusType?, int)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in CourierHubApi.");
-        return (null, 400);
-        // Kamilu pamiętaj o 30s limitu (wzoruj się na gotowych implementacjach)
+
+        StatusType? status = null;
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try {
+            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/api/Order/{code}/Status/", cancelToken.Token);
+        } catch (TaskCanceledException e) {
+            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        }
+
+        if (status == null) {
+            return (null, 504);
+        } else {
+            return (status, 200);
+        }
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
@@ -80,7 +92,6 @@ public class CourierHubApi : IWebApi {
     }
 
     public async Task<int> PostOrder(ApiOrder order) {
-        // order from our clients are saved in backend
         /*
         Console.WriteLine("PostOrder was invoked in CourierHubApi.");
 
@@ -109,12 +120,22 @@ public class CourierHubApi : IWebApi {
         }
         return (int)response.StatusCode;
         */
+
+        // we decided that order from our clients are saved in backend
+        await Task.Delay(1);
         return 200;
     }
 
     public async Task<int> PutOrderWithrawal(string code) {
         Console.WriteLine("PutOrderWithrawal was invoked in CourierHubApi.");
-        return 400;
-        // Kamilu pamiętaj o 30s limitu (wzoruj się na gotowych implementacjach)
+
+        var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try {
+            response = await _httpClient.PutAsJsonAsync("/api/Order/Withdraw", code, cancelToken.Token);
+        } catch (TaskCanceledException e) {
+            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        }
+        return (int)response.StatusCode;
     }
 }
