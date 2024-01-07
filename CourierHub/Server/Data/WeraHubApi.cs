@@ -2,7 +2,7 @@
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 
-namespace CourierHub.Server.Data; 
+namespace CourierHub.Server.Data;
 public class WeraHubApi : IWebApi {
     private readonly ApiService _service;
 

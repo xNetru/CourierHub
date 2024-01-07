@@ -3,7 +3,7 @@ using CourierHub.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CourierHub.Shared.Controllers; 
+namespace CourierHub.Shared.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class UserController : ControllerBase {

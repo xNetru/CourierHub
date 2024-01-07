@@ -3,15 +3,21 @@ using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
+using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace CourierHub.Shared.Controllers; 
+namespace CourierHub.Shared.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class ApiController : ControllerBase {
+    private readonly CourierHubDbContext _context;
+    private readonly InquireCodeContainer _container;
     private readonly IEnumerable<IWebApi> _webApis;
 
-    public ApiController(CourierHubDbContext context, IConfiguration config) {
+    public ApiController(CourierHubDbContext context, IConfiguration config, InquireCodeContainer container) {
+        _context = context;
+        _container = container;
         // w przyszłości z bazy danych, na czas testów z configa
         // -----
         string adres = config.GetValue<string>("ApiAddress") ??
@@ -40,12 +46,26 @@ public class ApiController : ControllerBase {
                 offers.Add(offer);
             }
         }
+
         if (offers.Any()) {
+            Inquire inquireDB = (Inquire)inquire;
+            if (inquire.Email != null) {
+                var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == inquire.Email && e.Type == (int)UserType.Client);
+                if (user != null) {
+                    inquireDB.ClientId = user.Id;
+                }
+            }
+            await _context.Inquires.AddAsync(inquireDB);
+            await _context.SaveChangesAsync();
+
+            // cash inquire with codes
+            var codeList = offers.Select(e => e.Code).ToList();
+            _container.InquireCodes.Add((codeList, inquireDB.Id));
+
             return Ok(offers);
         } else {
             return NotFound(Array.Empty<ApiOffer>());
         }
-
     }
 
     // POST: <ApiController>/CourierHub/order/{...}
@@ -53,9 +73,23 @@ public class ApiController : ControllerBase {
     public async Task<ActionResult> PostOrder(string serviceName, [FromBody] ApiOrder? order) {
         if (order == null) { return BadRequest(); }
 
+        var service = await _context.Services.FirstOrDefaultAsync(e => e.Name == serviceName);
+        if (service == null) { return NotFound(); }
+
         foreach (var webapi in _webApis) {
             if (webapi.ServiceName == serviceName) {
                 int status = await webapi.PostOrder(order);
+
+                // retrieve cashed id
+                int inquireId = _container.InquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
+                Order orderDB = (Order)order;
+                orderDB.InquireId = inquireId;
+                orderDB.ServiceId = service.Id;
+                orderDB.StatusId = (int)StatusType.NotConfirmed;
+
+                await _context.Orders.AddAsync(orderDB);
+                await _context.SaveChangesAsync();
+
                 return StatusCode(status);
             }
         }
@@ -74,8 +108,8 @@ public class ApiController : ControllerBase {
         return NotFound(); // should not happen if serviceName exists
     }
 
-    // to jest chyba realnie niepotrzebne, bo nie będzie wołane z frontendu
     // GET: <ApiController>/CourierHub/status/q1w2-e3r4-t5y6-u7i8-o9p0
+    /*
     [HttpGet("{serviceName}/status/{code}")]
     public async Task<ActionResult<StatusType?>> GetOrderStatus(string serviceName, string code) {
         foreach (var webapi in _webApis) {
@@ -90,4 +124,5 @@ public class ApiController : ControllerBase {
         }
         return NotFound(null); // should not happen if serviceName exists
     }
+    */
 }

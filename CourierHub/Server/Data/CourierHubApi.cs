@@ -4,7 +4,7 @@ using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using System.Net;
 
-namespace CourierHub.Server.Data; 
+namespace CourierHub.Server.Data;
 public class CourierHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
 
@@ -57,12 +57,7 @@ public class CourierHubApi : IWebApi {
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
-            if (inquire.Email != null) {
-                var apiInquireWithMail = new CreateInquireWithEmailRequest(apiInquire, inquire.Email);
-                response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquireWithMail, cancelToken.Token);
-            } else {
-                response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire, cancelToken.Token);
-            }
+            response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire, cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
@@ -85,6 +80,8 @@ public class CourierHubApi : IWebApi {
     }
 
     public async Task<int> PostOrder(ApiOrder order) {
+        // order from our clients are saved in backend
+        /*
         Console.WriteLine("PostOrder was invoked in CourierHubApi.");
 
         var address = new ApiSideAddress(
@@ -111,6 +108,8 @@ public class CourierHubApi : IWebApi {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
         return (int)response.StatusCode;
+        */
+        return 200;
     }
 
     public async Task<int> PutOrderWithrawal(string code) {

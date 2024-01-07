@@ -4,7 +4,7 @@ using CourierHub.Shared.Data;
 using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
 
-namespace CourierHub; 
+namespace CourierHub;
 public class Program {
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +34,10 @@ public class Program {
             string sender = configuration.GetSection("AzureCommunicationService")["Sender"] ??
                 throw new NullReferenceException("Communication Service sender could not be loaded!");
             return new AzureCommunicationService(connection, sender);
+        });
+
+        builder.Services.AddSingleton(provider => {
+            return new InquireCodeContainer();
         });
 
         var app = builder.Build();

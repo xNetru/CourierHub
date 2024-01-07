@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CourierHub.Shared.Controllers; 
+namespace CourierHub.Shared.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class OrderController : ControllerBase {
@@ -38,9 +38,9 @@ public class OrderController : ControllerBase {
         return Ok(apiOrders);
     }
 
-    // GET: <OrderController>/1/status
-    [HttpGet("{status}/status")]
-    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetConfirmed(int status) {
+    // GET: <OrderController>/1/order
+    [HttpGet("{status}/order")]
+    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrderByStatus(int status) {
         // hardcoded
         if (status < 1 || status > 7) { return BadRequest(); }
         var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == status).ToListAsync();
@@ -52,6 +52,25 @@ public class OrderController : ControllerBase {
             apiOrders.Add((ApiOrder)order);
         }
         return Ok(apiOrders);
+    }
+
+    // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status
+    [HttpGet("{code}/status")]
+    public async Task<ActionResult<StatusType?>> GetStatusByCode(string code) {
+        if (code.IsNullOrEmpty()) { return BadRequest(); }
+        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+        if (order == null) { return NotFound(); }
+        StatusType? type = (StatusType)Enum.Parse(typeof(StatusType), order.StatusId.ToString());
+        return Ok(type);
+    }
+
+    // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/service
+    [HttpGet("{code}/service")]
+    public async Task<ActionResult<string>> GetServiceByCode(string code) {
+        if (code.IsNullOrEmpty()) { return BadRequest(); }
+        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+        if (order == null) { return NotFound(); }
+        return Ok(order.Service.Name);
     }
 
     // POST: <OrderController>/{...}

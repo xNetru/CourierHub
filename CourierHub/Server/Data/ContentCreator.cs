@@ -2,7 +2,7 @@
 using CourierHub.Shared.ApiModels;
 using System.Net.Mime;
 
-namespace CourierHub.Server.Data; 
+namespace CourierHub.Server.Data;
 public class ContentCreator {
     private readonly ApiService _service;
 

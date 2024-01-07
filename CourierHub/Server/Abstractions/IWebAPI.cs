@@ -1,7 +1,7 @@
 ﻿using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 
-namespace CourierHub.Shared.Abstractions; 
+namespace CourierHub.Shared.Abstractions;
 public interface IWebApi {
     public string ServiceName { get; set; }
 

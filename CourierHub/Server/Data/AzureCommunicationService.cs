@@ -3,7 +3,7 @@ using Azure.Communication.Email;
 using CourierHub.Shared.Abstractions;
 using System.Text;
 
-namespace CourierHub.Server.Data; 
+namespace CourierHub.Server.Data;
 public class AzureCommunicationService : ICloudCommunicationService {
     private readonly EmailClient _emailClient;
     private readonly string _sender;

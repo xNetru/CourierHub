@@ -5,7 +5,7 @@ using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CourierHub.Shared.Controllers; 
+namespace CourierHub.Shared.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class ContentController : ControllerBase {
