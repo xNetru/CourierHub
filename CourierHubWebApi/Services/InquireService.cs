@@ -14,25 +14,29 @@ namespace CourierHubWebApi.Services {
     public class InquireService : IInquireService {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService; // Must be changed if only database is updated
-        public InquireService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService) {
+        private IApiKeyService _apiKeyService;
+        public InquireService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService = null)
+        {
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
+            _apiKeyService = apiKeyService;
         }
         public async Task<ErrorOr<CreateInquireResponse>> CreateInquire(CreateInquireRequest request, int serviceId) {
             Inquire inquire = request.CreateInquire();
 
             SetOrderCode(inquire);
 
-            Error? error = await AddInquireToDataBase(inquire);
-            if (error != null)
+            if(!_apiKeyService.IsOurServiceRequest(serviceId))
             {
-                return error.Value;
+                Error? error = await AddInquireToDataBase(inquire);
+                if (error != null)
+                {
+                    return error.Value;
+                }
             }
 
             return CreateResponse(inquire);
         }
-
-
         public async Task<ErrorOr<CreateInquireResponse>> CreateInquireWithEmail(CreateInquireWithEmailRequest request, int serviceId)
         {
             Inquire inquire = request.CreateInquire();
@@ -54,7 +58,6 @@ namespace CourierHubWebApi.Services {
 
             return CreateResponse(inquire);
         }
-
         private void SetOrderCode(Inquire inquire) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(DateTime.Now.Date.Year);
@@ -71,7 +74,6 @@ namespace CourierHubWebApi.Services {
             // TODO: implement price calculation
             return 0m;
         }
-
         private async Task<Error?> AddInquireToDataBase(Inquire inquire)
         {
             try
@@ -94,14 +96,13 @@ namespace CourierHubWebApi.Services {
             cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
             if (expirationTime != null)
             {
-                return new CreateInquireResponse(CalculatePrice(inquire), inquire.Code, DateTime.Now.AddMinutes(15));
+                return new CreateInquireResponse(calculatedPrice, inquire.Code, DateTime.Now.AddMinutes(15));
             }
             else
             {
                 return cacheResult.Errors;
             }
         }
-
         private bool TryGetUserId(string email, out int id)
         {
             id = 0;
@@ -122,7 +123,5 @@ namespace CourierHubWebApi.Services {
                 return false; 
             }
         }
-        
-
     }
 }

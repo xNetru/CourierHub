@@ -1,10 +1,13 @@
 ﻿using Azure.Core;
+using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Primitives;
+using System.Runtime.CompilerServices;
 
 namespace CourierHubWebApi.Extensions
 {
@@ -49,6 +52,19 @@ namespace CourierHubWebApi.Extensions
                 }
             }
             return Error.Custom(description: "Middleware error", type: (int)ErrorType.Unexpected, code: "500");
+        }
+        public static ErrorOr<int> GetServiceIdFromHttpContext(this ControllerBase controller, 
+            IApiKeyService apiKeyService) 
+        {
+            if(apiKeyService.TryExtractApiKey(controller.HttpContext, out string apiKey))
+            {
+                if(apiKeyService.TryGetServiceId(apiKey, out int serviceId))
+                {
+                    return serviceId;
+                }
+                return Error.Unauthorized(description: "API key was not provided");
+            }
+            return Error.Unauthorized(description: "Invalid API key");
         }
     }
 }
