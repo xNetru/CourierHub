@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using CourierHub.Shared.Data
+
+@inject RoleContainer Role
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">CourierHub</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,19 +13,19 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+        <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"])">
+            <NavLink class="nav-link" href="/history" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Historia
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+        <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"] && !Role.Roles["NotAuthorized"])">
+            <NavLink class="nav-link" href="inquireForm">
+                <span class="oi oi-plus" aria-hidden="true"></span> Zamów wysyłkę
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+        <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["OfficeWorker"])">
+            <NavLink class="nav-link" href="OfficeWorker/Orders">
+                <span class="oi oi-plus" aria-hidden="true"></span> Przegląd ofert
             </NavLink>
         </div>
     </nav>
@@ -35,5 +39,10 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    public void RefreshMe()
+    {
+        StateHasChanged();
     }
 }

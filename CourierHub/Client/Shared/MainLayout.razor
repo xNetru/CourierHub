@@ -1,13 +1,27 @@
 ﻿@inherits LayoutComponentBase
+@using CourierHub.Shared.ApiModels
+@using System.Security.Claims
+@using CourierHub.Shared.Enums;
+@using CourierHub.Shared.Data
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+@inject NavigationManager Navigation
+@inject RoleContainer Role
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu @ref="Menu" />
     </div>
-
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <a class="nav-link btn btn-link" @onclick="BeginLogIn" hidden="@(!Role.Roles["NotAuthorized"])">Log in</a>
+            <AuthorizeView>
+                <Authorized>
+                    <a href="authentication/profile" hidden="@(Role.Roles["NotAuthorized"])">Hello, @context.User.Identity?.Name</a>
+                    <button class="nav-link btn btn-link" @onclick="BeginLogOut" hidden="@(Role.Roles["NotAuthorized"])">Log out</button>
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
@@ -15,3 +29,93 @@
         </article>
     </main>
 </div>
+
+@code {
+    private void BeginLogIn() {
+        StateHasChanged();
+        Navigation.NavigateToLogout("authentication/login");
+    }
+
+    private async void BeginLogOut() {
+        var state = await Provider.GetAuthenticationStateAsync();
+        SetRole(state.User, "NotAuthorized");
+        Role.Roles["NotAuthorized"] = true;
+        Role.Roles["Client"] = false;
+        Role.Roles["OfficeWorker"] = false;
+        Role.Roles["Courier"] = false;
+        Menu.RefreshMe();
+        Navigation.NavigateToLogout("authentication/logout");
+    }
+
+    private HttpResponseMessage? present;
+    private bool isChecked = false;
+    private NavMenu Menu;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (isChecked) { return; }
+
+        var state = await Provider.GetAuthenticationStateAsync();
+        // SetRole(state.User, "NotAuthorized");
+        // Role.Roles["NotAuthorized"] = true;
+        // Role.Roles["Client"] = false;
+        // Role.Roles["OfficeWorker"] = false;
+        // Role.Roles["Courier"] = false;
+        // Menu.RefreshMe();
+        // StateHasChanged();
+
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null) { return; }
+        isChecked = true;
+
+        if (state.User.IsInRole("NotAuthorized")) {
+            Console.WriteLine("NOT AUTHORIZED");
+        } else {
+            foreach (var claim in state.User.Claims) {
+                Console.WriteLine(claim.Value);
+            }
+        }
+
+        present = await Http.SendAsync(new HttpRequestMessage(HttpMethod.Head, new Uri($"{Http.BaseAddress}User/{email.Value}")));
+        if (!present.IsSuccessStatusCode) {
+            string username = state.User.Identity!.Name!;
+            string[] credentials = username.Split(" ");
+            Navigation.NavigateTo("/registrationForm/"+credentials[0]+"/"+credentials[1]+"/"+email.Value);
+        } else {
+            // set role
+            var type = await Http.GetFromJsonAsync<UserType?>(new Uri($"{Http.BaseAddress}User/{email.Value}"));
+            if (type == null) { return; }
+            SetRole(state.User, type.ToString()!);
+            if (state.User.IsInRole("Client")) {
+                Console.WriteLine("CLIENT!!!");
+                Role.Roles["NotAuthorized"] = false;
+                Role.Roles["Client"] = true;
+                Role.Roles["OfficeWorker"] = false;
+                Role.Roles["Courier"] = false;
+            }
+            else if (state.User.IsInRole("OfficeWorker"))
+            {
+                Role.Roles["NotAuthorized"] = false;
+                Role.Roles["Client"] = false;
+                Role.Roles["OfficeWorker"] = true;
+                Role.Roles["Courier"] = false;
+            }
+            else if (state.User.IsInRole("Courier")){
+                Role.Roles["NotAuthorized"] = false;
+                Role.Roles["Client"] = false;
+                Role.Roles["OfficeWorker"] = false;
+                Role.Roles["Courier"] = true;
+            }
+            Menu.RefreshMe();
+            StateHasChanged();
+        }
+    }
+
+    private void SetRole(ClaimsPrincipal user, string roleName) {
+        var indentity = user.Identities.FirstOrDefault();
+        if (indentity == null) {
+            user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Role, roleName) }, "Roles"));
+        } else {
+            indentity.AddClaim(new Claim(ClaimTypes.Role, roleName));
+        }
+    }
+}

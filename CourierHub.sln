@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierHub.Client", "Courie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierHub.Shared", "CourierHub\Shared\CourierHub.Shared.csproj", "{22623502-EF4E-47D3-9191-9173D71DD232}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierHubWebApi", "CourierHubWebApi\CourierHubWebApi.csproj", "{1B90DFA8-9B9C-4383-8714-01D31E6E336B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierHubWebApi", "CourierHubWebApi\CourierHubWebApi.csproj", "{1B90DFA8-9B9C-4383-8714-01D31E6E336B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ABF67A22-DDDF-4092-AE41-39728FC84F78}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

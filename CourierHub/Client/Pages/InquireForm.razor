@@ -1,0 +1,251 @@
+﻿@page "/inquireForm"
+
+@using CourierHub.Shared.Models
+@using CourierHub.Shared.Data
+@using CourierHub.Shared.Enums
+@using CourierHub.Shared.ApiModels
+@using System.Text.Json;
+@using System.Text;
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+@inject InquireContainer UserInquires
+@inject OfferContainer UserOffers
+@inject RoleContainer Role
+
+<div class="container">
+
+    <EditForm Model="@NewInquire" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+
+        <ObjectGraphDataAnnotationsValidator />
+
+        <h2>Wymiary paczki</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Width" class="col-form-label">Szerokość</label>
+                        <input type="text" class="form-control" id="Width" @bind-value="@NewInquire.Width" placeholder="podaj szerokość paczki..." />
+                        <ValidationMessage For="@(()=>NewInquire.Width)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Length" class="col-form-label">Wysokość</label>
+                        <input type="text" class="form-control" id="Length" @bind-value="@NewInquire.Length" placeholder="podaj długość paczki..." />
+                        <ValidationMessage For="@(()=>NewInquire.Length)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Depth" class="col-form-label">Głębokość</label>
+                        <input type="text" class="form-control" id="Depth" @bind-value="@NewInquire.Depth" placeholder="podaj głębokość paczki..." />
+                        <ValidationMessage For="@(()=>NewInquire.Depth)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Mass" class="col-form-label">Masa</label>
+                        <input type="text" class="form-control" id="Mass" @bind-value="@NewInquire.Mass" placeholder="podaj masę paczki..." />
+                        <ValidationMessage For="@(()=>NewInquire.Mass)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Okres wysyłki </h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="SourceDate">Data wysyłki</label>
+                        <input type="date" class="form-control" id="src" @bind-value="@NewInquire.SourceDate" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <ValidationMessage For="@(()=>NewInquire.SourceDate)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="DestinationDate">Data dostawy</label>
+                        <input type="date" class="form-control" id="destDate" @bind-value="@NewInquire.DestinationDate" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <ValidationMessage For="@(()=>NewInquire.DestinationDate)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Właściwości przesyłki </h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-4">
+                        <InputCheckbox @bind-Value="NewInquire.IsWeekend" /> Możliwość dostawy w weekend
+                    </div>
+
+                    <div class="col-md-4">
+                        <InputCheckbox @bind-Value="NewInquire.IsCompany" /> Wysyłka jako pracownik firmy
+                    </div>
+
+                    <div class="col-md-4">
+                        <InputSelect @bind-Value="NewInquire.Priority">
+                            <option value="-1">Wybierz priorytet paczki</option>
+                            @foreach (var val in Enum.GetValues(typeof(PriorityTypePL)))
+                            {
+                                <option value="@Convert.ToInt32(val)">@val</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(()=>NewInquire.Priority)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Adres wysyłki</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="SA_City" @bind-value="@NewInquire.Source.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewInquire.Source.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="SA_Street" @bind-value="@NewInquire.Source.Street" placeholder="podaj ulicę..." />
+                        <ValidationMessage For="@(()=>NewInquire.Source.Street)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="SA_Number" @bind-value="@NewInquire.Source.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewInquire.Source.Number)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="SA_Flat" @bind-value="@NewInquire.Source.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewInquire.Source.Flat)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="SA_PostalCode" @bind-value="@NewInquire.Source.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewInquire.Source.PostalCode)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Adres docelowy</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="DA_City" @bind-value="@NewInquire.Destination.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewInquire.Destination.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="DA_Street" @bind-value="@NewInquire.Destination.Street" placeholder="podaj ulicę..." />
+                        <ValidationMessage For="@(()=>NewInquire.Destination.Street)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="DA_Number" @bind-value="@NewInquire.Destination.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewInquire.Destination.Number)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="DA_Flat" @bind-value="@NewInquire.Destination.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewInquire.Destination.Flat)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="DA_PostalCode" @bind-value="@NewInquire.Destination.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewInquire.Destination.PostalCode)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (displayInquireSent)
+        {
+            <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+                <label class="p-2">Zapytanie wysłane </label>
+            </div>
+        }
+
+        <button type="submit" class="btn btn-info" Style="margin-top:10px" disabled=@isButtonDisabled>Wyślij</button>
+    </EditForm>
+</div>
+
+@code {
+    private ApiInquire NewInquire = new ApiInquire
+    {
+        Source = new ApiAddress(),
+        Destination = new ApiAddress(),
+        Code = "" // from API
+    };
+    private bool displayInquireSent = false;
+    private bool isButtonDisabled = false;
+
+    private async void HandleValidSubmit(EditContext context)
+    {
+        var state = await Provider.GetAuthenticationStateAsync();
+
+        NewInquire.Datetime = DateTime.Today;
+
+        UserInquires.Inquires.Clear();
+        UserInquires.Inquires.Add(NewInquire);
+
+        if (Role.Roles["Client"]) {
+            var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+            if (email == null)
+            {
+                Console.WriteLine("NO MAIL");
+                NavigationManager.NavigateTo(""); // interesting...
+            }
+            NewInquire.Email = email?.Value;
+        }
+        UserOffers.Offers.Clear();
+
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/inquire/", NewInquire);
+        Console.WriteLine("POST INQUIRE STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode) {
+            var offers = await response.Content.ReadFromJsonAsync<ApiOffer[]>();
+
+            if (offers != null) {
+                foreach (var offer in offers) {
+                    UserOffers.Offers.Add(offer);
+                }
+                displayInquireSent = true;
+                isButtonDisabled = true;
+                NavigationManager.NavigateTo("/offerList");
+            } else {
+                Console.WriteLine("GET INQUIRE FAILED");
+            }
+        }
+    }
+
+    private void HandleInvalidSubmit(EditContext context)
+    {
+        displayInquireSent = false;
+    }
+}

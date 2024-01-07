@@ -1,0 +1,214 @@
+﻿@page "/registrationForm/{name}/{surname}/{email}"
+
+@using CourierHub.Shared.ApiModels;
+@using System.Text.Json;
+@using System.Text;
+
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<div class="container">
+
+    <EditForm Model="@NewClient" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+
+        <ObjectGraphDataAnnotationsValidator />
+
+        <h2>Dane podstawowe</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Name" class="col-form-label">Imię</label>
+                        <input type="text" class="form-control" id="Name" @bind-value="@NewClient.Name" placeholder="podaj imię..." />
+                        <ValidationMessage For="@(()=>NewClient.Name)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Surname" class="col-form-label">Nazwisko</label>
+                        <input type="text" class="form-control" id="Surname" @bind-value="@NewClient.Surname" placeholder="podaj nazwisko..." />
+                        <ValidationMessage For="@(()=>NewClient.Surname)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="Email" class="col-form-label">Email</label>
+                        <input type="text" class="form-control" id="Email" @bind-value="@NewClient.Email" disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Dane dodatkowe</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Phone" class="col-form-label">Numer telefonu</label>
+                        <input type="text" class="form-control" id="Phone" @bind-value="@NewClient.Phone" placeholder="podaj numer telefonu..." />
+                        <ValidationMessage For="@(()=>NewClient.Phone)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Company" class="col-form-label">Firma</label>
+                        <input type="text" class="form-control" id="Company" @bind-value="@NewClient.Company" placeholder="podaj nazwę firmy..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Adres zamieszkania</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="CA_City" @bind-value="@NewClient.Address.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="CA_Street" @bind-value="@NewClient.Address.Street" placeholder="podaj ulicę..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.Street)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="CA_Number" @bind-value="@NewClient.Address.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.Number)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="CA_Flat" @bind-value="@NewClient.Address.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.Flat)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="CA_PostalCode" @bind-value="@NewClient.Address.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewClient.Address.PostalCode)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <h2>Domyślny adres wysyłki</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <label for="City" class="col-form-label">Miasto</label>
+                        <input type="text" class="form-control" id="SA_City" @bind-value="@NewClient.SourceAddress.City" placeholder="podaj miasto..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.City)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Ulica</label>
+                        <input type="text" class="form-control" id="SA_Street" @bind-value="@NewClient.SourceAddress.Street" placeholder="podaj ulicę..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.Street)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Number" class="col-form-label">Numer budynku</label>
+                        <input type="text" class="form-control" id="SA_Number" @bind-value="@NewClient.SourceAddress.Number" placeholder="podaj numer budynku..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.Number)" />
+                    </div>
+                </div>
+
+                <div class="form-group row" style="margin-top:10px">
+                    <div class="col-md-6">
+                        <label for="Street" class="col-form-label">Numer lokalu</label>
+                        <input type="text" class="form-control" id="SA_Flat" @bind-value="@NewClient.SourceAddress.Flat" placeholder="podaj numer lokalu..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.Flat)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="PostalCode" class="col-form-label">Kod pocztowy</label>
+                        <input type="text" class="form-control" id="SA_PostalCode" @bind-value="@NewClient.SourceAddress.PostalCode" placeholder="podaj kod pocztowy..." />
+                        <ValidationMessage For="@(()=>NewClient.SourceAddress.PostalCode)" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+
+        @if (displayUserAddedToDB) {
+                <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+                    <label class="p-2">Zostałeś zarejestrowany </label>
+                </div>
+        }
+
+        <button type="submit" class="btn btn-info" Style="margin-top:10px" disabled=@isButtonDisabled>Zatwierdź</button>
+        <hr />
+    </EditForm>
+</div>
+
+@code {
+    private ApiClient NewClient = new ApiClient {
+        Address = new ApiAddress(),
+        SourceAddress = new ApiAddress()
+    };
+
+    private bool displayUserAddedToDB = false;
+    private bool isButtonDisabled = false;
+    [Parameter]
+    public string? name { get; set; }
+    [Parameter]
+    public string? surname { get; set; }
+    [Parameter]
+    public string? email { get; set; }
+
+    private async void HandleValidSubmit(EditContext context)
+    {
+        var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
+        Console.WriteLine(x.StatusCode + " STATUS " + x.IsSuccessStatusCode);
+        Console.WriteLine($"{Http.BaseAddress}Client");
+        if (x.IsSuccessStatusCode)
+        {
+            displayUserAddedToDB = true;
+            isButtonDisabled = true;
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
+
+    private void HandleInvalidSubmit(EditContext context)
+    {
+        displayUserAddedToDB = false;
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        NewClient.Name = name!;
+        NewClient.Surname = surname!;
+        NewClient.Email = email!;
+
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var context = await Provider.GetAuthenticationStateAsync();
+            string? image = context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+            // ta linijka wywala error, ale nie mogę jej złapać
+            //NewClient.Photo = await Http.GetByteArrayAsync(image);
+        }
+    }
+}
