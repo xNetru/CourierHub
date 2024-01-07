@@ -6,10 +6,8 @@ using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
 
-namespace CourierHubWebApi.Services
-{
-    public class OrderService : IOrderService
-    {
+namespace CourierHubWebApi.Services {
+    public class OrderService : IOrderService {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService;
         private IApiKeyService _apiKeyService;
@@ -30,8 +28,7 @@ namespace CourierHubWebApi.Services
             // checking whether offer is not expired
             ErrorOr<decimal> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
             decimal? price = result.Match(x => x, x => default);
-            if(price == default)
-            {
+            if (price == default) {
                 // TODO: return valid error
                 return Error.Failure();
             }
@@ -41,11 +38,10 @@ namespace CourierHubWebApi.Services
             // taking matching inquiry from database 
             IQueryable<Inquire> inquiryIdQuery = from inquires
                              in _dbContext.Inquires
-                             where inquires.Code == inquiryCode
-                             select inquires;
+                                                 where inquires.Code == inquiryCode
+                                                 select inquires;
 
-            if(inquiryIdQuery.Count() != 1)
-            {
+            if (inquiryIdQuery.Count() != 1) {
                 // TODO: return valid error
                 return Error.Failure();
             }
@@ -58,8 +54,7 @@ namespace CourierHubWebApi.Services
 
             order.ClientAddress = clientAddress;
 
-            try
-            {
+            try {
                 _dbContext.Add(order);
                 _dbContext.SaveChanges();
             }

@@ -1,5 +1,4 @@
-﻿namespace CourierHubWebApi.Models
-{
+﻿namespace CourierHubWebApi.Models {
     public record CreateOrderResponse(
         string Message);
 }
