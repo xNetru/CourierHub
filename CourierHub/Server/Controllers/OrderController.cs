@@ -68,9 +68,14 @@ public class OrderController : ControllerBase {
     [HttpGet("{code}/service")]
     public async Task<ActionResult<string>> GetServiceByCode(string code) {
         if (code.IsNullOrEmpty()) { return BadRequest(); }
+
         var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
         if (order == null) { return NotFound(); }
-        return Ok(order.Service.Name);
+
+        var service = await _context.Services.FirstOrDefaultAsync(e => e.Id == order.ServiceId);
+        if (service == null) { return NotFound(); }
+
+        return Ok(service.Name);
     }
 
     // POST: <OrderController>/{...}
