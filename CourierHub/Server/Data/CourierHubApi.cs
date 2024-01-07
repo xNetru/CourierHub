@@ -24,7 +24,7 @@ public class CourierHubApi : IWebApi {
         StatusType? status = null;
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
-            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/api/Order/{code}/Status/", cancelToken.Token);
+            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/api/Order/Status/{code}/", cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
