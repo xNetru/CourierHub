@@ -5,5 +5,7 @@ public class ApiOffer {
 
     public string Code { get; set; } = null!;
 
+    public string ServiceName { get; set; } = null!;
+
     public DateTime ExpirationDate { get; set; }
 }
