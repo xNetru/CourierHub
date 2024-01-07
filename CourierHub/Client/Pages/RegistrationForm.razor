@@ -210,7 +210,8 @@
         {
             var context = await Provider.GetAuthenticationStateAsync();
             string? image = context.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
-            NewClient.Photo = await Http.GetByteArrayAsync(image);
+            // ta linijka wywala error, ale nie mogę jej złapać
+            //NewClient.Photo = await Http.GetByteArrayAsync(image);
         }
     }
 }
