@@ -6,19 +6,15 @@ using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
 
-namespace CourierHubWebApi.Services
-{
-    public class OrderService : IOrderService
-    {
+namespace CourierHubWebApi.Services {
+    public class OrderService : IOrderService {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService;
-        public OrderService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService)
-        {
+        public OrderService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService) {
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
         }
-        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId)
-        {
+        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId) {
             Order order = request.CreateOrder();
             Address clientAddress = request.CreateClientAddress();
             string inquiryCode = request.InquireCode;
@@ -27,8 +23,7 @@ namespace CourierHubWebApi.Services
 
             ErrorOr<decimal> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
             decimal? price = result.Match(x => x, x => default);
-            if(price == default)
-            {
+            if (price == default) {
                 // TODO: return valid error
                 return Error.Failure();
             }
@@ -38,11 +33,10 @@ namespace CourierHubWebApi.Services
             // taking matching inquiry from database 
             IQueryable<Inquire> inquiryIdQuery = from inquires
                              in _dbContext.Inquires
-                             where inquires.Code == inquiryCode
-                             select inquires;
+                                                 where inquires.Code == inquiryCode
+                                                 select inquires;
 
-            if(inquiryIdQuery.Count() != 1)
-            {
+            if (inquiryIdQuery.Count() != 1) {
                 // TODO: return valid error
                 return Error.Failure();
             }
@@ -71,21 +65,15 @@ namespace CourierHubWebApi.Services
 
             order.ClientAddress = clientAddress;
 
-            try
-            {
+            try {
                 _dbContext.Add(order);
-            }
-            catch(Exception ex)
-            {
+            } catch (Exception ex) {
                 return Error.Failure();
             }
 
-            try
-            {
+            try {
                 _dbContext.SaveChanges();
-            }
-            catch(Exception ex)
-            {
+            } catch (Exception ex) {
                 // TODO: rollback changes
                 return Error.Failure();
             }

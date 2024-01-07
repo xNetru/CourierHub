@@ -1,7 +1,7 @@
-﻿using CourierHub.Shared.Abstractions;
+﻿using CourierHub.CourierHubApiModels;
+using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
-using CourierHub.CourierHubApiModels;
 using System.Net;
 
 namespace CourierHub.Server.Data {
@@ -20,6 +20,7 @@ namespace CourierHub.Server.Data {
         public async Task<(StatusType?, int)> GetOrderStatus(string code) {
             Console.WriteLine("GetOrderStatus was invoked in CourierHubApi.");
             return (null, 400);
+            // Kamilu pamiętaj o 30s limitu (wzoruj się na gotowych implementacjach)
         }
 
         public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
@@ -72,7 +73,7 @@ namespace CourierHub.Server.Data {
                     var offer = new ApiOffer {
                         Price = inquireResponse.Price,
                         Code = inquireResponse.Code,
-                        ExpirationDate  = inquireResponse.ExpirationDate
+                        ExpirationDate = inquireResponse.ExpirationDate
                     };
                     return (offer, (int)response.StatusCode);
                 } else {
@@ -102,13 +103,20 @@ namespace CourierHub.Server.Data {
                 order.ClientCompany,
                 address);
 
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/Order", apiOrder);
+            var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+            var cancelToken = new CancellationTokenSource(30 * 1000);
+            try {
+                response = await _httpClient.PostAsJsonAsync("/api/Order", apiOrder, cancelToken.Token);
+            } catch (TaskCanceledException e) {
+                Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+            }
             return (int)response.StatusCode;
         }
 
         public async Task<int> PutOrderWithrawal(string code) {
             Console.WriteLine("PutOrderWithrawal was invoked in CourierHubApi.");
             return 400;
+            // Kamilu pamiętaj o 30s limitu (wzoruj się na gotowych implementacjach)
         }
     }
 }

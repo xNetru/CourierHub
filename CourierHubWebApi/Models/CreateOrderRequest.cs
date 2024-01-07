@@ -1,5 +1,4 @@
-﻿namespace CourierHubWebApi.Models
-{
+﻿namespace CourierHubWebApi.Models {
     public record CreateOrderRequest(
         string InquireCode,
         string ClientName,
@@ -8,5 +7,5 @@
         string ClientPhoneNumber,
         string ClientCompany,
         ApiSideAddress ClientAddress);
-        
+
 }

@@ -22,7 +22,7 @@ namespace CourierHub.Shared.Controllers {
         }
 
         // GET: <OrderController>/30
-        [HttpGet("days")]
+        [HttpGet("{days}")]
         public async Task<ActionResult<IEnumerable<ApiOrder>>> Get(int days) {
             DateTime today = DateTime.Now;
             DateTime before = today.AddDays(-days);

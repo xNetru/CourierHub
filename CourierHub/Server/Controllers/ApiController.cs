@@ -2,6 +2,7 @@
 using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierHub.Shared.Controllers {
@@ -28,7 +29,7 @@ namespace CourierHub.Shared.Controllers {
         }
 
         // POST: <ApiController>/inquire/{...}
-        [HttpPost]
+        [HttpPost("inquire")]
         public async Task<ActionResult<IEnumerable<ApiOffer>>> PostInquireGetOffers([FromBody] ApiInquire? inquire) {
             if (inquire == null) { return BadRequest(Array.Empty<ApiOffer>()); }
 
@@ -48,7 +49,7 @@ namespace CourierHub.Shared.Controllers {
         }
 
         // POST: <ApiController>/CourierHub/order/{...}
-        [HttpPost("{serviceName}")]
+        [HttpPost("{serviceName}/order")]
         public async Task<ActionResult> PostOrder(string serviceName, [FromBody] ApiOrder? order) {
             if (order == null) { return BadRequest(); }
 
@@ -58,13 +59,35 @@ namespace CourierHub.Shared.Controllers {
                     return StatusCode(status);
                 }
             }
-            return Ok();
+            return NotFound(); // should not happen if serviceName exists
         }
 
-        // PATCH: <ApiController>/CourierHub/q1w2-e3r4-t5y6-u7i8-o9p0
-        [HttpPost("{serviceName}/{code}")]
+        // PATCH: <ApiController>/CourierHub/cancel/q1w2-e3r4-t5y6-u7i8-o9p0
+        [HttpPatch("{serviceName}/cancel/{code}")]
         public async Task<ActionResult> PutOrderWithrawal(string serviceName, string code) {
-            throw new NotImplementedException();
+            foreach (var webapi in _webApis) {
+                if (webapi.ServiceName == serviceName) {
+                    int status = await webapi.PutOrderWithrawal(code);
+                    return StatusCode(status);
+                }
+            }
+            return NotFound(); // should not happen if serviceName exists
+        }
+
+        // GET: <ApiController>/CourierHub/status/q1w2-e3r4-t5y6-u7i8-o9p0
+        [HttpGet("{serviceName}/status/{code}")]
+        public async Task<ActionResult<StatusType?>> GetOrderStatus(string serviceName, string code) {
+            foreach (var webapi in _webApis) {
+                if (webapi.ServiceName == serviceName) {
+                    (StatusType? type, int status) = await webapi.GetOrderStatus(code);
+                    if (type != null && status >= 200 && status < 300) {
+                        return Ok(type);
+                    } else {
+                        return BadRequest(type);
+                    }
+                }
+            }
+            return NotFound(null); // should not happen if serviceName exists
         }
     }
 }

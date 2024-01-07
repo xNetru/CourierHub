@@ -1,27 +1,21 @@
-﻿using CourierHubWebApi.Models;
+﻿using CourierHubWebApi.Extensions;
+using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using FluentValidation.Results;
-using CourierHubWebApi.Extensions;
 
-namespace CourierHubWebApi.Controllers
-{
+namespace CourierHubWebApi.Controllers {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
-    {
+    public class OrderController : ControllerBase {
         private IOrderService _orderService;
-        public OrderController(IOrderService orderService)
-        {
+        public OrderController(IOrderService orderService) {
             _orderService = orderService;
         }
         [HttpPost]
         public IActionResult CreateOrder(CreateOrderRequest request,
-            [FromServices] IValidator<CreateOrderRequest> validator)
-        {
+            [FromServices] IValidator<CreateOrderRequest> validator) {
             ModelStateDictionary? errors = this.Validate<CreateOrderRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
