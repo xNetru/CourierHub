@@ -37,27 +37,37 @@
 @code {
     [Parameter]
     public string? orderCode { get; set; }
-    private ApiStatus status = new ApiStatus
-        {
-            Name = "CouldNotDeliver",
-            IsCancelable = false
-        };
     private string? statusName;
 
     protected async override Task OnInitializedAsync()
     {
-        // get order status by code
         StatusType statusType;
-        Enum.TryParse(status.Name, out statusType);
-        int type = (int)statusType;
-        StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
-        statusName = Enum.GetName(typeof(StatusTypePL), statusTypePL);
-        statusName = statusName?.Replace('_', ' ');
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
+        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<StatusType>();
+            if (c > 0)
+            {
+                statusType = c;
+                int type = (int)statusType;
+                StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
+                statusName = Enum.GetName(typeof(StatusTypePL), statusTypePL);
+                statusName = statusName?.Replace('_', ' ');
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
     }
 
     private async void Cancel()
     {
-        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/inquire/", NewInquire);
-        Console.WriteLine("POST INQUIRE STATUS : " + response.StatusCode);
+
     }
 }
