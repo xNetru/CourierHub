@@ -25,6 +25,15 @@
     </tbody>
 </table>
 
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="() => Cancel()">Odwołaj zamówienie</button>
+    </div>
+    <div class="col">
+        <button class="btn btn-primary">Oceń serwis</button>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public string? orderCode { get; set; }
@@ -44,5 +53,11 @@
         StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
         statusName = Enum.GetName(typeof(StatusTypePL), statusTypePL);
         statusName = statusName?.Replace('_', ' ');
+    }
+
+    private async void Cancel()
+    {
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/inquire/", NewInquire);
+        Console.WriteLine("POST INQUIRE STATUS : " + response.StatusCode);
     }
 }
