@@ -2,6 +2,7 @@
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using CourierHub.CourierHubApiModels;
+using System.Net;
 
 namespace CourierHub.Server.Data {
     public class CourierHubApi : IWebApi {
@@ -52,12 +53,17 @@ namespace CourierHub.Server.Data {
                 inquire.IsWeekend,
                 inquire.Priority);
 
-            HttpResponseMessage response;
-            if (inquire.Email != null) {
-                var apiInquireWithMail = new CreateInquireWithEmailRequest(apiInquire, inquire.Email);
-                response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquireWithMail);
-            } else {
-                response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire);
+            var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+            var cancelToken = new CancellationTokenSource(30 * 1000);
+            try {
+                if (inquire.Email != null) {
+                    var apiInquireWithMail = new CreateInquireWithEmailRequest(apiInquire, inquire.Email);
+                    response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquireWithMail, cancelToken.Token);
+                } else {
+                    response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire, cancelToken.Token);
+                }
+            } catch (TaskCanceledException e) {
+                Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
             }
 
             if (response.IsSuccessStatusCode) {

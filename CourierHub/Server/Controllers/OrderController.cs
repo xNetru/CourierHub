@@ -27,7 +27,7 @@ namespace CourierHub.Shared.Controllers {
             DateTime today = DateTime.Now;
             DateTime before = today.AddDays(-days);
 
-            var orders = await _context.Orders.Where(e => e.Inquire.Datetime >= before).ToListAsync();
+            var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Inquire.Datetime >= before).ToListAsync();
             if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<ApiOrder>()); }
 
             var apiOrders = new List<ApiOrder>();
