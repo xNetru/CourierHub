@@ -92,7 +92,6 @@ namespace CourierHub.Shared.Controllers {
             if (statusType == null) { return BadRequest(); }
             var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
             if (order == null) { return NotFound(); }
-            var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == (int)statusType);
             order.StatusId = (int)statusType;
             await _context.SaveChangesAsync();
             return Ok();
