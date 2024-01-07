@@ -13,14 +13,14 @@
         <tr>
             <th>Kod</th>
             <th>Status</th>
-            <th></th>
-            <th></th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td style="white-space:nowrap">@orderCode</td>
             <td style="white-space:nowrap">@statusName</td>
+            <td style="white-space:nowrap">@service</td>
         </tr>
     </tbody>
 </table>
@@ -38,17 +38,22 @@
     [Parameter]
     public string? orderCode { get; set; }
     private string? statusName;
+    private string? service;
 
     protected async override Task OnInitializedAsync()
     {
         StatusType statusType;
         var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
         Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+        var y = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/srvice");
+        Console.WriteLine(x.StatusCode + " GET ORDERS SERVICE");
         if (x.IsSuccessStatusCode)
         {
             var c = await x.Content.ReadFromJsonAsync<StatusType>();
-            if (c > 0)
+            var s = await y.Content.ReadFromJsonAsync<string>();
+            if (c > 0 && s != null)
             {
+                service = s;
                 statusType = c;
                 int type = (int)statusType;
                 StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
@@ -68,6 +73,6 @@
 
     private async void Cancel()
     {
-
+        // cancel from api controller
     }
 }
