@@ -11,16 +11,16 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Serwis</th>
             <th>Kod</th>
-            <th>Status</th>
             <th>Status</th>
         </tr>
     </thead>
     <tbody>
         <tr>
+            <td style="white-space:nowrap">@service</td>
             <td style="white-space:nowrap">@orderCode</td>
             <td style="white-space:nowrap">@statusName</td>
-            <td style="white-space:nowrap">@service</td>
         </tr>
     </tbody>
 </table>
@@ -50,9 +50,16 @@
         if (x.IsSuccessStatusCode)
         {
             var c = await x.Content.ReadFromJsonAsync<StatusType>();
-            var s = await y.Content.ReadFromJsonAsync<string>();
+            var s = await y.Content.ReadAsStringAsync();
             if (c > 0 && s != null)
             {
+                int startIndex = s.IndexOf("<title>") + "<title>".Length;
+                int endIndex = s.IndexOf("</title>", startIndex);
+                if (startIndex >= 0 && endIndex > startIndex)
+                {
+                    s = s.Substring(startIndex, endIndex - startIndex);
+                }
+
                 service = s;
                 statusType = c;
                 int type = (int)statusType;
