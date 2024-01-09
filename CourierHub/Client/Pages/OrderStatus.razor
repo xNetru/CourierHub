@@ -99,7 +99,13 @@
 
     private async void Cancel()
     {
-        // cancel from api controller
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Api/{service}/cancel/{orderCode}", service); // fake content for PATCH
+        Console.WriteLine("PATCH REVIEW STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            
+        }
     }
 
     private async void Submit()
