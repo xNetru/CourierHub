@@ -27,7 +27,14 @@
 </table>
 
 <div class="col" style="text-align: center;">
-    <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(!status.IsCancelable)">Odwołaj zamówienie</button>
+    @if (DBsuccess)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Status zmieniony </label>
+        </div>
+    }
+    <br/>
+    <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(!status.IsCancelable || DBsuccess)">Odwołaj zamówienie</button>
 </div>
 
 <div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(statusType != StatusType.CouldNotDeliver && statusType != StatusType.Delivered)">
@@ -81,10 +88,7 @@
                 service = s;
                 status = c;
                 Enum.TryParse(status.Name, out statusType);
-                int type = (int)statusType;
-                StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
-                statusName = Enum.GetName(typeof(StatusTypePL), statusTypePL);
-                statusName = statusName?.Replace('_', ' ');
+                statusName = Enum2String(statusType);
             }
             else
             {
@@ -104,7 +108,10 @@
 
         if (response.IsSuccessStatusCode)
         {
-            
+            DBsuccess = true;
+            statusType = StatusType.Cancelled;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
         }
     }
 
@@ -119,5 +126,13 @@
             DBsuccess = true;
             StateHasChanged();
         }
+    }
+
+    private string? Enum2String(StatusType statusType)
+    {
+        int type = (int)statusType;
+        StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
+        string? res = Enum.GetName(typeof(StatusTypePL), statusTypePL);
+        return res?.Replace('_', ' ');
     }
 }
