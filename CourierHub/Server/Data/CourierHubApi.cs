@@ -2,6 +2,7 @@
 using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
+using CourierHubWebApi.Models;
 using System.Net;
 
 namespace CourierHub.Server.Data;
@@ -23,7 +24,7 @@ public class CourierHubApi : IWebApi {
         StatusType? status = null;
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
-            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/api/Order/{code}/Status/", cancelToken.Token);
+            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/api/Order/Status/{code}/", cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
@@ -133,7 +134,7 @@ public class CourierHubApi : IWebApi {
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
-            response = await _httpClient.PutAsJsonAsync("/api/Order/Withdraw", code, cancelToken.Token);
+            response = await _httpClient.PutAsJsonAsync("/api/Order/Withdraw", new WithdrawOrderRequest(code), cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }

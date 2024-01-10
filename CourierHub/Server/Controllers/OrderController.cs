@@ -56,12 +56,18 @@ public class OrderController : ControllerBase {
 
     // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status
     [HttpGet("{code}/status")]
-    public async Task<ActionResult<StatusType?>> GetStatusByCode(string code) {
+    public async Task<ActionResult<ApiStatus>> GetStatusByCode(string code) {
         if (code.IsNullOrEmpty()) { return BadRequest(); }
+
         var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
         if (order == null) { return NotFound(); }
-        StatusType? type = (StatusType)Enum.Parse(typeof(StatusType), order.StatusId.ToString());
-        return Ok(type);
+
+        var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == order.StatusId);
+        if (status == null) { return NotFound(); }
+
+        return Ok(new ApiStatus { 
+            Name = status.Name, IsCancelable = status.IsCancelable
+        });
     }
 
     // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/service

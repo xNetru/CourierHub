@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CourierHub\Server\CourierHub.Server.csproj" />
     <ProjectReference Include="..\CourierHub\Shared\CourierHub.Shared.csproj" />
   </ItemGroup>
 
