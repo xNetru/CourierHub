@@ -49,6 +49,7 @@ public class OrderController : ControllerBase {
         var apiOrders = new List<ApiOrder>();
         foreach (var order in orders) {
             order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
+            order.Inquire = (await _context.Inquires.FirstOrDefaultAsync(e => e.Id == order.InquireId))!;
             apiOrders.Add((ApiOrder)order);
         }
         return Ok(apiOrders);

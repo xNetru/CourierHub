@@ -14,7 +14,7 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"])">
-            <NavLink class="nav-link" href="/history/inquires" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="history/inquires" Match="NavLinkMatch.All">
                 <span class="oi oi-list" aria-hidden="true"></span> Historia zapytań
             </NavLink>
         </div>
@@ -24,8 +24,13 @@
             </NavLink>
         </div>
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"])">
-            <NavLink class="nav-link" href="/history/orders" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="history/orders" Match="NavLinkMatch.All">
                 <span class="oi oi-list" aria-hidden="true"></span> Historia zamówień
+            </NavLink>
+        </div>
+        <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Courier"])">
+            <NavLink class="nav-link" href="Courier/orders/available" Match="NavLinkMatch.All">
+                <span class="oi oi-list" aria-hidden="true"></span> Dostępne paczki
             </NavLink>
         </div>
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"] && !Role.Roles["NotAuthorized"])">
