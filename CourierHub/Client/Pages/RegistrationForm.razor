@@ -172,9 +172,16 @@
 
     private async void HandleValidSubmit(EditContext context)
     {
-        var HTTPcontext = await Provider.GetAuthenticationStateAsync();
-        string? image = HTTPcontext.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
-        NewClient.Photo = await Http.GetByteArrayAsync(image);
+        try
+        {
+            var HTTPcontext = await Provider.GetAuthenticationStateAsync();
+            string? image = HTTPcontext.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+            NewClient.Photo = await Http.GetByteArrayAsync(image);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
         var x = await Http.PostAsJsonAsync($"{Http.BaseAddress}Client", NewClient);
         Console.WriteLine(x.StatusCode + " STATUS " + x.IsSuccessStatusCode);
         Console.WriteLine($"{Http.BaseAddress}Client");
