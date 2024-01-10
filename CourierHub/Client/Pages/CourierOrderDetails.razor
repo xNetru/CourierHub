@@ -14,12 +14,14 @@
         <tr>
             <th>Kod</th>
             <th>Status</th>
+            <th hidden="@(statusType == StatusType.Confirmed)">Data odbioru</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td style="white-space:nowrap">@orderCode</td>
             <td style="white-space:nowrap">@statusName</td>
+            <td style="white-space:nowrap" hidden="@(statusType == StatusType.Confirmed)">@(parcel.PickupDatetime?.ToString("dd-MM-yyyy"))</td>
         </tr>
     </tbody>
 </table>
@@ -41,7 +43,7 @@
     [Parameter]
     public string? mail { get; set; }
     private string? statusName;
-    private ApiParcel parcel = new ApiParcel();
+    private ApiParcel parcel = new ApiParcel(); // need some GET and PATCH (edit deliverytime and undelivered reason)
     private ApiStatus status = new ApiStatus();
     private StatusType statusType;
     private bool DBsuccess = false;
