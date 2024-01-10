@@ -15,31 +15,44 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CourierHub.Test; 
-public class OfficeWorkerControllerTest {
-    private readonly OfficeWorkerController _controller;
+public class ClientControllerTest {
+    private readonly ClientController _controller;
     private readonly Mock<CourierHubDbContext> _mockContext;
 
-    public OfficeWorkerControllerTest() {
+    public ClientControllerTest() {
         var mockContext = new Mock<CourierHubDbContext>();
         IList<User> users = new List<User> {
             new() { Id = 1, Email = "januszkowalski@gmail.com", Name = "Janusz", Surname = "Kowalski", Type = 0 },
             new() { Id = 2, Email = "mariuszkamiński@gmail.com", Name = "Mariusz", Surname = "Kamiński", Type = 1 }
         };
         mockContext.Setup(c => c.Users).ReturnsDbSet(users);
+        IList<Address> addresses = new List<Address> {
+            new() { Id = 1, City = "Warszawa" },
+            new() { Id = 2, City = "Kraków" },
+        };
+        mockContext.Setup(c => c.Addresses).ReturnsDbSet(addresses);
+        IList<ClientData> datum = new List<ClientData> {
+            new() { Id = 1, ClientId = 1, SourceAddressId = 1, AddressId = 2 }
+        };
+        mockContext.Setup(c => c.ClientDatum).ReturnsDbSet(datum);
+        IList<Inquire> inquires = new List<Inquire> { 
+            new() { Id = 1, Code = "q1w2-e3r4-t5y6-u7i8-o9p0", ClientId = 1, SourceId = 1, DestinationId = 2 }
+        };
+        mockContext.Setup(c => c.Inquires).ReturnsDbSet(inquires);
         IList<Order> orders = new List<Order> {
-            new() { Id = 1, Inquire = new Inquire { Code = "q1w2-e3r4-t5y6-u7i8-o9p0" } }
+            new() { Id = 1, InquireId = 1, ClientAddressId = 2,
+                ClientName = "Janusz", ClientSurname = "Kowalski", ClientEmail =  "januszkowalski@gmail.com"
+            }
         };
         mockContext.Setup(c => c.Orders).ReturnsDbSet(orders);
-        IList<Evaluation> evaluations = new List<Evaluation>();
-        mockContext.Setup(c => c.Evaluations).ReturnsDbSet(evaluations);
         _mockContext = mockContext;
-        _controller = new OfficeWorkerController(mockContext.Object);
+        _controller = new ClientController(mockContext.Object);
     }
 
     [Fact]
-    public async Task Head_ShouldReturn200_WhenOfficeWorkerExists() {
+    public async Task Head_ShouldReturn200_WhenClientExists() {
         // Arrange
-        string email = "mariuszkamiński@gmail.com";
+        string email = "januszkowalski@gmail.com";
         // Act
         var result = await _controller.Head(email);
         // Assert
@@ -48,7 +61,7 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Head_ShouldReturn404_WhenOfficeWorkerNotExists() {
+    public async Task Head_ShouldReturn404_WhenClientNotExists() {
         // Arrange
         string email = "edytagórniak@gmail.com";
         // Act
@@ -59,9 +72,9 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Head_ShouldReturn404_WhenUserIsNotOfficeWorker() {
+    public async Task Head_ShouldReturn404_WhenUserIsNotClient() {
         // Arrange
-        string email = "januszkowalski@gmail.com";
+        string email = "mariuszkamiński@gmail.com";
         // Act
         var result = await _controller.Head(email);
         // Assert
@@ -70,22 +83,23 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Get_ShouldReturnOfficeWorker_WhenOfficeWorkerExists() {
+    public async Task Get_ShouldReturnClient_WhenClientsExists() {
         // Arrange
-        string email = "mariuszkamiński@gmail.com";
+        string email = "januszkowalski@gmail.com";
         // Act
         var result = await _controller.Get(email);
         OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(200, objResult.StatusCode);
-        ApiOfficeWorker? worker = (ApiOfficeWorker?)objResult.Value;
+        ApiClient? client = (ApiClient?)objResult.Value;
         // Assert
-        Assert.NotNull(worker);
-        Assert.Equal("Mariusz", worker.Name);
-        Assert.Equal("Kamiński", worker.Surname);
+        Assert.NotNull(client);
+        Assert.Equal("Janusz", client.Name);
+        Assert.Equal("Kowalski", client.Surname);
+        Assert.Equal("Kraków", client.Address.City);
     }
 
     [Fact]
-    public async Task Get_ShouldReturn404_WhenOfficeWorkerNotExists() {
+    public async Task Get_ShouldReturn404_WhenClienntNotExists() {
         // Arrange
         string email = "edytagórniak@gmail.com";
         // Act
@@ -96,32 +110,13 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Get_ShouldReturn404_WhenUserIsNotOfficeWorker() {
+    public async Task Get_ShouldReturn404_WhenUserIsNotClient() {
         // Arrange
-        string email = "januszkowalski@gmail.com";
+        string email = "mariuszkamiński@gmail.com";
         // Act
         var result = await _controller.Get(email);
         // Assert
         NotFoundObjectResult objResult = Assert.IsType<NotFoundObjectResult>(result.Result);
         Assert.Equal(404, objResult.StatusCode);
-    }
-
-    [Fact]
-    public async Task PatchEvaluation_ShouldAddEvaluation_WhenOfficeWorkerExistsAndEvaluationCorrect() {
-        // Arrange
-        string email = "mariuszkamiński@gmail.com";
-        string code = "q1w2-e3r4-t5y6-u7i8-o9p0";
-        var eval = new ApiEvaluation {
-            Datetime = DateTime.Today,
-            RejectionReason = "Lmao, gottem."
-        };
-        // Act
-        var result = await _controller.PatchEvaluation(email, code, eval);
-        // Assert
-        var status = Assert.IsType<OkResult>(result);
-        Assert.Equal(200, status.StatusCode);
-        var order = _mockContext.Object.Orders.FirstOrDefault();
-        Assert.NotNull(order);
-        Assert.NotNull(order.EvaluationId); // evaluation id was set
     }
 }

@@ -15,31 +15,32 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CourierHub.Test; 
-public class OfficeWorkerControllerTest {
-    private readonly OfficeWorkerController _controller;
+public class CourierControllerTest {
+    private readonly CourierController _controller;
     private readonly Mock<CourierHubDbContext> _mockContext;
 
-    public OfficeWorkerControllerTest() {
+    public CourierControllerTest() {
         var mockContext = new Mock<CourierHubDbContext>();
         IList<User> users = new List<User> {
             new() { Id = 1, Email = "januszkowalski@gmail.com", Name = "Janusz", Surname = "Kowalski", Type = 0 },
-            new() { Id = 2, Email = "mariuszkamiński@gmail.com", Name = "Mariusz", Surname = "Kamiński", Type = 1 }
+            new() { Id = 2, Email = "mariuszkamiński@gmail.com", Name = "Mariusz", Surname = "Kamiński", Type = 1 },
+            new() { Id = 3, Email = "maciejwąsik@gmail.com", Name = "Maciej", Surname = "Wąsik", Type = 2 }
         };
         mockContext.Setup(c => c.Users).ReturnsDbSet(users);
         IList<Order> orders = new List<Order> {
             new() { Id = 1, Inquire = new Inquire { Code = "q1w2-e3r4-t5y6-u7i8-o9p0" } }
         };
         mockContext.Setup(c => c.Orders).ReturnsDbSet(orders);
-        IList<Evaluation> evaluations = new List<Evaluation>();
-        mockContext.Setup(c => c.Evaluations).ReturnsDbSet(evaluations);
+        IList<Parcel> parcels = new List<Parcel>();
+        mockContext.Setup(c => c.Parcels).ReturnsDbSet(parcels);
         _mockContext = mockContext;
-        _controller = new OfficeWorkerController(mockContext.Object);
+        _controller = new CourierController(mockContext.Object);
     }
 
     [Fact]
-    public async Task Head_ShouldReturn200_WhenOfficeWorkerExists() {
+    public async Task Head_ShouldReturn200_WhenCourierExists() {
         // Arrange
-        string email = "mariuszkamiński@gmail.com";
+        string email = "maciejwąsik@gmail.com";
         // Act
         var result = await _controller.Head(email);
         // Assert
@@ -48,7 +49,7 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Head_ShouldReturn404_WhenOfficeWorkerNotExists() {
+    public async Task Head_ShouldReturn404_WhenCourierNotExists() {
         // Arrange
         string email = "edytagórniak@gmail.com";
         // Act
@@ -59,7 +60,7 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Head_ShouldReturn404_WhenUserIsNotOfficeWorker() {
+    public async Task Head_ShouldReturn404_WhenUserIsNotCourier() {
         // Arrange
         string email = "januszkowalski@gmail.com";
         // Act
@@ -70,22 +71,22 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Get_ShouldReturnOfficeWorker_WhenOfficeWorkerExists() {
+    public async Task Get_ShouldReturnCourier_WhenCourierExists() {
         // Arrange
-        string email = "mariuszkamiński@gmail.com";
+        string email = "maciejwąsik@gmail.com";
         // Act
         var result = await _controller.Get(email);
         OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(200, objResult.StatusCode);
-        ApiOfficeWorker? worker = (ApiOfficeWorker?)objResult.Value;
+        ApiCourier? courier = (ApiCourier?)objResult.Value;
         // Assert
-        Assert.NotNull(worker);
-        Assert.Equal("Mariusz", worker.Name);
-        Assert.Equal("Kamiński", worker.Surname);
+        Assert.NotNull(courier);
+        Assert.Equal("Maciej", courier.Name);
+        Assert.Equal("Wąsik", courier.Surname);
     }
 
     [Fact]
-    public async Task Get_ShouldReturn404_WhenOfficeWorkerNotExists() {
+    public async Task Get_ShouldReturn404_WhenClientNotExists() {
         // Arrange
         string email = "edytagórniak@gmail.com";
         // Act
@@ -96,7 +97,7 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task Get_ShouldReturn404_WhenUserIsNotOfficeWorker() {
+    public async Task Get_ShouldReturn404_WhenUserIsNotClient() {
         // Arrange
         string email = "januszkowalski@gmail.com";
         // Act
@@ -107,21 +108,22 @@ public class OfficeWorkerControllerTest {
     }
 
     [Fact]
-    public async Task PatchEvaluation_ShouldAddEvaluation_WhenOfficeWorkerExistsAndEvaluationCorrect() {
+    public async Task PatchParcel_ShouldAddEvaluation_WhenCourierExistsAndParcelCorrect() {
         // Arrange
-        string email = "mariuszkamiński@gmail.com";
+        string email = "maciejwąsik@gmail.com";
         string code = "q1w2-e3r4-t5y6-u7i8-o9p0";
-        var eval = new ApiEvaluation {
-            Datetime = DateTime.Today,
-            RejectionReason = "Lmao, gottem."
+        var parcel = new ApiParcel {
+            PickupDatetime = DateTime.Now,
+            DeliveryDatetime = DateTime.Now.AddDays(1),
+            UndeliveredReason = "Pozdrowienia do Więzienia"
         };
         // Act
-        var result = await _controller.PatchEvaluation(email, code, eval);
+        var result = await _controller.PatchParcel(email, code, parcel);
         // Assert
         var status = Assert.IsType<OkResult>(result);
         Assert.Equal(200, status.StatusCode);
         var order = _mockContext.Object.Orders.FirstOrDefault();
         Assert.NotNull(order);
-        Assert.NotNull(order.EvaluationId); // evaluation id was set
+        Assert.NotNull(order.ParcelId); // evaluation id was set
     }
 }
