@@ -117,13 +117,24 @@
         }
     }
 
-    private void Deliver()
+    private async void Deliver()
     {
         parcel.DeliveryDatetime = DateTime.Now;
-        deliverySuccess = true;
+
         statusType = StatusType.Delivered;
-        statusName = Enum2String(statusType);
-        StateHasChanged();
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            deliverySuccess = true;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
+        }
+        else
+        {
+            statusType = StatusType.PickedUp;
+        }
 
         // some PATCH for parcel
     }
@@ -133,13 +144,23 @@
         notDeliveredHidden = false;
     }
 
-    private void ConfirmNotDelivered()
+    private async void ConfirmNotDelivered()
     {
-        notDeliveredHidden = true;
-        pickUpSuccess = true;
         statusType = StatusType.CouldNotDeliver;
-        statusName = Enum2String(statusType);
-        StateHasChanged();
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            notDeliveredHidden = true;
+            pickUpSuccess = true;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
+        }
+        else
+        {
+            statusType = StatusType.PickedUp;
+        }
 
         // some PATCH for parcel
     }
