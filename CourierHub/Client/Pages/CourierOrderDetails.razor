@@ -39,6 +39,21 @@
     <button class="btn btn-primary" @onclick="() => PickUp()" hidden="@(statusType != StatusType.Confirmed || DBsuccess)">Odbiór paczki</button>
 </div>
 
+<div class="col" style="text-align: center;">
+    @if (statusType == StatusType.CouldNotDeliver)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Paczka oznaczona jako niedostarczona</label>
+        </div>
+    }
+    <br />
+    <button class="btn btn-primary" @onclick="() => SetNotDelivered()" hidden="@(statusType != StatusType.PickedUp)">Nieudana dostawa</button>
+    <br />
+    <textarea id="reviewTextArea" style="margin-top:10px;" rows="10" cols="100" @bind=@parcel.UndeliveredReason placeholder="Opisz powód nieudanej dostawy..." hidden="@notDeliveredHidden" />
+    <br />
+    <button class="btn btn-primary" @onclick="() => ConfirmNotDelivered()" hidden="@notDeliveredHidden">Potwierdź</button>
+</div>
+
 @code {
     [Parameter]
     public string? orderCode { get; set; }
@@ -49,6 +64,7 @@
     private ApiStatus status = new ApiStatus();
     private StatusType statusType;
     private bool DBsuccess = false;
+    private bool notDeliveredHidden = true;
 
     protected async override Task OnInitializedAsync()
     {
@@ -89,6 +105,21 @@
         }
     }
 
+    private void SetNotDelivered()
+    {
+        notDeliveredHidden = false;
+    }
+
+    private void ConfirmNotDelivered()
+    {
+        notDeliveredHidden = true;
+        DBsuccess = true;
+        statusType = StatusType.CouldNotDeliver;
+        statusName = Enum2String(statusType);
+        StateHasChanged();
+
+        // some PATCH for parcel
+    }
 
     private string? Enum2String(StatusType statusType)
     {
