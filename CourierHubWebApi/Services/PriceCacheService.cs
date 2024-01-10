@@ -12,7 +12,6 @@ namespace CourierHubWebApi.Services {
                 return Error.Conflict();
             }
             return timeStamp;
-
         }
         public ErrorOr<decimal> GetPrice(string InquireCode, DateTime obtainmentTime) {
             if (!_registeredOffers.TryGetValue(InquireCode, out OfferData? offer)) {
