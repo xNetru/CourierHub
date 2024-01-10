@@ -15,6 +15,7 @@
             <th>Kod</th>
             <th>Status</th>
             <th hidden="@(statusType == StatusType.Confirmed)">Data odbioru</th>
+            <th hidden="@(statusType != StatusType.Delivered)">Data dostawy</th>
         </tr>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
             <td style="white-space:nowrap">@orderCode</td>
             <td style="white-space:nowrap">@statusName</td>
             <td style="white-space:nowrap" hidden="@(statusType == StatusType.Confirmed)">@(parcel.PickupDatetime?.ToString("dd-MM-yyyy"))</td>
+            <td style="white-space:nowrap" hidden="@(statusType != StatusType.Delivered)">@(parcel.DeliveryDatetime?.ToString("dd-MM-yyyy"))</td>
         </tr>
     </tbody>
 </table>
