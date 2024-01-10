@@ -57,8 +57,20 @@
         }
     }
 
-    private void Choose(ApiOrder item)
+    private async void Choose(ApiOrder item)
     {
-        //NavigationManager.NavigateTo("/order/status/" + item.Code);
+        var context = await Provider.GetAuthenticationStateAsync();
+        var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
+        string mail = "";
+        if (email != null)
+        {
+            mail = email.Value;
+        }
+        else
+        {
+            Console.WriteLine("BAD MAIL");
+            return;
+        }
+        NavigationManager.NavigateTo($"/Courier/order/details/{item.Code}/{mail}");
     }
 }
