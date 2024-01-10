@@ -133,4 +133,7 @@ public class SzymoHubApi : IWebApi {
 class AccessTokenResponse
 {
     public string? access_token { get; set; }
+
+    // seems to be number of seconds untill the token is expired
+    public int expires_in { get; set; } 
 }
