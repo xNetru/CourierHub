@@ -29,14 +29,25 @@
 </table>
 
 <div class="col" style="text-align: center;">
-    @if (DBsuccess)
+    @if (pickUpSuccess)
     {
         <div class="row bg-success text-white" style="margin-top:10px; height:40px">
             <label class="p-2">Paczka odebrana</label>
         </div>
     }
     <br />
-    <button class="btn btn-primary" @onclick="() => PickUp()" hidden="@(statusType != StatusType.Confirmed || DBsuccess)">Odbiór paczki</button>
+    <button class="btn btn-primary" @onclick="() => PickUp()" hidden="@(statusType != StatusType.Confirmed || pickUpSuccess)">Odbiór paczki</button>
+</div>
+
+<div class="col" style="text-align: center;">
+    @if (deliverySuccess)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Paczka dostarczona</label>
+        </div>
+    }
+    <br />
+    <button class="btn btn-primary" @onclick="() => Deliver()" hidden="@(statusType != StatusType.PickedUp || deliverySuccess)">Dostawa paczki</button>
 </div>
 
 <div class="col" style="text-align: center;">
@@ -63,7 +74,8 @@
     private ApiParcel parcel = new ApiParcel(); // need some GET and PATCH (edit deliverytime and undelivered reason)
     private ApiStatus status = new ApiStatus();
     private StatusType statusType;
-    private bool DBsuccess = false;
+    private bool pickUpSuccess = false;
+    private bool deliverySuccess = false;
     private bool notDeliveredHidden = true;
 
     protected async override Task OnInitializedAsync()
@@ -98,11 +110,22 @@
 
         if (response.IsSuccessStatusCode)
         {
-            DBsuccess = true;
+            pickUpSuccess = true;
             statusType = StatusType.PickedUp;
             statusName = Enum2String(statusType);
             StateHasChanged();
         }
+    }
+
+    private void Deliver()
+    {
+        parcel.DeliveryDatetime = DateTime.Now;
+        deliverySuccess = true;
+        statusType = StatusType.Delivered;
+        statusName = Enum2String(statusType);
+        StateHasChanged();
+
+        // some PATCH for parcel
     }
 
     private void SetNotDelivered()
@@ -113,7 +136,7 @@
     private void ConfirmNotDelivered()
     {
         notDeliveredHidden = true;
-        DBsuccess = true;
+        pickUpSuccess = true;
         statusType = StatusType.CouldNotDeliver;
         statusName = Enum2String(statusType);
         StateHasChanged();
