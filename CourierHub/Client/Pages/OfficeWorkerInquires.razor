@@ -1,0 +1,91 @@
+﻿@page "/OfficeWorker/history/inquires"
+
+@using CourierHub.Shared.ApiModels
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<h1>Historia zapytań</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Szerokość</th>
+            <th>Długość</th>
+            <th>Głębokość</th>
+            <th>Data zapytania</th>
+            <th>Miasto</th>
+            <th>Ulica</th>
+            <th>Numer</th>
+            <th>Lokal</th>
+            <th>Kod</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Inquires)
+        {
+            <tr>
+                <td style="white-space:nowrap">@item.Width</td>
+                <td style="white-space:nowrap">@item.Length</td>
+                <td style="white-space:nowrap">@item.Depth</td>
+                <td style="white-space:nowrap">@item.Datetime.ToString("dd-MM-yyyy")</td>
+                <td>
+                    <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.City</p>
+                    <p style="white-space:nowrap">do: @item.Destination.City</p>
+                </td>
+                <td>
+                    <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.Street</p>
+                    <p style="white-space:nowrap">do: @item.Destination.Street</p>
+                </td>
+                <td>
+                    <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.Number</p>
+                    <p style="white-space:nowrap">do: @item.Destination.Number</p>
+                </td>
+                <td>
+                    <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.Flat</p>
+                    <p style="white-space:nowrap">do: @item.Destination.Flat</p>
+                </td>
+                <td>
+                    <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.PostalCode</p>
+                    <p style="white-space:nowrap">do: @item.Destination.PostalCode</p>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+    private IEnumerable<ApiInquire> Inquires = new List<ApiInquire>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            var x = await Http.GetAsync($"{Http.BaseAddress}Inquire/30");
+            Console.WriteLine(x.StatusCode + " GET OFFICE WORKER INQUIRES");
+
+            if (x.IsSuccessStatusCode)
+            {
+                var c = await x.Content.ReadFromJsonAsync<ApiInquire[]>();
+                if (c != null)
+                {
+                    Inquires = c;
+                }
+                else
+                {
+                    Console.WriteLine("BAD DESERIALIZATION");
+                }
+            }
+            else
+            {
+                Console.WriteLine("FAIL");
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+}
