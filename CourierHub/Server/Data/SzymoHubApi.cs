@@ -3,26 +3,56 @@ using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using CourierHub.Shared.SzymoApiModels;
+using CourierHub.Shared.Data;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using System.Net.Http;
+using System.Net;
+using CourierHubWebApi.Models;
 
 namespace CourierHub.Server.Data;
 public class SzymoHubApi : IWebApi {
     private readonly ApiService _service;
-
+    private readonly HttpClient _httpClient = new();
+    private readonly AccessTokenContainer _accessTokenContainer;
+    private static string _tokenEndPoint = "/connect/token";
     public string ServiceName { get; set; }
 
-    public SzymoHubApi(ApiService service) {
+    public SzymoHubApi(ApiService service, IConfiguration config, AccessTokenContainer accessTokenContainer) {
         _service = service;
+        _service.BaseAddress = config.GetValue<string>("SzymoAddress") ??
+            throw new NullReferenceException("Base address could not be loaded!");
         ServiceName = _service.Name;
+        _httpClient.BaseAddress = new Uri(_service.BaseAddress);
+        _accessTokenContainer = accessTokenContainer;
     }
 
     public async Task<(StatusType?, int)> GetOrderStatus(string code) {
-    
-
         Console.WriteLine("GetOrderStatus was invoked in SzymoHubApi.");
-        return (null, 400);
+
+        StatusType? status = null;
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try
+        {
+            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/offer/request/{code}/status", cancelToken.Token);
+        }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        }
+
+        if (status == null)
+        {
+            return (null, 504);
+        }
+        else
+        {
+            return (status, 200);
+        }
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
+        Console.WriteLine("PostInquireGetOffer was invoked in SzymoHubApi.");
+
         var source = new SzymoAddress(
             inquire.Source.Number,
             inquire.Source.Flat,
@@ -65,68 +95,112 @@ public class SzymoHubApi : IWebApi {
             true,
             inquire.IsCompany);
 
+        AddTokenToClient(_httpClient);
 
+        var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try
+        {
+            response = await _httpClient.PostAsJsonAsync("/Inquires", szymoInquiry, cancelToken.Token);
+        }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        }
 
-        Console.WriteLine("PostInquireGetOffer was invoked in SzymoHubApi.");
-        return (null, 400);
+        if (response.IsSuccessStatusCode)
+        {
+            var inquireResponse = await response.Content.ReadFromJsonAsync<SzymoInquireResponse>();
+            if (inquireResponse != null)
+            {
+                var offer = new ApiOffer
+                {
+                    Price = (decimal)inquireResponse.totalPrice,
+                    Code = inquireResponse.inquiryId,
+                    ServiceName = ServiceName,
+                    ExpirationDate = inquireResponse.expiringAt
+                };
+                return (offer, (int)response.StatusCode);
+            }
+            else
+            {
+                return (null, StatusCodes.Status503ServiceUnavailable);
+            }
+        }
+        else
+        {
+            return (null, (int)response.StatusCode);
+        }
     }
 
     public async Task<int> PostOrder(ApiOrder order) {
         Console.WriteLine("PostOrder was invoked in SzymoHubApi.");
-        return 400;
+
+        var address = new SzymoAddress(
+            order.ClientAddress.Number,
+            order.ClientAddress.Flat,
+            order.ClientAddress.Street,
+            order.ClientAddress.PostalCode,
+            order.ClientAddress.City,
+            "Poland");
+
+        var apiOrder = new SzymoPostOfferRequest(
+            order.Code,
+            order.ClientName,
+            order.ClientEmail,
+            address);
+
+        AddTokenToClient(_httpClient);
+
+        var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try
+        {
+            response = await _httpClient.PostAsJsonAsync("/Offers", apiOrder, cancelToken.Token);
+        }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        }
+        return (int)response.StatusCode;
     }
 
     public async Task<int> PutOrderWithrawal(string code) {
         Console.WriteLine("PutOrderWithrawal was invoked in SzymoHubApi.");
-        return 400;
-    }
 
-    static async Task<string?> GetAccessToken(string clientId, string clientSecret, string tokenEndpoint)
-    {
-        using (HttpClient client = new HttpClient())
+        AddTokenToClient(_httpClient);
+
+        var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try
         {
-            var credentials = $"{clientId}:{clientSecret}";
-            var base64Credentials = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(credentials));
-
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", base64Credentials);
-
-            var formData = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("grant_type", "client_credentials"),
-            });
-
-            var response = await client.PostAsync(tokenEndpoint, formData);
-            if(response.IsSuccessStatusCode)
-            {
-                var tokenResponse = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
-                if(tokenResponse != null) 
-                {
-                    return tokenResponse.access_token;
-                } 
-                else
-                {
-                    return null;
-                }
-            } 
-            else
-            {
-                return null;
-            }
+            response = await _httpClient.DeleteAsync($"/offer/{code}/cancel", cancelToken.Token);
         }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        }
+        return (int)response.StatusCode;
     }
 
-    static async Task MakeApiRequest(string apiUrl, string accessToken)
+    private bool AddTokenToClient(HttpClient client)
     {
-        using (HttpClient client = new HttpClient())
+        if(!_accessTokenContainer.IsServiceTokenCachedAndNotExpired(_service))
         {
+            string[] userCredentials = _service.ApiKey.Split(';');
+            if (userCredentials.Length < 2)
+                return false;
+
+            string clientId = userCredentials[0];
+            string clientSecret = userCredentials[1];
+
+            string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenEndPoint);
+            if (accessToken == null)
+                return false;
+
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-
-            var response = await client.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(responseBody);
         }
+        return true;
     }
 }
 

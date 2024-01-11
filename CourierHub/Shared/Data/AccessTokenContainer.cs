@@ -5,14 +5,18 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace CourierHub.Shared.Data
 {
-    internal class AccessTokenContainer
+    public class AccessTokenContainer
     {
         private static Dictionary<string, (string token, DateTime expiration)> tokens = new();
- 
-        public static string? GetToken(ApiService service, string clientId, string clientSecret, string tokenEndPoint)
+        public bool IsServiceTokenCachedAndNotExpired(ApiService service)
+        {
+            return tokens.TryGetValue(service.Name, out var tokenData) && DateTime.Now < tokenData.expiration);
+        }
+        public string? GetToken(ApiService service, string clientId, string clientSecret, string tokenEndPoint)
         {
             if(tokens.TryGetValue(service.Name, out var tokenData))
             {
@@ -22,7 +26,7 @@ namespace CourierHub.Shared.Data
                 }
                 else
                 {
-                    var tokenResponse = GetAccessToken(clientId, clientSecret, tokenEndPoint).Result;
+                    var tokenResponse = GetAccessToken(clientId, clientSecret, $"{service.BaseAddress}{tokenEndPoint}").Result;
                     if(tokenResponse != null && tokenResponse.access_token != null)
                     {
                         tokens[service.Name] = (tokenResponse.access_token, DateTime.Now.AddMinutes(tokenResponse.expires_in));
@@ -32,7 +36,7 @@ namespace CourierHub.Shared.Data
             }
             else
             {
-                var tokenResponse = GetAccessToken(clientId, clientSecret, tokenEndPoint).Result;
+                var tokenResponse = GetAccessToken(clientId, clientSecret, $"{service.BaseAddress}{tokenEndPoint}").Result;
                 if(tokenResponse != null && tokenResponse.access_token != null) 
                 {
                     tokens.Add(service.Name, (tokenResponse.access_token, DateTime.Now.AddMinutes(tokenResponse.expires_in)));
@@ -41,7 +45,7 @@ namespace CourierHub.Shared.Data
             }
             return null;
         }
-        static async Task<AccessTokenResponse?> GetAccessToken(string clientId, string clientSecret, string tokenEndpoint)
+        private static async Task<AccessTokenResponse?> GetAccessToken(string clientId, string clientSecret, string tokenEndpoint)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -52,8 +56,8 @@ namespace CourierHub.Shared.Data
 
                 var formData = new FormUrlEncodedContent(new[]
                 {
-                new KeyValuePair<string, string>("grant_type", "client_credentials"),
-            });
+                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                });
 
                 var response = await client.PostAsync(tokenEndpoint, formData);
                 if (response.IsSuccessStatusCode)
