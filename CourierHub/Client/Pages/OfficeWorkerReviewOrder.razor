@@ -5,6 +5,7 @@
 @using CourierHub.Shared.Data
 
 @inject OrderContainer Container
+@inject HttpClient Http
 
 <h1>Przegląd oferty</h1>
 
@@ -280,23 +281,7 @@
 </div>
 
 @code {
-    ApiOrder Order = new ApiOrder
-        {
-            Price = 10,
-            ClientEmail = "bsjkj",
-            ClientName = "Skam",
-            ClientSurname = "Skam",
-            ClientCompany = "Kurieroinator",
-            ClientPhone = "3278378",
-            ClientAddress = new ApiAddress
-            {
-                City = "abdsguyusuksc",
-                Street = "abdjgdkc",
-                Number = "1",
-                Flat = "1",
-                PostalCode = "00-000"
-            }
-        };
+    ApiOrder Order = new ApiOrder();
     // Need to load Inquire for given Offer
     // GET Inquire by Code???
     ApiInquire Inquire = new ApiInquire
@@ -330,19 +315,30 @@
 
     protected override void OnInitialized()
     {
-        Order = Container.Inquires.Last();
+        Order = Container.Orders.Last();
         // TODO: load Inquire
     }
 
-    private void Accept()
+    private async void Accept()
     {
-        buttonDisabled = true;
-        displayOfferAccepted = true;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{Order.Code}/status", StatusType.Confirmed);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+        if(response.IsSuccessStatusCode) {
+            buttonDisabled = true;
+            displayOfferAccepted = true;
+            StateHasChanged();
+        }
     }
 
-    private void Deny()
+    private async void Deny()
     {
-        buttonDisabled = true;
-        displayOfferDenied = true;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{Order.Code}/status", StatusType.Denied);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            buttonDisabled = true;
+            displayOfferDenied = true;
+            StateHasChanged();
+        }
     }
 }

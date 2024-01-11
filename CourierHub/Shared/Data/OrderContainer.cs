@@ -2,6 +2,6 @@
 
 namespace CourierHub.Shared.Data {
     public class OrderContainer {
-        public List<ApiOrder> Inquires { get; set; } = new List<ApiOrder>();
+        public List<ApiOrder> Orders { get; set; } = new List<ApiOrder>();
     }
 }
