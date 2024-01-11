@@ -1,0 +1,175 @@
+﻿@page "/Courier/order/details/{orderCode}/{mail}"
+
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
+@using Radzen.Blazor
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<h1 style="text-align: center;">Status paczki</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kod</th>
+            <th>Status</th>
+            <th hidden="@(statusType == StatusType.Confirmed)">Data odbioru</th>
+            <th hidden="@(statusType != StatusType.Delivered)">Data dostawy</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="white-space:nowrap">@orderCode</td>
+            <td style="white-space:nowrap">@statusName</td>
+            <td style="white-space:nowrap" hidden="@(statusType == StatusType.Confirmed)">@(parcel.PickupDatetime?.ToString("dd-MM-yyyy"))</td>
+            <td style="white-space:nowrap" hidden="@(statusType != StatusType.Delivered)">@(parcel.DeliveryDatetime?.ToString("dd-MM-yyyy"))</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="col" style="text-align: center;">
+    @if (pickUpSuccess)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Paczka odebrana</label>
+        </div>
+    }
+    <br />
+    <button class="btn btn-primary" @onclick="() => PickUp()" hidden="@(statusType != StatusType.Confirmed || pickUpSuccess)">Odbiór paczki</button>
+</div>
+
+<div class="col" style="text-align: center;">
+    @if (deliverySuccess)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Paczka dostarczona</label>
+        </div>
+    }
+    <br />
+    <button class="btn btn-primary" @onclick="() => Deliver()" hidden="@(statusType != StatusType.PickedUp || deliverySuccess)">Dostawa paczki</button>
+</div>
+
+<div class="col" style="text-align: center;">
+    @if (statusType == StatusType.CouldNotDeliver)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Paczka oznaczona jako niedostarczona</label>
+        </div>
+    }
+    <br />
+    <button class="btn btn-primary" @onclick="() => SetNotDelivered()" hidden="@(statusType != StatusType.PickedUp)">Nieudana dostawa</button>
+    <br />
+    <textarea id="reviewTextArea" style="margin-top:10px;" rows="10" cols="100" @bind=@parcel.UndeliveredReason placeholder="Opisz powód nieudanej dostawy..." hidden="@notDeliveredHidden" />
+    <br />
+    <button class="btn btn-primary" @onclick="() => ConfirmNotDelivered()" hidden="@notDeliveredHidden">Potwierdź</button>
+</div>
+
+@code {
+    [Parameter]
+    public string? orderCode { get; set; }
+    [Parameter]
+    public string? mail { get; set; }
+    private string? statusName;
+    private ApiParcel parcel = new ApiParcel(); // need some GET and PATCH (edit deliverytime and undelivered reason)
+    private ApiStatus status = new ApiStatus();
+    private StatusType statusType;
+    private bool pickUpSuccess = false;
+    private bool deliverySuccess = false;
+    private bool notDeliveredHidden = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
+        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<ApiStatus>();
+            if (c != null)
+            {
+                status = c;
+                Enum.TryParse(status.Name, out statusType);
+                statusName = Enum2String(statusType);
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
+
+    private async void PickUp()
+    {
+        parcel.PickupDatetime = DateTime.Now;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel", parcel);
+        Console.WriteLine("PATCH PARCEL STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            pickUpSuccess = true;
+            statusType = StatusType.PickedUp;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
+        }
+    }
+
+    private async void Deliver()
+    {
+        parcel.DeliveryDatetime = DateTime.Now;
+
+        statusType = StatusType.Delivered;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            deliverySuccess = true;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
+        }
+        else
+        {
+            statusType = StatusType.PickedUp;
+        }
+
+        // some PATCH for parcel
+    }
+
+    private void SetNotDelivered()
+    {
+        notDeliveredHidden = false;
+    }
+
+    private async void ConfirmNotDelivered()
+    {
+        statusType = StatusType.CouldNotDeliver;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            notDeliveredHidden = true;
+            pickUpSuccess = true;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
+        }
+        else
+        {
+            statusType = StatusType.PickedUp;
+        }
+
+        // some PATCH for parcel
+    }
+
+    private string? Enum2String(StatusType statusType)
+    {
+        int type = (int)statusType;
+        StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
+        string? res = Enum.GetName(typeof(StatusTypePL), statusTypePL);
+        return res?.Replace('_', ' ');
+    }
+}

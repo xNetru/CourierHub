@@ -1,0 +1,76 @@
+﻿@page "/Courier/orders/available"
+
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+@inject NavigationManager NavigationManager
+
+<h1>Dostępne paczki</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kod</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Orders)
+        {
+            <tr>
+                <td style="white-space:nowrap">@item.Code</td>
+                <td style="white-space:nowrap">
+                    <button class="btn btn-primary" @onclick="() => Choose(item)">Wybierz</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+    private IEnumerable<ApiOrder> Orders = new List<ApiOrder>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{(int)StatusType.Confirmed}/order");
+        Console.WriteLine(x.StatusCode + " GET COURIER ORDERS");
+
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<ApiOrder[]>();
+            if (c != null)
+            {
+                Orders = c;
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
+
+    private async void Choose(ApiOrder item)
+    {
+        var context = await Provider.GetAuthenticationStateAsync();
+        var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
+        string mail = "";
+        if (email != null)
+        {
+            mail = email.Value;
+        }
+        else
+        {
+            Console.WriteLine("BAD MAIL");
+            return;
+        }
+        NavigationManager.NavigateTo($"/Courier/order/details/{item.Code}/{mail}");
+    }
+}
