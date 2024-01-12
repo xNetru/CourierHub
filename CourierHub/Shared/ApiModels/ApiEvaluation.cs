@@ -13,4 +13,11 @@ public class ApiEvaluation {
             RejectionReason = evaluation.RejectionReason
         };
     }
+
+    public static explicit operator ApiEvaluation(Evaluation evaluation) {
+        return new ApiEvaluation {
+            Datetime = evaluation.Datetime,
+            RejectionReason = evaluation.RejectionReason
+        };
+    }
 }

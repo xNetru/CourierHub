@@ -12,8 +12,7 @@ namespace CourierHubWebApi.Services {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService; // Must be changed if only database is updated
         private IApiKeyService _apiKeyService;
-        public InquireService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService = null)
-        {
+        public InquireService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService = null) {
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
             _apiKeyService = apiKeyService;
@@ -23,19 +22,16 @@ namespace CourierHubWebApi.Services {
 
             SetOrderCode(inquire);
 
-            if(!_apiKeyService.IsOurServiceRequest(serviceId))
-            {
+            if (!_apiKeyService.IsOurServiceRequest(serviceId)) {
                 Error? error = await AddInquireToDataBase(inquire);
-                if (error != null)
-                {
+                if (error != null) {
                     return error.Value;
                 }
             }
 
             return CreateResponse(inquire);
         }
-        public async Task<ErrorOr<CreateInquireResponse>> CreateInquireWithEmail(CreateInquireWithEmailRequest request, int serviceId)
-        {
+        public async Task<ErrorOr<CreateInquireResponse>> CreateInquireWithEmail(CreateInquireWithEmailRequest request, int serviceId) {
             Inquire inquire = request.CreateInquire();
 
             SetOrderCode(inquire);
@@ -69,10 +65,8 @@ namespace CourierHubWebApi.Services {
             // TODO: implement price calculation
             return 0m;
         }
-        private async Task<Error?> AddInquireToDataBase(Inquire inquire)
-        {
-            try
-            {
+        private async Task<Error?> AddInquireToDataBase(Inquire inquire) {
+            try {
                 await _dbContext.AddAsync(inquire);
                 _dbContext.SaveChanges();
             } catch (Exception ex) {
@@ -86,17 +80,13 @@ namespace CourierHubWebApi.Services {
 
             DateTime? expirationTime = null;
             cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
-            if (expirationTime != null)
-            {
+            if (expirationTime != null) {
                 return new CreateInquireResponse(calculatedPrice, inquire.Code, DateTime.Now.AddMinutes(15));
-            }
-            else
-            {
+            } else {
                 return cacheResult.Errors;
             }
         }
-        private bool TryGetUserId(string email, out int id)
-        {
+        private bool TryGetUserId(string email, out int id) {
             id = 0;
             IQueryable<int> idQuery = from users
                                     in _dbContext.Users

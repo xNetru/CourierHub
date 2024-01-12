@@ -121,14 +121,14 @@ public class ClientController : ControllerBase {
         if (client == null) { return NotFound(Array.Empty<ApiOrder>()); }
         var orders = await _context.Orders.Where(e => e.Inquire.ClientId == client.Id && e.Inquire.Datetime >= before).ToListAsync();
 
-            var apiOrders = new List<ApiOrder>();
-            foreach (var order in orders) {
-                order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
-                order.Inquire = (await _context.Inquires.FirstOrDefaultAsync(e => e.Id == order.InquireId))!;
-                apiOrders.Add((ApiOrder)order);
-            }
-            return Ok(apiOrders);
+        var apiOrders = new List<ApiOrder>();
+        foreach (var order in orders) {
+            order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
+            order.Inquire = (await _context.Inquires.FirstOrDefaultAsync(e => e.Id == order.InquireId))!;
+            apiOrders.Add((ApiOrder)order);
         }
+        return Ok(apiOrders);
+    }
 
     private async Task<ActionResult> AddClient(ApiClient? client) {
         if (client == null) { return BadRequest(); }
