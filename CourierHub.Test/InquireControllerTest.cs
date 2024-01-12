@@ -15,11 +15,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CourierHub.Test; 
-public class CourierControllerTest {
-    private readonly CourierController _controller;
+public class InquireControllerTest {
+    private readonly InquireControllerTest _controller;
     private readonly Mock<CourierHubDbContext> _mockContext;
 
-    public CourierControllerTest() {
+    public InquireControllerTest() {
         var mockContext = new Mock<CourierHubDbContext>();
         IList<User> users = new List<User> {
             new() { Id = 1, Email = "januszkowalski@gmail.com", Name = "Janusz", Surname = "Kowalski", Type = 0 },
