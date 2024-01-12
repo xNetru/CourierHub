@@ -44,7 +44,11 @@ public class OfficeWorkerController : ControllerBase {
 
         var evaluationDB = (Evaluation)evaluation;
         evaluationDB.OfficeWorkerId = user.Id;
-        await _context.Evaluations.AddAsync(evaluationDB);
+        if (order.EvaluationId != null) {
+            order.Evaluation = evaluationDB;
+        } else {
+            await _context.Evaluations.AddAsync(evaluationDB);
+        }
         await _context.SaveChangesAsync();
 
         order.EvaluationId = evaluationDB.Id;

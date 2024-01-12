@@ -82,6 +82,12 @@ public class ApiController : ControllerBase {
 
                 // retrieve cashed id
                 int inquireId = _container.InquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
+
+                var inquireDB = _context.Inquires.FirstOrDefault(e => e.Id == inquireId);
+                if (inquireDB == null) { return NotFound(); }
+                // for now this code, but in case of e.g. SzymoAPI it must be retrived from webapi.PostOrder(order)
+                inquireDB.Code = order.Code;
+
                 Order orderDB = (Order)order;
                 orderDB.InquireId = inquireId;
                 orderDB.ServiceId = service.Id;

@@ -16,4 +16,12 @@ public class ApiReview {
             Datetime = review.Datetime
         };
     }
+
+    public static explicit operator ApiReview(Review review) {
+        return new ApiReview {
+            Value = review.Value,
+            Description = review.Description,
+            Datetime = review.Datetime
+        };
+    }
 }
