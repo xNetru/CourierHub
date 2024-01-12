@@ -4,10 +4,12 @@ using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using CourierHub.Shared.SzymoApiModels;
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Models;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using System.Net.Http;
 using System.Net;
 using CourierHubWebApi.Models;
+using System;
 
 namespace CourierHub.Server.Data;
 public class SzymoHubApi : IWebApi {
@@ -15,38 +17,55 @@ public class SzymoHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
     private readonly AccessTokenContainer _accessTokenContainer;
     private static string _tokenEndPoint = "/connect/token";
+    private readonly CourierHubDbContext _context;
     public string ServiceName { get; set; }
 
-    public SzymoHubApi(ApiService service, IConfiguration config, AccessTokenContainer accessTokenContainer) {
+    public SzymoHubApi(ApiService service, IConfiguration config, AccessTokenContainer accessTokenContainer, CourierHubDbContext context)
+    {
         _service = service;
         _service.BaseAddress = config.GetValue<string>("SzymoAddress") ??
             throw new NullReferenceException("Base address could not be loaded!");
         ServiceName = _service.Name;
         _httpClient.BaseAddress = new Uri(_service.BaseAddress);
         _accessTokenContainer = accessTokenContainer;
+        _context = context;
     }
 
-    public async Task<(StatusType?, int)> GetOrderStatus(string code) {
+    public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in SzymoHubApi.");
 
-        StatusType? status = null;
+        SzymoGetOfferStatusResponse? response = null;
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try
         {
-            status = await _httpClient.GetFromJsonAsync<StatusType?>($"/offer/request/{code}/status", cancelToken.Token);
+            response = await _httpClient.GetFromJsonAsync<SzymoGetOfferStatusResponse?>($"/offer/request/{code}/status", cancelToken.Token);
+        }
+        catch (HttpRequestException ex)
+        {
+            if (ex.Message.Contains(HttpStatusCode.NotFound.ToString()))
+            {
+                return (StatusType.Cancelled, StatusCodes.Status200OK, null);
+            }
         }
         catch (TaskCanceledException e)
         {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
 
-        if (status == null)
+        if (response == null)
         {
-            return (null, 504);
+            return (null, (int)HttpStatusCode.GatewayTimeout, null);
         }
         else
         {
-            return (status, 200);
+            if(response.isReady)
+            {
+                return (StatusType.Confirmed, StatusCodes.Status200OK, response.offerId);
+            }
+            else
+            {
+                return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
+            }
         }
     }
 
@@ -133,7 +152,7 @@ public class SzymoHubApi : IWebApi {
         }
     }
 
-    public async Task<int> PostOrder(ApiOrder order) {
+    public async Task<(int, string?)> PostOrder(ApiOrder order) {
         Console.WriteLine("PostOrder was invoked in SzymoHubApi.");
 
         var address = new SzymoAddress(
@@ -162,7 +181,20 @@ public class SzymoHubApi : IWebApi {
         {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
-        return (int)response.StatusCode;
+
+        if (response.IsSuccessStatusCode)
+        {
+            var orderResponse = await response.Content.ReadFromJsonAsync<SzymoPostOfferResponse>();
+            if (orderResponse != null)
+            {
+                return ((int)response.StatusCode, orderResponse.offerRequestId);
+            }
+            else
+            {
+                return (StatusCodes.Status503ServiceUnavailable, null);
+            }
+        }
+        return ((int)response.StatusCode, null);
     }
 
     public async Task<int> PutOrderWithrawal(string code) {
