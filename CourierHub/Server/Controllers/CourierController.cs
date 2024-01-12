@@ -4,6 +4,7 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CourierHub.Shared.Controllers;
 [ApiController]
@@ -44,7 +45,11 @@ public class CourierController : ControllerBase {
 
         var parcelDB = (Parcel)parcel;
         parcelDB.CourierId = user.Id;
-        await _context.Parcels.AddAsync(parcelDB);
+        if (order.ParcelId != null) {
+            order.Parcel = parcelDB;
+        } else {
+            await _context.Parcels.AddAsync(parcelDB);
+        }
         await _context.SaveChangesAsync();
 
         order.ParcelId = parcelDB.Id;

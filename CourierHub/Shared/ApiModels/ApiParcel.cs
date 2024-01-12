@@ -16,4 +16,12 @@ public class ApiParcel {
             UndeliveredReason = parcel.UndeliveredReason
         };
     }
+
+    public static explicit operator ApiParcel(Parcel parcel) {
+        return new ApiParcel {
+            PickupDatetime = parcel.PickupDatetime,
+            DeliveryDatetime = parcel.DeliveryDatetime,
+            UndeliveredReason = parcel.UndeliveredReason
+        };
+    }
 }
