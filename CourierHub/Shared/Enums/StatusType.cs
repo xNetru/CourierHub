@@ -10,8 +10,7 @@ public enum StatusType {
     CouldNotDeliver = 7
 }
 
-public enum StatusTypePL
-{
+public enum StatusTypePL {
     Niepotwierdzone = 1,
     Potwierdzone = 2,
     Anulowane = 3,

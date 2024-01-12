@@ -4,9 +4,6 @@ using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using FluentValidation.Results;
-using CourierHubWebApi.Extensions;
-using System.ComponentModel.DataAnnotations;
 
 namespace CourierHubWebApi.Controllers {
     [Route("api/[controller]")]
@@ -18,9 +15,8 @@ namespace CourierHubWebApi.Controllers {
         }
         [HttpPost]
         public IActionResult CreateOrder(CreateOrderRequest request,
-            [FromServices] IValidator<CreateOrderRequest> validator, 
-            [FromServices] IApiKeyService apiKeyService)
-        {
+            [FromServices] IValidator<CreateOrderRequest> validator,
+            [FromServices] IApiKeyService apiKeyService) {
             ModelStateDictionary? errors = this.Validate<CreateOrderRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
@@ -29,14 +25,14 @@ namespace CourierHubWebApi.Controllers {
                 serviceId => {
                     return _orderService.CreateOrder(request, serviceId).Match(
                     statusCode => Ok(statusCode),
-                    errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType)); },
+                    errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
+                },
                 errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
         [HttpPut("Withdraw")]
         public IActionResult WithdrawOrder(WithdrawOrderRequest request,
             [FromServices] IValidator<WithdrawOrderRequest> validator,
-            [FromServices] IApiKeyService apiKeyService)
-        {
+            [FromServices] IApiKeyService apiKeyService) {
             ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
@@ -51,8 +47,7 @@ namespace CourierHubWebApi.Controllers {
         [HttpGet("Status/{code}")]
         public IActionResult GetOrderStatus(string code,
             [FromServices] IValidator<GetOrderStatusRequest> validator,
-            [FromServices] IApiKeyService apiKeyService)
-        {
+            [FromServices] IApiKeyService apiKeyService) {
             GetOrderStatusRequest request = new(code);
             ModelStateDictionary? errors = this.Validate<GetOrderStatusRequest>(validator, request);
             if (errors != null)

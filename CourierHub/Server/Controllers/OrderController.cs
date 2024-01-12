@@ -2,7 +2,6 @@
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -67,8 +66,9 @@ public class OrderController : ControllerBase {
         var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == order.StatusId);
         if (status == null) { return NotFound(); }
 
-        return Ok(new ApiStatus { 
-            Name = status.Name, IsCancelable = status.IsCancelable
+        return Ok(new ApiStatus {
+            Name = status.Name,
+            IsCancelable = status.IsCancelable
         });
     }
 

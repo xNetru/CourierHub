@@ -4,7 +4,6 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CourierHub.Shared.Controllers;
 [ApiController]
