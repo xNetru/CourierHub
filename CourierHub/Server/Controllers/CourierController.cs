@@ -46,6 +46,7 @@ public class CourierController : ControllerBase {
         parcelDB.CourierId = user.Id;
         if (order.ParcelId != null) {
             order.Parcel = parcelDB;
+            order.Parcel.Id = order.ParcelId.Value;
         } else {
             await _context.Parcels.AddAsync(parcelDB);
         }

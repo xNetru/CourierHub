@@ -134,8 +134,10 @@
         statusType = StatusType.Delivered;
         var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
         Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+        var response2 = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel", parcel);
+        Console.WriteLine("PATCH PARCEL STATUS : " + response.StatusCode);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode && response2.IsSuccessStatusCode)
         {
             deliverySuccess = true;
             statusName = Enum2String(statusType);
@@ -145,8 +147,6 @@
         {
             statusType = StatusType.PickedUp;
         }
-
-        // some PATCH for parcel
     }
 
     private void SetNotDelivered()
@@ -159,8 +159,10 @@
         statusType = StatusType.CouldNotDeliver;
         var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
         Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+        var response2 = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel", parcel);
+        Console.WriteLine("PATCH PARCEL STATUS : " + response.StatusCode);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode && response2.IsSuccessStatusCode)
         {
             notDeliveredHidden = true;
             pickUpSuccess = true;
@@ -171,8 +173,6 @@
         {
             statusType = StatusType.PickedUp;
         }
-
-        // some PATCH for parcel
     }
 
     private string? Enum2String(StatusType statusType)
