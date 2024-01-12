@@ -1,6 +1,5 @@
 ﻿using CourierHubWebApi.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 
 namespace CourierHubWebApi.Middleware {
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
@@ -12,8 +11,7 @@ namespace CourierHubWebApi.Middleware {
         }
 
         public Task Invoke(HttpContext context, [FromServices] IApiKeyService apiKeyService) {
-            if(!apiKeyService.TryExtractApiKey(context, out string apiKey))
-            {
+            if (!apiKeyService.TryExtractApiKey(context, out string apiKey)) {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return context.Response.WriteAsync("Api Key was not provided");
             }

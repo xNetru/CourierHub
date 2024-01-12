@@ -27,19 +27,16 @@ namespace CourierHubWebApi {
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(x =>
-            {
-                x.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme{
+            builder.Services.AddSwaggerGen(x => {
+                x.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme {
                     Description = "The API key to access the API",
                     Type = SecuritySchemeType.ApiKey,
                     Name = "x-api-key",
                     In = ParameterLocation.Header,
                     Scheme = "ApiKeyScheme"
                 });
-                var scheme = new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
+                var scheme = new OpenApiSecurityScheme {
+                    Reference = new OpenApiReference {
                         Type = ReferenceType.SecurityScheme,
                         Id = "ApiKey"
                     },
@@ -56,9 +53,9 @@ namespace CourierHubWebApi {
 
             builder.Services.AddScoped<IValidator<CreateInquireRequest>, CreateInquireRequestValidator>();
             builder.Services.AddScoped<IValidator<CreateOrderRequest>, CreateOrderRequestValidator>();
-            builder.Services.AddScoped<IValidator<ApiSideAddress>, ApiSideAddressValidator>();  
-            builder.Services.AddScoped<IValidator<WithdrawOrderRequest>,WithdrawOrderRequestValidator>();
-            builder.Services.AddScoped<IValidator<GetOrderStatusRequest>,GetOrderStatusRequestValidator>();
+            builder.Services.AddScoped<IValidator<ApiSideAddress>, ApiSideAddressValidator>();
+            builder.Services.AddScoped<IValidator<WithdrawOrderRequest>, WithdrawOrderRequestValidator>();
+            builder.Services.AddScoped<IValidator<GetOrderStatusRequest>, GetOrderStatusRequestValidator>();
 
             var app = builder.Build();
 
