@@ -1,0 +1,138 @@
+﻿@page "/order/status/{orderCode}"
+
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
+@using Radzen.Blazor
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<h1 style="text-align: center;">Status zamówienia</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Serwis</th>
+            <th>Kod</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="white-space:nowrap">@service</td>
+            <td style="white-space:nowrap">@orderCode</td>
+            <td style="white-space:nowrap">@statusName</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="col" style="text-align: center;">
+    @if (DBsuccess)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Status zmieniony </label>
+        </div>
+    }
+    <br/>
+    <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(!status.IsCancelable || DBsuccess)">Odwołaj zamówienie</button>
+</div>
+
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(statusType != StatusType.CouldNotDeliver && statusType != StatusType.Delivered)">
+    <hr />
+    <h1 style="padding-top: 25px;">Ocena serwisu</h1>
+    <br/>
+    <div class="rz-p-6 rz-text-align-center">
+        <RadzenRating @bind-Value=@review.Value />
+    </div>
+    <br/>
+    <textarea id="reviewTextArea" rows="10" cols="100" @bind=@review.Description placeholder="Napisz swoją recenzję..."/>
+    <br/>
+    @if (DBsuccess) {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Ocena zapisana </label>
+        </div>
+    }
+    <br/>
+    <button class="btn btn-primary" @onclick="() => Submit()">Zatwierdź ocenę</button>
+</div>
+
+@code {
+    [Parameter]
+    public string? orderCode { get; set; }
+    private string? statusName;
+    private string? service;
+    private ApiStatus status = new ApiStatus();
+    private ApiReview review = new ApiReview();
+    private StatusType statusType;
+    private bool DBsuccess = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
+        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+        var y = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/service");
+        Console.WriteLine(x.StatusCode + " GET ORDERS SERVICE");
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<ApiStatus>();
+            var s = await y.Content.ReadAsStringAsync();
+            if (c != null && s != null)
+            {
+                int startIndex = s.IndexOf("<title>") + "<title>".Length;
+                int endIndex = s.IndexOf("</title>", startIndex);
+                if (startIndex >= 0 && endIndex > startIndex)
+                {
+                    s = s.Substring(startIndex, endIndex - startIndex);
+                }
+
+                service = s;
+                status = c;
+                Enum.TryParse(status.Name, out statusType);
+                statusName = Enum2String(statusType);
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
+
+    private async void Cancel()
+    {
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Api/{service}/cancel/{orderCode}", service); // fake content for PATCH
+        Console.WriteLine("PATCH REVIEW STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            DBsuccess = true;
+            statusType = StatusType.Cancelled;
+            statusName = Enum2String(statusType);
+            StateHasChanged();
+        }
+    }
+
+    private async void Submit()
+    {
+        review.Datetime = DateTime.Today;
+
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/review", review);
+        Console.WriteLine("PATCH REVIEW STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode) {
+            DBsuccess = true;
+            StateHasChanged();
+        }
+    }
+
+    private string? Enum2String(StatusType statusType)
+    {
+        int type = (int)statusType;
+        StatusTypePL statusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
+        string? res = Enum.GetName(typeof(StatusTypePL), statusTypePL);
+        return res?.Replace('_', ' ');
+    }
+}
