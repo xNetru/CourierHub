@@ -124,6 +124,6 @@ public class CourierControllerTest {
         Assert.Equal(200, status.StatusCode);
         var order = _mockContext.Object.Orders.FirstOrDefault();
         Assert.NotNull(order);
-        Assert.NotNull(order.ParcelId); // evaluation id was set
+        Assert.NotNull(order.ParcelId); // parcel id was set
     }
 }
