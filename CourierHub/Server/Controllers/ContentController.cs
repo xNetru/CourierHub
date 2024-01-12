@@ -46,7 +46,7 @@ public class ContentController : ControllerBase {
     }
 
     // POST <ContentController>/mailcontent/{...}
-    [HttpPost]
+    [HttpPost("mailcontent")]
     public async Task<ActionResult> PostMailContent([FromBody] ApiMailContent? content) {
         if (content == null) { return BadRequest(); }
 

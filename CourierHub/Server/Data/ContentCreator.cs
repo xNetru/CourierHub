@@ -16,6 +16,8 @@ public class ContentCreator {
     }
 
     public EmailContent CreateMailContent(ApiMailContent content) {
+        int index = content.Link.LastIndexOf('/');
+        string code = content.Link.Substring(index + 1);
         string htmlContent =
         $@"
             <!DOCTYPE html>
@@ -30,7 +32,7 @@ public class ContentCreator {
             
                 <h2>Szanowny/a {content.Client.Name} {content.Client.Surname},</h2>
             
-                <p>Mamy nadzieję, że niniejsza wiadomość znajdzie Cię w dobrym zdrowiu. Chcielibyśmy poinformować Cię o aktualnym statusie Twojego zamówienia.</p>
+                <p>Mamy nadzieję, że niniejsza wiadomość znajdzie Cię w dobrym zdrowiu. Chcielibyśmy poinformować Cię o aktualnym statusie Twojego zamówienia o kodzie {code}.</p>
             
                 <p>Możesz sprawdzić aktualny status swojego zamówienia, klikając na poniższy link:</p>
             
@@ -46,7 +48,9 @@ public class ContentCreator {
             </body>
             </html>
         ";
-        return new EmailContent(htmlContent);
+        EmailContent email = new EmailContent($"Status zamówienia {code}");
+        email.Html = htmlContent;
+        return email;
     }
 
     public string CreateContract(ApiContract contract) {

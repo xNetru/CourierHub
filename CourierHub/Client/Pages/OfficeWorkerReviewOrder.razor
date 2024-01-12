@@ -290,6 +290,7 @@
             Priority = 0,
             Length = 20,
             Depth = 30,
+            Mass = 10,
             Datetime = DateTime.Today,
             Source = new ApiAddress
             {
@@ -317,6 +318,7 @@
     {
         Order = Container.Orders.Last();
         // TODO: load Inquire
+        Inquire.Code = Order.Code;
     }
 
     private async void Accept()
@@ -327,6 +329,7 @@
             buttonDisabled = true;
             displayOfferAccepted = true;
             StateHasChanged();
+            SendEmail();
         }
     }
 
@@ -339,6 +342,55 @@
             buttonDisabled = true;
             displayOfferDenied = true;
             StateHasChanged();
+            SendEmail();
         }
+    }
+
+    private async void SendEmail()
+    {
+        ApiClient client = new ApiClient
+            {
+                Email = Order.ClientEmail,
+                Name = Order.ClientName,
+                Surname = Order.ClientSurname,
+                Address = new ApiAddress
+                {
+                    City = "abc",
+                    Number = "2a",
+                    Street = "abc",
+                    PostalCode = "00-000"
+                },
+                SourceAddress = new ApiAddress
+                {
+                    City = "abc",
+                    Number = "2a",
+                    Street = "abc",
+                    PostalCode = "00-000"
+                },
+            };
+        DateTime time = DateTime.Now;
+        ApiMailContent mailContent = new ApiMailContent
+            {
+                Recipient = Order.ClientEmail,
+                Link = $"{Http.BaseAddress}order/status/{Order.Code}",
+                Client = client,
+                Receipt = new ApiReceipt
+                {
+                    Code = Order.Code,
+                    Order = Order,
+                    DateTime = time,
+                    Inquire = Inquire
+                },
+                Contract = new ApiContract
+                {
+                    Code = Order.Code,
+                    Client = client,
+                    DateTime = time
+                }
+            };
+
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/mailcontent", mailContent);
+        string s = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("POST MAIL : " + response.StatusCode + " " + s);
     }
 }
