@@ -282,43 +282,33 @@
 
 @code {
     ApiOrder Order = new ApiOrder();
-    // Need to load Inquire for given Offer
-    // GET Inquire by Code???
-    ApiInquire Inquire = new ApiInquire
-        {
-            Width = 10,
-            Priority = 0,
-            Length = 20,
-            Depth = 30,
-            Mass = 10,
-            Datetime = DateTime.Today,
-            Source = new ApiAddress
-            {
-                City = "abdsguyusuksc",
-                Street = "abdjgdkc",
-                Number = "1",
-                Flat = "1",
-                PostalCode = "00-000"
-            },
-            Destination = new ApiAddress
-            {
-                City = "abddjkvhkjdhkc",
-                Street = "abxzhjjvkjfc",
-                Number = "1",
-                Flat = "1",
-                PostalCode = "00-000"
-            }
-        };
+    ApiInquire Inquire = new ApiInquire { Source = new ApiAddress(), Destination = new ApiAddress() };
 
     private bool displayOfferAccepted = false;
     private bool displayOfferDenied = false;
     private bool buttonDisabled = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Order = Container.Orders.Last();
-        // TODO: load Inquire
-        Inquire.Code = Order.Code;
+        var response = await Http.GetAsync($"{Http.BaseAddress}Inquire/{Order.Code}/code");
+        Console.WriteLine("GET INQUIRE: " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            var inq = await response.Content.ReadFromJsonAsync<ApiInquire>();
+            if(inq != null)
+            {
+                Inquire = inq;
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
     }
 
     private async void Accept()
