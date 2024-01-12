@@ -76,10 +76,11 @@ public class CourierControllerTest {
         string email = "maciejwąsik@gmail.com";
         // Act
         var result = await _controller.Get(email);
+        // Assert
         OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(200, objResult.StatusCode);
         ApiCourier? courier = (ApiCourier?)objResult.Value;
-        // Assert
+
         Assert.NotNull(courier);
         Assert.Equal("Maciej", courier.Name);
         Assert.Equal("Wąsik", courier.Surname);

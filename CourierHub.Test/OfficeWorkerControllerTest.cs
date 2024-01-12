@@ -75,10 +75,11 @@ public class OfficeWorkerControllerTest {
         string email = "mariuszkamiński@gmail.com";
         // Act
         var result = await _controller.Get(email);
+        // Assert
         OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(200, objResult.StatusCode);
         ApiOfficeWorker? worker = (ApiOfficeWorker?)objResult.Value;
-        // Assert
+
         Assert.NotNull(worker);
         Assert.Equal("Mariusz", worker.Name);
         Assert.Equal("Kamiński", worker.Surname);

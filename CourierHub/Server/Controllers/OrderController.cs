@@ -12,13 +12,11 @@ namespace CourierHub.Shared.Controllers;
 public class OrderController : ControllerBase {
     private readonly CourierHubDbContext _context;
     private readonly string _serviceName;
-    private readonly int _serviceId;
 
     public OrderController(CourierHubDbContext context, IConfiguration config) {
         _context = context;
         _serviceName = config.GetValue<string>("ServiceName") ??
             throw new NullReferenceException("Service name could not be loaded!");
-        _serviceId = _context.Services.Where(s => s.Name == _serviceName).Select(s => s.Id).FirstOrDefault();
     }
 
     // GET: <OrderController>/30
@@ -43,7 +41,7 @@ public class OrderController : ControllerBase {
     public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrderByStatus(int status) {
         // hardcoded
         if (status < 1 || status > 7) { return BadRequest(); }
-        var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == status).ToListAsync();
+        var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.StatusId == status).ToListAsync();
         if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
 
         var apiOrders = new List<ApiOrder>();
@@ -84,6 +82,52 @@ public class OrderController : ControllerBase {
         return Ok(service.Name);
     }
 
+    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
+    [HttpPatch("{code}/status")]
+    public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
+        if (statusType == null) { return BadRequest(); }
+        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+        if (order == null) { return NotFound(); }
+        order.StatusId = (int)statusType;
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
+    [HttpPatch("{code}/review")]
+    public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
+        if (review == null) { return BadRequest(); }
+
+        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+        if (order == null) { return NotFound(); }
+
+        var reviewDB = (Review)review;
+        await _context.Reviews.AddAsync(reviewDB);
+        await _context.SaveChangesAsync();
+
+        order.ReviewId = reviewDB.Id;
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    /* 
+     * === UNUSED ===
+     * 
+    private async Task<ActionResult> AddOrder(ApiOrder? order) {
+        if (order == null) { return BadRequest(); }
+        var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
+        if (inquire == null) { return NotFound(); }
+
+        var orderDB = (Order)order;
+        orderDB.InquireId = inquire.Id;
+        orderDB.ServiceId = _serviceId;
+        orderDB.StatusId = (int)StatusType.NotConfirmed;
+
+        await _context.Orders.AddAsync(orderDB);
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
     // POST: <OrderController>/{...}
     [HttpPost]
     public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
@@ -115,47 +159,5 @@ public class OrderController : ControllerBase {
         await _context.SaveChangesAsync();
         return Ok();
     }
-
-    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
-    [HttpPatch("{code}/status")]
-    public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
-        if (statusType == null) { return BadRequest(); }
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-        order.StatusId = (int)statusType;
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
-    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
-    [HttpPatch("{code}/review")]
-    public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
-        if (review == null) { return BadRequest(); }
-
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-
-        var reviewDB = (Review)review;
-        await _context.Reviews.AddAsync(reviewDB);
-        await _context.SaveChangesAsync();
-
-        order.ReviewId = reviewDB.Id;
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
-    private async Task<ActionResult> AddOrder(ApiOrder? order) {
-        if (order == null) { return BadRequest(); }
-        var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
-        if (inquire == null) { return NotFound(); }
-
-        var orderDB = (Order)order;
-        orderDB.InquireId = inquire.Id;
-        orderDB.ServiceId = _serviceId;
-        orderDB.StatusId = (int)StatusType.NotConfirmed;
-
-        await _context.Orders.AddAsync(orderDB);
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
+    */
 }

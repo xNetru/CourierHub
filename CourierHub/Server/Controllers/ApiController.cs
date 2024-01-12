@@ -108,8 +108,10 @@ public class ApiController : ControllerBase {
         return NotFound(); // should not happen if serviceName exists
     }
 
+    /* 
+     * === UNUSED ===
+     * 
     // GET: <ApiController>/CourierHub/status/q1w2-e3r4-t5y6-u7i8-o9p0
-    /*
     [HttpGet("{serviceName}/status/{code}")]
     public async Task<ActionResult<StatusType?>> GetOrderStatus(string serviceName, string code) {
         foreach (var webapi in _webApis) {

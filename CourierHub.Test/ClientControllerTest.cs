@@ -1,4 +1,5 @@
-﻿using CourierHub.Shared.ApiModels;
+﻿using Azure.Communication.Email;
+using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Controllers;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
@@ -11,6 +12,7 @@ using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,19 +34,28 @@ public class ClientControllerTest {
         };
         mockContext.Setup(c => c.Addresses).ReturnsDbSet(addresses);
         IList<ClientData> datum = new List<ClientData> {
-            new() { Id = 1, ClientId = 1, SourceAddressId = 1, AddressId = 2 }
+            new() { Id = 1, ClientId = 1, SourceAddress = addresses[0], SourceAddressId = 1, AddressId = 2, Address = addresses[1] }
         };
         mockContext.Setup(c => c.ClientDatum).ReturnsDbSet(datum);
-        IList<Inquire> inquires = new List<Inquire> { 
-            new() { Id = 1, Code = "q1w2-e3r4-t5y6-u7i8-o9p0", ClientId = 1, SourceId = 1, DestinationId = 2 }
+        IList<Inquire> inquires = new List<Inquire> {
+            new() { Id = 1, Code = "0123", ClientId = 1, SourceId = 1, DestinationId = 2, Datetime = DateTime.Now },
+            new() { Id = 2, Code = "4567", ClientId = 1, SourceId = 1, DestinationId = 2, Datetime = DateTime.Now.AddDays(-9) },
+            new() { Id = 3, Code = "8910", ClientId = 1, SourceId = 1, DestinationId = 2, Datetime = DateTime.Now.AddDays(-10) }
         };
         mockContext.Setup(c => c.Inquires).ReturnsDbSet(inquires);
         IList<Order> orders = new List<Order> {
-            new() { Id = 1, InquireId = 1, ClientAddressId = 2,
+            new() { Id = 1, InquireId = 1, Inquire = inquires[0], ClientAddressId = 2,
+                ClientName = "Janusz", ClientSurname = "Kowalski", ClientEmail =  "januszkowalski@gmail.com"
+            },
+            new() { Id = 2, InquireId = 2, Inquire = inquires[1], ClientAddressId = 2,
+                ClientName = "Janusz", ClientSurname = "Kowalski", ClientEmail =  "januszkowalski@gmail.com"
+            },
+            new() { Id = 3, InquireId = 3, Inquire = inquires[2], ClientAddressId = 2,
                 ClientName = "Janusz", ClientSurname = "Kowalski", ClientEmail =  "januszkowalski@gmail.com"
             }
         };
         mockContext.Setup(c => c.Orders).ReturnsDbSet(orders);
+
         _mockContext = mockContext;
         _controller = new ClientController(mockContext.Object);
     }
@@ -88,10 +99,11 @@ public class ClientControllerTest {
         string email = "januszkowalski@gmail.com";
         // Act
         var result = await _controller.Get(email);
+        // Assert
         OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(200, objResult.StatusCode);
         ApiClient? client = (ApiClient?)objResult.Value;
-        // Assert
+
         Assert.NotNull(client);
         Assert.Equal("Janusz", client.Name);
         Assert.Equal("Kowalski", client.Surname);
@@ -118,5 +130,95 @@ public class ClientControllerTest {
         // Assert
         NotFoundObjectResult objResult = Assert.IsType<NotFoundObjectResult>(result.Result);
         Assert.Equal(404, objResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetInquires_ShouldReturnInquires_WhenNumberOfDaysSpecified() {
+        // Arrange
+        string email = "januszkowalski@gmail.com";
+        int days = 10;
+        // Act
+        var result = await _controller.GetInquires(email, days);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        List<ApiInquire> inquires = (List<ApiInquire>)objResult.Value;
+        Assert.NotEmpty(inquires);
+        Assert.Equal(2, inquires.Count);
+    }
+
+    [Fact]
+    public async Task GetOrders_ShouldReturnOrders_WhenNumberOfDaysSpecified() {
+        // Arrange
+        string email = "januszkowalski@gmail.com";
+        int days = 10;
+        // Act
+        var result = await _controller.GetOrders(email, days);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        List<ApiOrder> inquires = (List<ApiOrder>)objResult.Value;
+        Assert.NotEmpty(inquires);
+        Assert.Equal(2, inquires.Count);
+    }
+
+    [Fact]
+    public async Task Put_ShouldChangeClient_WhenClientExists() {
+        // Arrange
+        string email = "januszkowalski@gmail.com";
+        var client = new ApiClient {
+            Name = "Nie",
+            Surname = "Istnieje",
+            Email = email,
+            Address = new ApiAddress(),
+            SourceAddress = new ApiAddress(),
+        };
+        // Act
+        var result = await _controller.Put(email, client);
+        // Assert
+        var status = Assert.IsType<OkResult>(result);
+        Assert.Equal(200, status.StatusCode);
+        var user = _mockContext.Object.Users.FirstOrDefault(e => e.Email == email);
+        Assert.NotNull(user);
+        Assert.Equal("Nie", user.Name);
+    }
+
+    [Fact]
+    public async Task Put_ShouldAddClient_WhenClientNotExists() {
+        // Arrange
+        string email = "maciejwąsik@gmail.com";
+        var client = new ApiClient {
+            Name = "Maciej",
+            Surname = "Wąsik",
+            Email = email,
+            Address = new ApiAddress(),
+            SourceAddress = new ApiAddress(),
+            Company = "Zakład Karny Ostrołęka"
+        };
+        // Act
+        var result = await _controller.Put(email, client);
+        // Assert
+        var status = Assert.IsType<OkResult>(result);
+        Assert.Equal(200, status.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_ShouldAddClient_Always() {
+        // Arrange
+        var client = new ApiClient {
+            Name = "Maciej",
+            Surname = "Wąsik",
+            Email = "maciejwąsik@gmail.com",
+            Address = new ApiAddress(),
+            SourceAddress = new ApiAddress(),
+            Company = "Zakład Karny Ostrołęka"
+        };
+        // Act
+        var result = await _controller.Post(client);
+        // Assert
+        var status = Assert.IsType<OkResult>(result);
+        Assert.Equal(200, status.StatusCode);
     }
 }
