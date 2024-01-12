@@ -31,6 +31,7 @@ public class InquireController : ControllerBase {
         return Ok(apiInquires);
     }
 
+    /*
     // POST: <InquireController>/email@gmail.com/{...}
     [HttpPost("{email}")]
     public async Task<ActionResult<int>> Post(string email, [FromBody] ApiInquire? inquire) {
@@ -46,4 +47,5 @@ public class InquireController : ControllerBase {
         await _context.SaveChangesAsync();
         return Ok(inquireDB.Id);
     }
+    */
 }
