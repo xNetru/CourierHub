@@ -329,7 +329,7 @@
             buttonDisabled = true;
             displayOfferAccepted = true;
             StateHasChanged();
-            SendEmail();
+            SendEmail(StatusType.Confirmed);
         }
     }
 
@@ -342,11 +342,11 @@
             buttonDisabled = true;
             displayOfferDenied = true;
             StateHasChanged();
-            SendEmail();
+            SendEmail(StatusType.Denied);
         }
     }
 
-    private async void SendEmail()
+    private async void SendEmail(StatusType status)
     {
         ApiClient client = new ApiClient
             {
@@ -374,6 +374,7 @@
                 Recipient = Order.ClientEmail,
                 Link = $"{Http.BaseAddress}order/status/{Order.Code}",
                 Client = client,
+                Status = status,
                 Receipt = new ApiReceipt
                 {
                     Code = Order.Code,

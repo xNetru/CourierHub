@@ -54,13 +54,13 @@ public class ContentController : ControllerBase {
 
         var attachments = new List<EmailAttachment>();
 
-        if (content.Contract != null) {
+        if (content.Contract != null && content.Status == Enums.StatusType.Confirmed) {
             string contract = _creator.CreateContract(content.Contract);
             EmailAttachment attach = _creator.CreateMailAttachment("contract.txt", contract);
             attachments.Add(attach);
         }
 
-        if (content.Receipt != null) {
+        if (content.Receipt != null && content.Status == Enums.StatusType.Confirmed) {
             string receipt = _creator.CreateReceipt(content.Receipt);
             EmailAttachment attach = _creator.CreateMailAttachment("receipt.txt", receipt);
             attachments.Add(attach);
