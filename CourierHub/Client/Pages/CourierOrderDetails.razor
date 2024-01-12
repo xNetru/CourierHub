@@ -90,6 +90,16 @@
                 status = c;
                 Enum.TryParse(status.Name, out statusType);
                 statusName = Enum2String(statusType);
+                var y = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/parcel");
+                Console.WriteLine(x.StatusCode + " GET PARCEL");
+                if (y.IsSuccessStatusCode)
+                {
+                    var p = await y.Content.ReadFromJsonAsync<ApiParcel>();
+                    if (p != null)
+                    {
+                        parcel = p;
+                    }
+                }
             }
             else
             {
