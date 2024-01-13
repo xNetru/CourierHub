@@ -24,7 +24,7 @@ public class ContentController : ControllerBase {
     }
 
     // POST <ContentController>/contract/{...}
-    [HttpPost]
+    [HttpPost("contract")]
     public async Task<ActionResult> PostContract([FromBody] ApiContract? contract) {
         if (contract == null) { return BadRequest(); }
 
@@ -34,7 +34,7 @@ public class ContentController : ControllerBase {
     }
 
     // POST <ContentController>/receipt/{...}
-    [HttpPost]
+    [HttpPost("receipt")]
     public async Task<ActionResult> PostReceipt([FromBody] ApiReceipt? receipt) {
         if (receipt == null) { return BadRequest(); }
 
@@ -44,7 +44,7 @@ public class ContentController : ControllerBase {
     }
 
     // POST <ContentController>/mailcontent/{...}
-    [HttpPost]
+    [HttpPost("mailcontent")]
     public async Task<ActionResult> PostMailContent([FromBody] ApiMailContent? content) {
         if (content == null) { return BadRequest(); }
 
