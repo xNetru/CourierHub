@@ -3,8 +3,6 @@ using CourierHub.Shared.Controllers;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Moq;
 using Moq.EntityFrameworkCore;
 
@@ -22,13 +20,13 @@ public class InquireControllerTest {
         mockContext.Setup(c => c.Addresses).ReturnsDbSet(addresses);
         IList<Inquire> inquires = new List<Inquire> {
             new() { Id = 1, Code = "0123", Datetime = DateTime.Now, SourceId = 1, Source = address,
-                DestinationId = 1, Destination = address, Mass = 1000 
+                DestinationId = 1, Destination = address, Mass = 1000
             },
             new() { Id = 2, Code = "4567", Datetime = DateTime.Now.AddDays(-9), SourceId = 1, Source = address,
-                DestinationId = 1, Destination = address 
+                DestinationId = 1, Destination = address
             },
             new() { Id = 3, Code = "8910", Datetime = DateTime.Now.AddDays(-10), SourceId = 1, Source = address,
-                DestinationId = 1, Destination = address 
+                DestinationId = 1, Destination = address
             }
         };
         mockContext.Setup(c => c.Inquires).ReturnsDbSet(inquires);

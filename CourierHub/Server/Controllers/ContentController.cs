@@ -1,6 +1,6 @@
 ﻿using Azure.Communication.Email;
-using CourierHub.Server.Data;
 using CourierHub.Cloud;
+using CourierHub.Server.Data;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using Microsoft.AspNetCore.Mvc;
