@@ -1,4 +1,4 @@
-﻿namespace CourierHub.Shared.Data {
+﻿namespace CourierHub.Client.Data {
     public class RoleContainer {
         public Dictionary<string, bool> Roles { get; set; } = new Dictionary<string, bool>
         {
