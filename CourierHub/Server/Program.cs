@@ -38,7 +38,7 @@ public class Program {
         });
 
         builder.Services.AddSingleton<InquireCodeContainer>();
-        builder.Services.AddSingleton<WebApiContainer>();
+        builder.Services.AddScoped<WebApiContainer>();
 
         var app = builder.Build();
 
