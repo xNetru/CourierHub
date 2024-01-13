@@ -82,6 +82,12 @@ public class ApiController : ControllerBase {
 
                 // retrieve cashed id
                 int inquireId = _container.InquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
+
+                var inquireDB = _context.Inquires.FirstOrDefault(e => e.Id == inquireId);
+                if (inquireDB == null) { return NotFound(); }
+                // for now this code, but in case of e.g. SzymoAPI it must be retrived from webapi.PostOrder(order)
+                inquireDB.Code = order.Code;
+
                 Order orderDB = (Order)order;
                 orderDB.InquireId = inquireId;
                 orderDB.ServiceId = service.Id;
@@ -108,8 +114,10 @@ public class ApiController : ControllerBase {
         return NotFound(); // should not happen if serviceName exists
     }
 
+    /* 
+     * === UNUSED ===
+     * 
     // GET: <ApiController>/CourierHub/status/q1w2-e3r4-t5y6-u7i8-o9p0
-    /*
     [HttpGet("{serviceName}/status/{code}")]
     public async Task<ActionResult<StatusType?>> GetOrderStatus(string serviceName, string code) {
         foreach (var webapi in _webApis) {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-
-namespace CourierHubWebApi.Services.Contracts {
+﻿namespace CourierHubWebApi.Services.Contracts {
     public interface IApiKeyService {
         bool TryGetServiceId(string ApiKey, out int ServiceId);
         bool TryExtractApiKey(HttpContext context, out string ApiKey);

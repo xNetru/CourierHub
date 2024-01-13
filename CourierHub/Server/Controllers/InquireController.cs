@@ -33,6 +33,20 @@ public class InquireController : ControllerBase {
         return Ok(apiInquires);
     }
 
+    // GET: <InquireController>/q1w2-e3r4-t5y6-u7i8-o9p0
+    [HttpGet("{code}")]
+    public async Task<ActionResult<ApiInquire>> GetInquireByCode(string code) {
+        if (code.IsNullOrEmpty()) { return BadRequest(); }
+
+        var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == code);
+        if (inquire == null) { return NotFound(); }
+
+        return Ok((ApiInquire)inquire);
+    }
+
+    /* 
+     * === UNUSED ===
+     * 
     // POST: <InquireController>/email@gmail.com/{...}
     [HttpPost("{email}")]
     public async Task<ActionResult<int>> Post(string email, [FromBody] ApiInquire? inquire) {
@@ -48,4 +62,5 @@ public class InquireController : ControllerBase {
         await _context.SaveChangesAsync();
         return Ok(inquireDB.Id);
     }
+    */
 }

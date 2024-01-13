@@ -10,7 +10,6 @@
 
   <ItemGroup>
 	<PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -26,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CourierHub.Cloud\CourierHub.Cloud.csproj" />
     <ProjectReference Include="..\Client\CourierHub.Client.csproj" />
     <ProjectReference Include="..\Shared\CourierHub.Shared.csproj" />
   </ItemGroup>

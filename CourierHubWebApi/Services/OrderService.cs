@@ -11,14 +11,12 @@ namespace CourierHubWebApi.Services {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService;
         private IApiKeyService _apiKeyService;
-        public OrderService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService)
-        {
+        public OrderService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService) {
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
             _apiKeyService = apiKeyService;
         }
-        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId)
-        {
+        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId) {
             if (_apiKeyService.IsOurServiceRequest(serviceId))
                 return StatusCodes.Status200OK;
             Order order = request.CreateOrder();
@@ -57,53 +55,41 @@ namespace CourierHubWebApi.Services {
             try {
                 _dbContext.Add(order);
                 _dbContext.SaveChanges();
-            }
-            catch
-            {
+            } catch {
                 // TODO: rollback changes
                 return Error.Failure();
             }
             return StatusCodes.Status200OK;
         }
-        
-        public async Task<ErrorOr<int>> WithdrawOrder(WithdrawOrderRequest request, int serviceId)
-        {
+
+        public async Task<ErrorOr<int>> WithdrawOrder(WithdrawOrderRequest request, int serviceId) {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.ServiceId == serviceId && x.Inquire.Code == request.Code);
-            if(orders.Count() != 1)
-            {
+            if (orders.Count() != 1) {
                 // TODO: pass valid error
                 return Error.Failure();
             }
             Order order = orders.First();
             Status? status = _dbContext.Statuses.Where(x => x.Id == order.StatusId).FirstOrDefault();
-            if (status != null && status.IsCancelable)
-            {
-                try
-                {
+            if (status != null && status.IsCancelable) {
+                try {
                     order.StatusId = (int)StatusType.Cancelled;
                     await _dbContext.SaveChangesAsync();
                     return StatusCodes.Status200OK;
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     // TODO: pass valid error
                     return Error.Failure();
                 }
-            }
-            else
-            {
+            } else {
                 // TODO: pass valid error
                 return Error.Failure();
             }
 
         }
 
-        public ErrorOr<StatusType> GetOrderStatus(GetOrderStatusRequest request, int serviceId)
-        {
+        public ErrorOr<StatusType> GetOrderStatus(GetOrderStatusRequest request, int serviceId) {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.Inquire.Code == request.Code && x.ServiceId == serviceId);
             Order? order = orders.FirstOrDefault();
-            if (orders.Count() != 1 || order == null)
-            {
+            if (orders.Count() != 1 || order == null) {
                 return Error.Conflict();
             }
             return (StatusType)order.StatusId;

@@ -1,4 +1,4 @@
-﻿namespace CourierHub.Shared.Abstractions;
+﻿namespace CourierHub.Cloud;
 /// <summary>
 /// Represents an interface for cloud storage operations.
 /// </summary>

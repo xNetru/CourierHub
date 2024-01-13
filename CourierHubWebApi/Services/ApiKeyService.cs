@@ -7,12 +7,11 @@ namespace CourierHubWebApi.Services {
         private CourierHubDbContext _dbContext;
         private static Dictionary<string, int>? _apiKeyToServiceIdDictionary = null;
         private static readonly string _apiKeyName = "X-Api-Key";
-        private static int _ourServiceId = 1; 
+        private static int _ourServiceId = 1;
         public string ApiKeyName { get => _apiKeyName; }
         public ApiKeyService(CourierHubDbContext dbContext, IConfiguration configuration) {
             _dbContext = dbContext;
-            if (_apiKeyToServiceIdDictionary == null)
-            {
+            if (_apiKeyToServiceIdDictionary == null) {
                 FillDictionary();
                 SetOurServiceId(configuration);
             }
@@ -24,18 +23,15 @@ namespace CourierHubWebApi.Services {
             }
             return _apiKeyToServiceIdDictionary.TryGetValue(apiKey, out serviceId);
         }
-        public bool TryExtractApiKey(HttpContext context, out string apiKey)
-        {
-            if (context.Request.Headers.TryGetValue(_apiKeyName, out StringValues key))
-            {
+        public bool TryExtractApiKey(HttpContext context, out string apiKey) {
+            if (context.Request.Headers.TryGetValue(_apiKeyName, out StringValues key)) {
                 apiKey = key.ToString();
                 return true;
             }
             apiKey = default!;
             return false;
         }
-        public bool IsOurServiceRequest(int serviceId) 
-        {
+        public bool IsOurServiceRequest(int serviceId) {
             return serviceId == _ourServiceId;
         }
         private void FillDictionary() {
@@ -55,12 +51,10 @@ namespace CourierHubWebApi.Services {
             }
 
         }
-        private void SetOurServiceId(IConfiguration configuration)
-        {
-            if(_apiKeyToServiceIdDictionary != null)
-            {
+        private void SetOurServiceId(IConfiguration configuration) {
+            if (_apiKeyToServiceIdDictionary != null) {
                 string? serviceName = configuration["AppSettings:OurService"];
-                if(serviceName != null)
+                if (serviceName != null)
                     _apiKeyToServiceIdDictionary.TryGetValue(serviceName, out _ourServiceId);
 
             }

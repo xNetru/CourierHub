@@ -1,10 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using CourierHub.Shared.Abstractions;
 using System.IO.Compression;
 using System.Text;
 
-namespace CourierHub.Shared.Data;
+namespace CourierHub.Cloud;
 /// <summary>
 /// Implements <see cref="ICloudStorage"/> interface and provides methods for Azure Blob Storage operations.
 /// </summary>
