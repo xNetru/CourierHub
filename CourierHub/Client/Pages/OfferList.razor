@@ -9,35 +9,34 @@
 
 <h1>Lista dostępnych ofert</h1>
 
-<div class="container">
-    <h3>Kurieroinator</h3>
-
-    <div class="col-md-12">
-        <div class="row" style="margin-top:10px">
-            <div class="col-md-4">
-                <label class="col-form-label">Cena</label>
-                <p>@Offer.Price</p>
-            </div>
-
-            <div class="col-md-4">
-                <label class="col-form-label">Data ważności oferty</label>
-                <p>@Offer.ExpirationDate.ToString()</p>
-            </div>
-
-            <div class="col-md-4">
-                <button class="btn btn-primary" @onclick="Submit">Wybierz</button>
-            </div>
-        </div>
-    </div>
-</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Serwis</th>
+            <th>Kod</th>
+            <th>Cena</th>
+            <th>Data ważności</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in UserOffers.Offers)
+        {
+            <tr>
+                <td style="white-space:nowrap">@item.ServiceName</td>
+                <td style="white-space:nowrap">@item.Code</td>
+                <td style="white-space:nowrap">@item.Price</td>
+                <td style="white-space:nowrap">@item.ExpirationDate</td>
+                <td style="white-space:nowrap">
+                    <button class="btn btn-primary" @onclick="() => Choose(item)">Wybierz</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
-    private ApiOffer Offer = new ApiOffer
-        {
-            ExpirationDate = new DateTime()
-        };
-
-    private async void Submit()
+    private async void Choose(ApiOffer offer)
     {
         var context = await Provider.GetAuthenticationStateAsync();
         var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
@@ -46,10 +45,8 @@
         {
             mail = email.Value;
         }
+        UserOffers.Offers.Clear();
+        UserOffers.Offers.Add(offer);
         NavigationManager.NavigateTo($"/offerSubmitForm/{mail}");
-    }
-
-    protected override void OnInitialized() {
-        Offer = UserOffers.Offers.First(); // TODO: load for all APIs, for now it is just our API
     }
 }

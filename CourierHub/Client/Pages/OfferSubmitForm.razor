@@ -118,7 +118,7 @@
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="OfferProvider" class="col-form-label">Serwis kurierski</label>
-                        <input type="text" class="form-control" id="OfferProvider" @bind-value="@Service" disabled="true" />
+                        <input type="text" class="form-control" id="OfferProvider" @bind-value="@Offer.ServiceName" disabled="true" />
                     </div>
 
                     <div class="col-md-6">
@@ -289,27 +289,24 @@
 
     private ApiOrder NewOrder = new ApiOrder {
             ClientAddress = new ApiAddress(),
-            Code = "", // from Offer
+            Code = "",
             ClientCompany = ""
     };
-    private ApiOffer Offer = new ApiOffer { // from inquireForm
+    private ApiOffer Offer = new ApiOffer {
         ExpirationDate = new DateTime()
     };
-    private ApiInquire Inquire = new ApiInquire { // from inquireForm
+    private ApiInquire Inquire = new ApiInquire {
         Source = new ApiAddress(),
         Destination = new ApiAddress(),
         Priority = 0
     };
-    private string Service = "Kurieroinator";
 
     private bool displayOfferConfirmed = false;
     private bool isButtonDisabled = false;
 
     private async void HandleValidSubmit(EditContext context)
     {
-        const string SERVICENAME = "CourierHub"; // needs to be readen from form, service chosen by client
-
-        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/{SERVICENAME}/order/", NewOrder);
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/{Offer.ServiceName}/order/", NewOrder);
         Console.WriteLine("POST ORDER STATUS : " + response.StatusCode);
         if (response.IsSuccessStatusCode) {
             displayOfferConfirmed = true;
@@ -327,9 +324,10 @@
     protected async override Task OnInitializedAsync()
     {
         Inquire = UserInquires.Inquires.Last();
-        Offer = UserOffers.Offers.First(); // for now as we have only our API
+        Offer = UserOffers.Offers.First();
         NewOrder.Code = Offer.Code;
         NewOrder.Price = Offer.Price;
+        Inquire.Code = Offer.Code;
 
         if (Role.Roles["Client"])
         {

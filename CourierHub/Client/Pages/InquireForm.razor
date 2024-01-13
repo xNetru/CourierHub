@@ -200,7 +200,6 @@
     {
         Source = new ApiAddress(),
         Destination = new ApiAddress(),
-        Code = "" // from API
     };
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
@@ -232,6 +231,7 @@
             var offers = await response.Content.ReadFromJsonAsync<ApiOffer[]>();
 
             if (offers != null) {
+                UserOffers.Offers.Clear();
                 foreach (var offer in offers) {
                     UserOffers.Offers.Add(offer);
                 }
