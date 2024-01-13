@@ -71,7 +71,7 @@
     [Parameter]
     public string? mail { get; set; }
     private string? statusName;
-    private ApiParcel parcel = new ApiParcel(); // need some GET and PATCH (edit deliverytime and undelivered reason)
+    private ApiParcel parcel = new ApiParcel();
     private ApiStatus status = new ApiStatus();
     private StatusType statusType;
     private bool pickUpSuccess = false;
@@ -115,15 +115,19 @@
     private async void PickUp()
     {
         parcel.PickupDatetime = DateTime.Now;
-        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel", parcel);
+        statusType = StatusType.PickedUp;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel/{(int)statusType}", parcel);
         Console.WriteLine("PATCH PARCEL STATUS : " + response.StatusCode);
 
         if (response.IsSuccessStatusCode)
         {
             pickUpSuccess = true;
-            statusType = StatusType.PickedUp;
             statusName = Enum2String(statusType);
             StateHasChanged();
+        }
+        else
+        {
+            statusType = StatusType.Confirmed;
         }
     }
 
@@ -132,12 +136,10 @@
         parcel.DeliveryDatetime = DateTime.Now;
 
         statusType = StatusType.Delivered;
-        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
-        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
-        var response2 = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel", parcel);
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel/{(int)statusType}", parcel);
         Console.WriteLine("PATCH PARCEL STATUS : " + response.StatusCode);
 
-        if (response.IsSuccessStatusCode && response2.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             deliverySuccess = true;
             statusName = Enum2String(statusType);
@@ -157,15 +159,12 @@
     private async void ConfirmNotDelivered()
     {
         statusType = StatusType.CouldNotDeliver;
-        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", statusType);
-        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
-        var response2 = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel", parcel);
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Courier/{mail}/order/{orderCode}/parcel/{(int)statusType}", parcel);
         Console.WriteLine("PATCH PARCEL STATUS : " + response.StatusCode);
 
-        if (response.IsSuccessStatusCode && response2.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             notDeliveredHidden = true;
-            pickUpSuccess = true;
             statusName = Enum2String(statusType);
             StateHasChanged();
         }

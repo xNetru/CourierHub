@@ -50,9 +50,9 @@ public class CourierController : ControllerBase {
         return Ok(apiOrders);
     }
 
-    // PATCH: <CourierController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/parcel/{...}
-    [HttpPatch("{email}/order/{code}/parcel")]
-    public async Task<ActionResult> PatchParcel(string email, string code, [FromBody] ApiParcel? parcel) {
+    // PATCH: <CourierController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/parcel/1/{...}
+    [HttpPatch("{email}/order/{code}/parcel/{status}")]
+    public async Task<ActionResult> PatchParcel(string email, string code, int status, [FromBody] ApiParcel? parcel) {
         if (parcel == null) { return BadRequest(); }
 
         var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Courier);
@@ -72,7 +72,7 @@ public class CourierController : ControllerBase {
         await _context.SaveChangesAsync();
 
         order.ParcelId = parcelDB.Id;
-        order.StatusId = (int)StatusType.PickedUp;
+        order.StatusId = status;
         await _context.SaveChangesAsync();
         return Ok();
     }
