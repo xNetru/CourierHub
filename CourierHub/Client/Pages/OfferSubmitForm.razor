@@ -311,6 +311,7 @@
         if (response.IsSuccessStatusCode) {
             displayOfferConfirmed = true;
             isButtonDisabled = true;
+            StateHasChanged();
         } else {
             Console.WriteLine("POST ORDER FAILED");
         }

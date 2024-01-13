@@ -200,6 +200,7 @@
     {
         Source = new ApiAddress(),
         Destination = new ApiAddress(),
+        Code = ""
     };
     private bool displayInquireSent = false;
     private bool isButtonDisabled = false;
@@ -225,7 +226,8 @@
         UserOffers.Offers.Clear();
 
         var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/inquire/", NewInquire);
-        Console.WriteLine("POST INQUIRE STATUS : " + response.StatusCode);
+        var s = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("POST INQUIRE STATUS : " + response.StatusCode + " " + s);
 
         if (response.IsSuccessStatusCode) {
             var offers = await response.Content.ReadFromJsonAsync<ApiOffer[]>();
