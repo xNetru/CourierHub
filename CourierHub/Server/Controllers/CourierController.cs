@@ -4,6 +4,7 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CourierHub.Shared.Controllers;
 [ApiController]
@@ -29,6 +30,24 @@ public class CourierController : ControllerBase {
         var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Courier);
         if (user == null) { return NotFound(null); }
         return Ok((ApiCourier)user);
+    }
+
+    // GET: <CourierController>/email@gmail.com/order
+    [HttpGet("{mail}/order")]
+    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrder(string mail)
+    {
+        if (mail == null) { return BadRequest(); }
+        var orders = await _context.Orders.Where(e => e.Status.Name == StatusType.PickedUp.ToString() && e.Parcel != null && e.Parcel.Courier != null && e.Parcel.Courier.Email == mail).ToListAsync();
+        if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
+
+        var apiOrders = new List<ApiOrder>();
+        foreach (var order in orders)
+        {
+            order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
+            order.Inquire = (await _context.Inquires.FirstOrDefaultAsync(e => e.Id == order.InquireId))!;
+            apiOrders.Add((ApiOrder)order);
+        }
+        return Ok(apiOrders);
     }
 
     // PATCH: <CourierController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/parcel/{...}
