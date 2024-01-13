@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Net;
 using CourierHubWebApi.Models;
 using System;
+using FluentValidation;
+using CourierHub.Shared.Validation;
 
 namespace CourierHub.Server.Data;
 public class SzymoHubApi : IWebApi {
@@ -17,6 +19,8 @@ public class SzymoHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
     private readonly AccessTokenContainer _accessTokenContainer;
     private static string _tokenEndPoint = "/connect/token";
+    private SzymoInquiryValidator inquiryValidator = new();
+    private SzymoPostOfferRequestValidator offerValidator = new();
     public string ServiceName { get; set; }
 
     public SzymoHubApi(ApiService service, AccessTokenContainer accessTokenContainer)
@@ -110,6 +114,9 @@ public class SzymoHubApi : IWebApi {
             true,
             inquire.IsCompany);
 
+        if (!inquiryValidator.Validate(szymoInquiry).IsValid)
+            return (null, StatusCodes.Status400BadRequest);
+
         AddTokenToClient(_httpClient);
 
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
@@ -159,11 +166,14 @@ public class SzymoHubApi : IWebApi {
             order.ClientAddress.City,
             "Poland");
 
-        var apiOrder = new SzymoPostOfferRequest(
+        var szymoOffer = new SzymoPostOfferRequest(
             order.Code,
             order.ClientName,
             order.ClientEmail,
             address);
+
+        if (!offerValidator.Validate(szymoOffer).IsValid)
+            return (StatusCodes.Status400BadRequest, null);
 
         AddTokenToClient(_httpClient);
 
@@ -171,7 +181,7 @@ public class SzymoHubApi : IWebApi {
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try
         {
-            response = await _httpClient.PostAsJsonAsync("/Offers", apiOrder, cancelToken.Token);
+            response = await _httpClient.PostAsJsonAsync("/Offers", szymoOffer, cancelToken.Token);
         }
         catch (TaskCanceledException e)
         {
