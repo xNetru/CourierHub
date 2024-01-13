@@ -200,6 +200,7 @@
     private void HandleInvalidSubmit(EditContext context)
     {
         displayUserAddedToDB = false;
+        StateHasChanged();
     }
 
     protected override Task OnInitializedAsync()
