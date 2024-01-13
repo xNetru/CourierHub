@@ -6,16 +6,16 @@ namespace CourierHub.Shared.ApiModels;
 public class ApiAddress {
     [Required(ErrorMessage = "Ulica jest wymagana")]
     [MaxLength(50, ErrorMessage = "Max długośc ulicy wynisi 50 znaków")]
-    [RegularExpression(@"^[A-Z][a-z]+", ErrorMessage = "Niewłaściwa wielkość liter")]
+    [RegularExpression(@"^[A-Z][a-z]+$", ErrorMessage = "Niewłaściwa wielkość liter")]
     public string Street { get; set; } = null!;
 
     [Required(ErrorMessage = "Numer budynku jest wymagany")]
     [MaxLength(6, ErrorMessage = "Max długośc numeru budynku wynisi 6 znaków")]
-    [RegularExpression(@"^[0-9]+[A-Za-z]*", ErrorMessage = "Niewłaściwy format")]
+    [RegularExpression(@"^[1-9]\d*[A-Za-z]?$", ErrorMessage = "Niewłaściwy format")]
     public string Number { get; set; } = null!;
 
     [MaxLength(6, ErrorMessage = "Max długośc numeru lokalu wynisi 6 znaków")]
-    [RegularExpression(@"^[0-9]+[A-Za-z]*", ErrorMessage = "Niewłaściwy format")]
+    [RegularExpression(@"^[1-9]+\d*[A-Za-z]?$", ErrorMessage = "Niewłaściwy format")]
     public string? Flat { get; set; } = null!;
 
     [Required(ErrorMessage = "Kod pocztowy jest wymagany")]
@@ -24,7 +24,7 @@ public class ApiAddress {
 
     [Required(ErrorMessage = "Nazwa miasta jest wymagana")]
     [MaxLength(50, ErrorMessage = "Max długośc miasta wynisi 50 znaków")]
-    [RegularExpression(@"^[A-Z][a-z]+", ErrorMessage = "Niewłaściwa wielkość liter")]
+    [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Niewłaściwa wielkość liter")]
     public string City { get; set; } = null!;
 
     public static explicit operator ApiAddress(Address address) {
