@@ -342,6 +342,7 @@
 
     private async void SendEmail(StatusType status)
     {
+        DateTime time = DateTime.Now;
         ApiClient client = new ApiClient
             {
                 Email = Order.ClientEmail,
@@ -362,31 +363,43 @@
                     PostalCode = "00-000"
                 },
             };
-        DateTime time = DateTime.Now;
+        ApiReceipt receipt = new ApiReceipt
+            {
+                Code = Order.Code,
+                Order = Order,
+                DateTime = time,
+                Inquire = Inquire
+            };
+        ApiContract contract = new ApiContract
+            {
+                Code = Order.Code,
+                Client = client,
+                DateTime = time
+            };
         ApiMailContent mailContent = new ApiMailContent
             {
                 Recipient = Order.ClientEmail,
                 Link = $"{Http.BaseAddress}order/status/{Order.Code}",
                 Client = client,
                 Status = status,
-                Receipt = new ApiReceipt
-                {
-                    Code = Order.Code,
-                    Order = Order,
-                    DateTime = time,
-                    Inquire = Inquire
-                },
-                Contract = new ApiContract
-                {
-                    Code = Order.Code,
-                    Client = client,
-                    DateTime = time
-                }
+                Receipt = receipt,
+                Contract = contract
             };
 
-        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/mailcontent", mailContent);
-        string s = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("POST MAIL : " + response.StatusCode + " " + s);
+        var mail_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/mailcontent", mailContent);
+        string s = await mail_response.Content.ReadAsStringAsync();
+        Console.WriteLine("POST MAIL : " + mail_response.StatusCode + " " + s);
+        if(status == StatusType.Confirmed)
+        {
+            var contract_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/contract", contract);
+            s = await contract_response.Content.ReadAsStringAsync();
+            Console.WriteLine("POST CONTRACT : " + contract_response.StatusCode + " " + s);
+            // Status: 403 (This request is not authorized to perform this operation using this resource type.)
+            var receipt_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/receipt", receipt);
+            s = await receipt_response.Content.ReadAsStringAsync();
+            Console.WriteLine("POST RECEIPT : " + receipt_response.StatusCode + " " + s);
+            // Status: 403 (This request is not authorized to perform this operation using this resource type.)
+        }
     }
 
     private async void Submit()
