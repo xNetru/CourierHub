@@ -2,9 +2,11 @@
 
 @using CourierHub.Shared.ApiModels
 @using CourierHub.Shared.Enums
-@using CourierHub.Shared.Data
+@using CourierHub.Client.Data
 
 @inject OrderContainer Container
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
 
 <h1>Przegląd oferty</h1>
 
@@ -264,11 +266,11 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group row" style="margin-top:10px">
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="text-align: center;">
                             <button type="submit" class="btn btn-info" Style="margin-top:10px" @onclick="Accept" disabled="@buttonDisabled">Zaakceptuj ofertę</button>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="text-align: center;">
                             <button type="submit" class="btn btn-info" Style="margin-top:10px" @onclick="Deny" disabled="@buttonDisabled">Odrzuć ofertę</button>
                         </div>
                     </div>
@@ -279,70 +281,148 @@
     </EditForm>
 </div>
 
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@evaluationHidden">
+    <hr />
+    <h1 style="padding-top: 25px;">Powód odrzucenia zamówienia</h1>
+    <br/>
+    <textarea id="reviewTextArea" rows="10" cols="100" @bind=@Evaluation.RejectionReason placeholder="Opisz powód..."/>
+    <br/>
+    <button class="btn btn-primary" @onclick="() => Submit()">Zatwierdź</button>
+</div>
+
 @code {
-    ApiOrder Order = new ApiOrder
-        {
-            Price = 10,
-            ClientEmail = "bsjkj",
-            ClientName = "Skam",
-            ClientSurname = "Skam",
-            ClientCompany = "Kurieroinator",
-            ClientPhone = "3278378",
-            ClientAddress = new ApiAddress
-            {
-                City = "abdsguyusuksc",
-                Street = "abdjgdkc",
-                Number = "1",
-                Flat = "1",
-                PostalCode = "00-000"
-            }
-        };
-    // Need to load Inquire for given Offer
-    // GET Inquire by Code???
-    ApiInquire Inquire = new ApiInquire
-        {
-            Width = 10,
-            Priority = 0,
-            Length = 20,
-            Depth = 30,
-            Datetime = DateTime.Today,
-            Source = new ApiAddress
-            {
-                City = "abdsguyusuksc",
-                Street = "abdjgdkc",
-                Number = "1",
-                Flat = "1",
-                PostalCode = "00-000"
-            },
-            Destination = new ApiAddress
-            {
-                City = "abddjkvhkjdhkc",
-                Street = "abxzhjjvkjfc",
-                Number = "1",
-                Flat = "1",
-                PostalCode = "00-000"
-            }
-        };
+    ApiOrder Order = new ApiOrder();
+    ApiInquire Inquire = new ApiInquire { Source = new ApiAddress(), Destination = new ApiAddress() };
+    ApiEvaluation Evaluation = new ApiEvaluation();
 
     private bool displayOfferAccepted = false;
     private bool displayOfferDenied = false;
     private bool buttonDisabled = false;
+    private bool evaluationHidden = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Order = Container.Inquires.Last();
-        // TODO: load Inquire
+        Order = Container.Orders.Last();
+        var response = await Http.GetAsync($"{Http.BaseAddress}Inquire/{Order.Code}/code");
+        Console.WriteLine("GET INQUIRE: " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            var inq = await response.Content.ReadFromJsonAsync<ApiInquire>();
+            if(inq != null)
+            {
+                Inquire = inq;
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
     }
 
-    private void Accept()
+    private async void Accept()
     {
-        buttonDisabled = true;
-        displayOfferAccepted = true;
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{Order.Code}/status", StatusType.Confirmed);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+        if(response.IsSuccessStatusCode) {
+            buttonDisabled = true;
+            displayOfferAccepted = true;
+            StateHasChanged();
+            SendEmail(StatusType.Confirmed);
+        }
     }
 
     private void Deny()
     {
-        buttonDisabled = true;
-        displayOfferDenied = true;
+        evaluationHidden = !evaluationHidden;
+    }
+
+    private async void SendEmail(StatusType status)
+    {
+        DateTime time = DateTime.Now;
+        ApiClient client = new ApiClient
+            {
+                Email = Order.ClientEmail,
+                Name = Order.ClientName,
+                Surname = Order.ClientSurname,
+                Address = new ApiAddress
+                {
+                    City = "abc",
+                    Number = "2a",
+                    Street = "abc",
+                    PostalCode = "00-000"
+                },
+                SourceAddress = new ApiAddress
+                {
+                    City = "abc",
+                    Number = "2a",
+                    Street = "abc",
+                    PostalCode = "00-000"
+                },
+            };
+        ApiReceipt receipt = new ApiReceipt
+            {
+                Code = Order.Code,
+                Order = Order,
+                DateTime = time,
+                Inquire = Inquire
+            };
+        ApiContract contract = new ApiContract
+            {
+                Code = Order.Code,
+                Client = client,
+                DateTime = time
+            };
+        ApiMailContent mailContent = new ApiMailContent
+            {
+                Recipient = Order.ClientEmail,
+                Link = $"{Http.BaseAddress}order/status/{Order.Code}",
+                Client = client,
+                Status = status,
+                Receipt = receipt,
+                Contract = contract
+            };
+
+        var mail_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/mailcontent", mailContent);
+        string s = await mail_response.Content.ReadAsStringAsync();
+        Console.WriteLine("POST MAIL : " + mail_response.StatusCode + " " + s);
+        if(status == StatusType.Confirmed)
+        {
+            var contract_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/contract", contract);
+            s = await contract_response.Content.ReadAsStringAsync();
+            Console.WriteLine("POST CONTRACT : " + contract_response.StatusCode + " " + s);
+            // Status: 403 (This request is not authorized to perform this operation using this resource type.)
+            var receipt_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/receipt", receipt);
+            s = await receipt_response.Content.ReadAsStringAsync();
+            Console.WriteLine("POST RECEIPT : " + receipt_response.StatusCode + " " + s);
+            // Status: 403 (This request is not authorized to perform this operation using this resource type.)
+        }
+    }
+
+    private async void Submit()
+    {
+        var state = await Provider.GetAuthenticationStateAsync();
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+        if (email == null) { return; }
+
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{Order.Code}/status", StatusType.Denied);
+        Console.WriteLine("PATCH ORDER STATUS : " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            Evaluation.Datetime = DateTime.Now;
+            response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}OfficeWorker/{email.Value}/order/{Order.Code}/evaluation", Evaluation);
+            Console.WriteLine("PATCH EVALUATION: " + response.StatusCode);
+            if (response.IsSuccessStatusCode)
+            {
+                buttonDisabled = true;
+                displayOfferDenied = true;
+                evaluationHidden = true;
+                StateHasChanged();
+                SendEmail(StatusType.Denied);
+            }
+        }
     }
 }

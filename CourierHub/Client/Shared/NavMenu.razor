@@ -1,4 +1,4 @@
-﻿@using CourierHub.Shared.Data
+﻿@using CourierHub.Client.Data
 
 @inject RoleContainer Role
 
@@ -31,6 +31,11 @@
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Courier"])">
             <NavLink class="nav-link" href="Courier/orders/available" Match="NavLinkMatch.All">
                 <span class="oi oi-list" aria-hidden="true"></span> Dostępne paczki
+            </NavLink>
+        </div>
+        <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Courier"])">
+            <NavLink class="nav-link" href="Courier/orders/pickedup" Match="NavLinkMatch.All">
+                <span class="oi oi-list" aria-hidden="true"></span> Moje paczki
             </NavLink>
         </div>
         <div class="nav-item px-3" style="white-space:nowrap" hidden="@(!Role.Roles["Client"] && !Role.Roles["NotAuthorized"])">

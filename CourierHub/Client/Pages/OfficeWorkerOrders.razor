@@ -1,7 +1,7 @@
 ﻿@page "/OfficeWorker/Orders"
 
 @using CourierHub.Shared.ApiModels
-@using CourierHub.Shared.Data
+@using CourierHub.Client.Data
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -45,39 +45,19 @@
 </table>
 
 @code {
-    private IEnumerable<ApiOrder> Orders = new List<ApiOrder>
-    {
-        new ApiOrder
-        {
-            Price = 2137,
-            ClientEmail = "bsjkj",
-            ClientName = "Skam",
-            ClientSurname = "Skam",
-            ClientCompany = "Kurieroinator",
-            ClientPhone = "3278378",
-            ClientAddress = new ApiAddress
-            {
-                City="abdsguyusuksc",
-                Street="abdjgdkc",
-                Number="1",
-                Flat="1",
-                PostalCode="00-000"
-            },
-            Code = "MjAyMzEyMTgxOTUwMzg2NDE="
-        }
-    };
+    private IEnumerable<ApiOrder> Orders = new List<ApiOrder>();
 
     private void Choose(ApiOrder item)
     {
-        Container.Inquires.Clear();
-        Container.Inquires.Add(item);
+        Container.Orders.Clear();
+        Container.Orders.Add(item);
         NavigationManager.NavigateTo("/OfficeWorker/Orders/Review");
     }
 
     protected async override Task OnInitializedAsync()
     {
-        var x = await Http.GetAsync($"{Http.BaseAddress}Order/1/status");
-        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/1/order");
+        Console.WriteLine(x.StatusCode + " GET ORDERS BY STATUS");
 
         if (x.IsSuccessStatusCode)
         {
