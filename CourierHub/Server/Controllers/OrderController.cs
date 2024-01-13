@@ -15,7 +15,7 @@ public class OrderController : ControllerBase {
 
     public OrderController(CourierHubDbContext context, IConfiguration config) {
         _context = context;
-        _serviceName = config.GetValue<string>("ServiceName") ??
+        _serviceName = config["ServiceName"] ??
             throw new NullReferenceException("Service name could not be loaded!");
     }
 

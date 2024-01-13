@@ -1,6 +1,7 @@
 ﻿using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Controllers;
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -50,13 +51,13 @@ public class OrderControllerTest {
         mockContext.Setup(c => c.Reviews).ReturnsDbSet(reviews);
 
         IList<Order> orders = new List<Order> {
-            new() { Id = 1, InquireId = 1, Inquire = inquires[0], ClientAddressId = 1, StatusId = 1, Service = services[0],
+            new() { Id = 1, InquireId = 1, Inquire = inquires[0], ClientAddressId = 1, StatusId = 1, ServiceId = 1, Service = services[0],
                 ClientName = "Janusz", ClientSurname = "Kowalski", ClientEmail =  "januszkowalski@gmail.com",
             },
-            new() { Id = 2, InquireId = 2, Inquire = inquires[1], ClientAddressId = 1, StatusId = 1, Service = services[0],
+            new() { Id = 2, InquireId = 2, Inquire = inquires[1], ClientAddressId = 1, StatusId = 1, ServiceId = 1, Service = services[0],
                 ClientName = "Maciej", ClientSurname = "Wąsik", ClientEmail =  "maciejwąsik@gmail.com"
             },
-            new() { Id = 3, InquireId = 3, Inquire = inquires[2], ClientAddressId = 1, StatusId = 2, Service = services[0],
+            new() { Id = 3, InquireId = 3, Inquire = inquires[2], ClientAddressId = 1, StatusId = 2, ServiceId = 1, Service = services[0],
                 ClientName = "Mariusz", ClientSurname = "Kamiński", ClientEmail =  "mariuszkamiński@gmail.com"
             }
         };
@@ -95,64 +96,118 @@ public class OrderControllerTest {
         Assert.NotEmpty(orders);
         Assert.Equal(2, orders.Count);
     }
+
+    [Fact]
+    public async Task GetStatusByCode_ShouldReturnStatus_WhenOrderExists() {
+        // Arrange
+        string code = "0123";
+        // Act
+        var result = await _controller.GetStatusByCode(code);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        ApiStatus status = (ApiStatus)objResult.Value;
+        Assert.NotNull(status);
+        Assert.Equal("NotConfirmed", status.Name);
+    }
+
+    [Fact]
+    public async Task GetStatusByCode_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        // Act
+        var result = await _controller.GetStatusByCode(code);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.Equal(404, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetServiceByCode_ShouldReturnService_WhenOrderExists() {
+        // Arrange
+        string code = "0123";
+        // Act
+        var result = await _controller.GetServiceByCode(code);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        string serviceName = (string)objResult.Value;
+        Assert.NotNull(serviceName);
+        Assert.Equal("TestService", serviceName);
+    }
+
+    [Fact]
+    public async Task GetServiceByCode_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        // Act
+        var result = await _controller.GetServiceByCode(code);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.Equal(404, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task PatchStatus_ShouldChnageStatus_WhenOrderExists() {
+        // Arrange
+        string code = "0123";
+        StatusType s = StatusType.Delivered;
+        // Act
+        var result = await _controller.PatchStatus(code, s);
+        // Assert
+        OkResult res = Assert.IsType<OkResult>(result);
+        Assert.Equal(200, res.StatusCode);
+        var order = _mockContext.Object.Orders.FirstOrDefault(e => e.Inquire.Code == code);
+        Assert.NotNull(order);
+        Assert.Equal((int)s, order.StatusId);
+    }
+
+    [Fact]
+    public async Task PatchStatus_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        StatusType s = StatusType.Delivered;
+        // Act
+        var result = await _controller.PatchStatus(code, s);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result);
+        Assert.Equal(404, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task PatchReview_ShouldAddReview_WhenOrderExists() {
+        // Arrange
+        string code = "0123";
+        var review = new ApiReview {
+            Datetime = DateTime.Now,
+            Value = 2,
+            Description = "Mocne 2/10."
+        };
+        // Act
+        var result = await _controller.PatchReview(code, review);
+        // Assert
+        var status = Assert.IsType<OkResult>(result);
+        Assert.Equal(200, status.StatusCode);
+        var order = _mockContext.Object.Orders.FirstOrDefault(e => e.Inquire.Code == code);
+        Assert.NotNull(order);
+        Assert.NotNull(order.ReviewId); // review id was set
+    }
+
+    [Fact]
+    public async Task PatchReview_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        var review = new ApiReview {
+            Datetime = DateTime.Now,
+            Value = 2,
+            Description = "Mocne 2/10."
+        };
+        // Act
+        var result = await _controller.PatchReview(code, review);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result);
+        Assert.Equal(404, res.StatusCode);
+    }
 }
-
-/*
-    // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status
-    [HttpGet("{code}/status")]
-    public async Task<ActionResult<ApiStatus>> GetStatusByCode(string code) {
-        if (code.IsNullOrEmpty()) { return BadRequest(); }
-
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-
-        var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Id == order.StatusId);
-        if (status == null) { return NotFound(); }
-
-        return Ok(new ApiStatus { 
-            Name = status.Name, IsCancelable = status.IsCancelable
-        });
-    }
-
-    // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/service
-    [HttpGet("{code}/service")]
-    public async Task<ActionResult<string>> GetServiceByCode(string code) {
-        if (code.IsNullOrEmpty()) { return BadRequest(); }
-
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-
-        var service = await _context.Services.FirstOrDefaultAsync(e => e.Id == order.ServiceId);
-        if (service == null) { return NotFound(); }
-
-        return Ok(service.Name);
-    }
-
-    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
-    [HttpPatch("{code}/status")]
-    public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
-        if (statusType == null) { return BadRequest(); }
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-        order.StatusId = (int)statusType;
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
-    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
-    [HttpPatch("{code}/review")]
-    public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
-        if (review == null) { return BadRequest(); }
-
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-
-        var reviewDB = (Review)review;
-        await _context.Reviews.AddAsync(reviewDB);
-        await _context.SaveChangesAsync();
-
-        order.ReviewId = reviewDB.Id;
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-*/
