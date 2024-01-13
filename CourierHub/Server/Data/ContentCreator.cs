@@ -59,7 +59,7 @@ public class ContentCreator {
             "                                                        CONTRACT\r\n" +
            $"                                       {contract.Code}\r\n" +
             "\r\n" +
-           $"This Agreement is entered into on {contract.DateTime:dd.MM.YYYY}, between:\r\n" +
+           $"This Agreement is entered into on {contract.DateTime:dd.MM.yyyy}, between:\r\n" +
             "\r\n" +
            $"{(contract.Client.Company ?? contract.Client.Name + " " + contract.Client.Surname)}, hereinafter referred to as the \"Client,\" located at {contract.Client.Address.Street} {contract.Client.Address.Number} {contract.Client.Address.City}\r\n" +
             "" +
@@ -103,15 +103,15 @@ public class ContentCreator {
     public string CreateReceipt(ApiReceipt receipt) {
         string text =
            $"Order code: {receipt.Code}\r\n" +
-           $"Date: {receipt.DateTime:dd.MM.YYYY}\r\n" +
+           $"Date: {receipt.DateTime:dd.MM.yyyy}\r\n" +
             "\r\n" +
             "Order details:\r\n" +
            $"  Depth: {receipt.Inquire.Depth}\r\n" +
            $"  Width: {receipt.Inquire.Width}\r\n" +
            $"  Length: {receipt.Inquire.Length}\r\n" +
            $"  Mass: {receipt.Inquire.Mass}\r\n" +
-           $"  Source Date: {receipt.Inquire.SourceDate:dd.MM.YYYY}\r\n" +
-           $"  Destination Date: {receipt.Inquire.DestinationDate:dd.MM.YYYY}\r\n" +
+           $"  Source Date: {receipt.Inquire.SourceDate:dd.MM.yyyy}\r\n" +
+           $"  Destination Date: {receipt.Inquire.DestinationDate:dd.MM.yyyy}\r\n" +
            $"  Is Company: {receipt.Inquire.IsCompany}\r\n" +
            $"  Is Weekend: {receipt.Inquire.IsWeekend}\r\n" +
            $"  Priority: {receipt.Inquire.Priority}\r\n" +

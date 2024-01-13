@@ -294,6 +294,7 @@
     ApiOrder Order = new ApiOrder();
     ApiInquire Inquire = new ApiInquire { Source = new ApiAddress(), Destination = new ApiAddress() };
     ApiEvaluation Evaluation = new ApiEvaluation();
+    ApiClient Client = new ApiClient();
 
     private bool displayOfferAccepted = false;
     private bool displayOfferDenied = false;
@@ -303,6 +304,9 @@
     protected override async Task OnInitializedAsync()
     {
         Order = Container.Orders.Last();
+        Order.ClientPhone = Order.ClientPhone.TrimEnd();
+        Order.ClientAddress.Number = Order.ClientAddress.Number.TrimEnd();
+        Order.ClientAddress.Flat = Order.ClientAddress.Flat.TrimEnd();
         var response = await Http.GetAsync($"{Http.BaseAddress}Inquire/{Order.Code}/code");
         Console.WriteLine("GET INQUIRE: " + response.StatusCode);
         if (response.IsSuccessStatusCode)
@@ -311,6 +315,10 @@
             if(inq != null)
             {
                 Inquire = inq;
+                Inquire.Source.Flat = Inquire.Source.Flat.TrimEnd();
+                Inquire.Source.Number = Inquire.Source.Number.TrimEnd();
+                Inquire.Destination.Flat = Inquire.Destination.Flat.TrimEnd();
+                Inquire.Destination.Number = Inquire.Destination.Number.TrimEnd();
             }
             else
             {
@@ -320,6 +328,21 @@
         else
         {
             Console.WriteLine("FAIL");
+        }
+        response = await Http.GetAsync($"{Http.BaseAddress}Client/{Order.ClientEmail}");
+        Console.WriteLine("GET CLIENT: " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            var cli = await response.Content.ReadFromJsonAsync<ApiClient>();
+            if(cli != null)
+            {
+                Client = cli;
+                Client.Phone = Client.Phone.TrimEnd();
+                Client.Address.Number = Client.Address.Number.TrimEnd();
+                Client.Address.Flat = Client.Address.Flat.TrimEnd();
+                Client.SourceAddress.Number = Client.Address.Number.TrimEnd();
+                Client.SourceAddress.Flat = Client.Address.Flat.TrimEnd();
+            }
         }
     }
 
@@ -343,26 +366,6 @@
     private async void SendEmail(StatusType status)
     {
         DateTime time = DateTime.Now;
-        ApiClient client = new ApiClient
-            {
-                Email = Order.ClientEmail,
-                Name = Order.ClientName,
-                Surname = Order.ClientSurname,
-                Address = new ApiAddress
-                {
-                    City = "abc",
-                    Number = "2a",
-                    Street = "abc",
-                    PostalCode = "00-000"
-                },
-                SourceAddress = new ApiAddress
-                {
-                    City = "abc",
-                    Number = "2a",
-                    Street = "abc",
-                    PostalCode = "00-000"
-                },
-            };
         ApiReceipt receipt = new ApiReceipt
             {
                 Code = Order.Code,
@@ -373,14 +376,14 @@
         ApiContract contract = new ApiContract
             {
                 Code = Order.Code,
-                Client = client,
+                Client = Client,
                 DateTime = time
             };
         ApiMailContent mailContent = new ApiMailContent
             {
                 Recipient = Order.ClientEmail,
                 Link = $"{Http.BaseAddress}order/status/{Order.Code}",
-                Client = client,
+                Client = Client,
                 Status = status,
                 Receipt = receipt,
                 Contract = contract
@@ -394,11 +397,9 @@
             var contract_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/contract", contract);
             s = await contract_response.Content.ReadAsStringAsync();
             Console.WriteLine("POST CONTRACT : " + contract_response.StatusCode + " " + s);
-            // Status: 403 (This request is not authorized to perform this operation using this resource type.)
             var receipt_response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Content/receipt", receipt);
             s = await receipt_response.Content.ReadAsStringAsync();
             Console.WriteLine("POST RECEIPT : " + receipt_response.StatusCode + " " + s);
-            // Status: 403 (This request is not authorized to perform this operation using this resource type.)
         }
     }
 

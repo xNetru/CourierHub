@@ -19,11 +19,11 @@ public class ApiClient {
     public byte[]? Photo { get; set; }
 
     [MaxLength(12)]
-    [RegularExpression(@"^[0-9]+", ErrorMessage = "Błędny format numeru telefonu")]
+    [RegularExpression(@"^\d*$", ErrorMessage = "Błędny format numeru telefonu")]
     public string? Phone { get; set; }
 
     [MaxLength(50)]
-    [RegularExpression(@"^[A-Za-z0-9]", ErrorMessage = "Błędny format numeru nazwy firmy")]
+    [RegularExpression(@"^[A-Za-z0-9]*$", ErrorMessage = "Błędny format numeru nazwy firmy")]
     public string? Company { get; set; }
 
     [ValidateComplexType]
