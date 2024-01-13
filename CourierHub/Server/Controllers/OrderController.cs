@@ -12,13 +12,11 @@ namespace CourierHub.Shared.Controllers;
 public class OrderController : ControllerBase {
     private readonly CourierHubDbContext _context;
     private readonly string _serviceName;
-    private readonly int _serviceId;
 
     public OrderController(CourierHubDbContext context, IConfiguration config) {
         _context = context;
-        _serviceName = config.GetValue<string>("ServiceName") ??
+        _serviceName = config["ServiceName"] ??
             throw new NullReferenceException("Service name could not be loaded!");
-        _serviceId = _context.Services.Where(s => s.Name == _serviceName).Select(s => s.Id).FirstOrDefault();
     }
 
     // GET: <OrderController>/30
@@ -43,7 +41,7 @@ public class OrderController : ControllerBase {
     public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrderByStatus(int status) {
         // hardcoded
         if (status < 1 || status > 7) { return BadRequest(); }
-        var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.Status.Id == status).ToListAsync();
+        var orders = await _context.Orders.Where(e => e.Service.Name == _serviceName && e.StatusId == status).ToListAsync();
         if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
 
         var apiOrders = new List<ApiOrder>();
@@ -86,38 +84,6 @@ public class OrderController : ControllerBase {
         return Ok(service.Name);
     }
 
-    // POST: <OrderController>/{...}
-    [HttpPost]
-    public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
-        return await AddOrder(order);
-    }
-
-    // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
-    [HttpPut("{code}")]
-    public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
-        if (order == null) { return BadRequest(); }
-        var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (entity == null) {
-            return await AddOrder(order);
-        } else {
-            var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == entity.ClientAddressId))!;
-
-            entity.Price = order.Price;
-            entity.ClientEmail = order.ClientEmail;
-            entity.ClientName = order.ClientName;
-            entity.ClientSurname = order.ClientSurname;
-            entity.ClientPhone = order.ClientPhone;
-            entity.ClientCompany = order.ClientCompany;
-            entity.ClientAddress.Street = address.Street;
-            entity.ClientAddress.Number = address.Number;
-            entity.ClientAddress.Flat = address.Flat;
-            entity.ClientAddress.PostalCode = address.PostalCode;
-            entity.ClientAddress.City = address.City;
-        }
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
     // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
     [HttpPatch("{code}/status")]
     public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
@@ -131,7 +97,7 @@ public class OrderController : ControllerBase {
 
     // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/evaluation
     [HttpGet("{code}/evaluation")]
-    public async Task<ActionResult<ApiParcel>> GetEvaluationByCode(string code) {
+    public async Task<ActionResult<ApiEvaluation>> GetEvaluationByCode(string code) {
         if (code.IsNullOrEmpty()) { return BadRequest(); }
 
         var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
@@ -193,6 +159,9 @@ public class OrderController : ControllerBase {
         return Ok();
     }
 
+    /* 
+     * === UNUSED ===
+     * 
     private async Task<ActionResult> AddOrder(ApiOrder? order) {
         if (order == null) { return BadRequest(); }
         var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
@@ -207,4 +176,37 @@ public class OrderController : ControllerBase {
         await _context.SaveChangesAsync();
         return Ok();
     }
+
+    // POST: <OrderController>/{...}
+    [HttpPost]
+    public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
+        return await AddOrder(order);
+    }
+
+    // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
+    [HttpPut("{code}")]
+    public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
+        if (order == null) { return BadRequest(); }
+        var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+        if (entity == null) {
+            return await AddOrder(order);
+        } else {
+            var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == entity.ClientAddressId))!;
+
+            entity.Price = order.Price;
+            entity.ClientEmail = order.ClientEmail;
+            entity.ClientName = order.ClientName;
+            entity.ClientSurname = order.ClientSurname;
+            entity.ClientPhone = order.ClientPhone;
+            entity.ClientCompany = order.ClientCompany;
+            entity.ClientAddress.Street = address.Street;
+            entity.ClientAddress.Number = address.Number;
+            entity.ClientAddress.Flat = address.Flat;
+            entity.ClientAddress.PostalCode = address.PostalCode;
+            entity.ClientAddress.City = address.City;
+        }
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+    */
 }

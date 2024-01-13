@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CourierHub\Server\CourierHub.Server.csproj" />
     <ProjectReference Include="..\CourierHub\Shared\CourierHub.Shared.csproj" />
   </ItemGroup>
 
