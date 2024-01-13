@@ -16,7 +16,7 @@ public class InquireController : ControllerBase {
     }
 
     // GET: <InquireController>/30
-    [HttpGet("days")]
+    [HttpGet("{days}")]
     public async Task<ActionResult<IEnumerable<ApiInquire>>> Get(int days) {
         DateTime today = DateTime.Now;
         DateTime before = today.AddDays(-days);
@@ -26,14 +26,30 @@ public class InquireController : ControllerBase {
 
         var apiInquires = new List<ApiInquire>();
         foreach (var inquire in inquires) {
+            inquire.Source = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.SourceId))!;
+            inquire.Destination = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.DestinationId))!;
             apiInquires.Add((ApiInquire)inquire);
         }
         return Ok(apiInquires);
     }
 
+<<<<<<< HEAD
     /* 
      * === UNUSED ===
      * 
+=======
+    // GET: <InquireController>/q1w2-e3r4-t5y6-u7i8-o9p0
+    [HttpGet("{code}")]
+    public async Task<ActionResult<ApiInquire>> GetInquireByCode(string code) {
+        if (code.IsNullOrEmpty()) { return BadRequest(); }
+
+        var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == code);
+        if (inquire == null) { return NotFound(); }
+
+        return Ok((ApiInquire)inquire);
+    }
+
+>>>>>>> 9f7816424c4409503aafb1bc3ac537dcfb310732
     // POST: <InquireController>/email@gmail.com/{...}
     [HttpPost("{email}")]
     public async Task<ActionResult<int>> Post(string email, [FromBody] ApiInquire? inquire) {
