@@ -97,7 +97,7 @@ public class OrderController : ControllerBase {
 
     // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/evaluation
     [HttpGet("{code}/evaluation")]
-    public async Task<ActionResult<ApiParcel>> GetEvaluationByCode(string code) {
+    public async Task<ActionResult<ApiEvaluation>> GetEvaluationByCode(string code) {
         if (code.IsNullOrEmpty()) { return BadRequest(); }
 
         var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);

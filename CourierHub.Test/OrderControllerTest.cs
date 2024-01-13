@@ -18,6 +18,7 @@ public class OrderControllerTest {
         configMock.Setup(c => c["ServiceName"]).Returns("TestService");
 
         var mockContext = new Mock<CourierHubDbContext>();
+
         var address = new Address() { Id = 1, City = "Warszawa" };
         IList<Address> addresses = new List<Address> { address };
         mockContext.Setup(c => c.Addresses).ReturnsDbSet(addresses);
@@ -47,7 +48,33 @@ public class OrderControllerTest {
         };
         mockContext.Setup(c => c.Services).ReturnsDbSet(services);
 
-        IList<Review> reviews = new List<Review>();
+        var evaluation = new Evaluation {
+            Id = 1,
+            Datetime = DateTime.Now,
+            OfficeWorkerId = 2,
+            RejectionReason = "REASON"
+        };
+        IList<Evaluation> evaluations = new List<Evaluation> { evaluation };
+        mockContext.Setup(c => c.Evaluations).ReturnsDbSet(evaluations);
+
+        var parcel = new Parcel {
+            Id = 1,
+            PickupDatetime = DateTime.Now,
+            DeliveryDatetime = DateTime.Now.AddDays(1),
+            CourierId = 3,
+            UndeliveredReason = "REASON"
+            
+        };
+        IList<Parcel> parcels = new List<Parcel> { parcel };
+        mockContext.Setup(c => c.Parcels).ReturnsDbSet(parcels);
+
+        var review = new Review {
+            Id = 1,
+            Datetime = DateTime.Now,
+            Value = 5,
+            Description = "REASON"
+        };
+        IList<Review> reviews = new List<Review> { review };
         mockContext.Setup(c => c.Reviews).ReturnsDbSet(reviews);
 
         IList<Order> orders = new List<Order> {
@@ -58,7 +85,8 @@ public class OrderControllerTest {
                 ClientName = "Maciej", ClientSurname = "Wąsik", ClientEmail =  "maciejwąsik@gmail.com"
             },
             new() { Id = 3, InquireId = 3, Inquire = inquires[2], ClientAddressId = 1, StatusId = 2, ServiceId = 1, Service = services[0],
-                ClientName = "Mariusz", ClientSurname = "Kamiński", ClientEmail =  "mariuszkamiński@gmail.com"
+                ClientName = "Mariusz", ClientSurname = "Kamiński", ClientEmail =  "mariuszkamiński@gmail.com",
+                Evaluation= evaluation, EvaluationId = 1, Parcel = parcel, ParcelId = 1, Review = review, ReviewId = 1,
             }
         };
         mockContext.Setup(c => c.Orders).ReturnsDbSet(orders);
@@ -118,6 +146,84 @@ public class OrderControllerTest {
         string code = "ABCD";
         // Act
         var result = await _controller.GetStatusByCode(code);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.Equal(404, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetEvaluationByCode_ShouldReturnEvaluation_WhenOrderExists() {
+        // Arrange
+        string code = "8910";
+        // Act
+        var result = await _controller.GetEvaluationByCode(code);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        ApiEvaluation evaluation = (ApiEvaluation)objResult.Value;
+        Assert.NotNull(evaluation);
+        Assert.Equal("REASON", evaluation.RejectionReason);
+    }
+
+    [Fact]
+    public async Task GetEvaluationByCode_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        // Act
+        var result = await _controller.GetEvaluationByCode(code);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.Equal(404, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetParcelByCode_ShouldReturnParcel_WhenOrderExists() {
+        // Arrange
+        string code = "8910";
+        // Act
+        var result = await _controller.GetParcelByCode(code);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        ApiParcel parcel = (ApiParcel)objResult.Value;
+        Assert.NotNull(parcel);
+        Assert.Equal("REASON", parcel.UndeliveredReason);
+    }
+
+    [Fact]
+    public async Task GetParcelByCode_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        // Act
+        var result = await _controller.GetParcelByCode(code);
+        // Assert
+        NotFoundResult res = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.Equal(404, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetReviewByCode_ShouldReturnReview_WhenOrderExists() {
+        // Arrange
+        string code = "8910";
+        // Act
+        var result = await _controller.GetReviewByCode(code);
+        // Assert
+        OkObjectResult objResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(200, objResult.StatusCode);
+        Assert.NotNull(objResult.Value);
+        ApiReview review = (ApiReview)objResult.Value;
+        Assert.NotNull(review);
+        Assert.Equal("REASON", review.Description);
+    }
+
+    [Fact]
+    public async Task GetReviewByCode_ShouldReturn404_WhenOrderNotExists() {
+        // Arrange
+        string code = "ABCD";
+        // Act
+        var result = await _controller.GetReviewByCode(code);
         // Assert
         NotFoundResult res = Assert.IsType<NotFoundResult>(result.Result);
         Assert.Equal(404, res.StatusCode);
