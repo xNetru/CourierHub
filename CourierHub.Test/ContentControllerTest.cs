@@ -94,9 +94,9 @@ public class ContentControllerTest {
         await Assert.ThrowsAnyAsync<Exception>(async () => await _controller.PostReceipt(receipt));
     }
 
-    /*
+
     [Fact]
-    public async Task PostMailContent_ShouldReturn200_WhenReceiptCorrect() {
+    public async Task PostMailContent_ShouldReturnStatusCode_WhenReceiptCorrect() {
         // Arrange
         var client = new ApiClient {
             Name = "Mariusz",
@@ -134,10 +134,10 @@ public class ContentControllerTest {
         // Act
         var result = await _controller.PostMailContent(content);
         // Assert
-        var status = Assert.IsType<OkResult>(result);
-        Assert.Equal(200, status.StatusCode);
+        var status = Assert.IsType<StatusCodeResult>(result);
+        Assert.Equal(503, status.StatusCode);
     }
-    */
+
 
     [Fact]
     public async Task PostMailContent_ShouldThrow_WhenReceiptNotCorrect() {

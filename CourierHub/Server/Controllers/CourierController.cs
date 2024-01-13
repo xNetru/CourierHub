@@ -34,15 +34,18 @@ public class CourierController : ControllerBase {
 
     // GET: <CourierController>/email@gmail.com/order
     [HttpGet("{mail}/order")]
-    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrder(string mail)
-    {
+    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrder(string mail) {
         if (mail == null) { return BadRequest(); }
-        var orders = await _context.Orders.Where(e => e.Status.Name == StatusType.PickedUp.ToString() && e.Parcel != null && e.Parcel.Courier != null && e.Parcel.Courier.Email == mail).ToListAsync();
+        var orders = await _context.Orders.Where(e =>
+            e.StatusId == (int)StatusType.PickedUp &&
+            e.Parcel != null &&
+            e.Parcel.Courier != null &&
+            e.Parcel.Courier.Email == mail
+        ).ToListAsync();
         if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
 
         var apiOrders = new List<ApiOrder>();
-        foreach (var order in orders)
-        {
+        foreach (var order in orders) {
             order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
             order.Inquire = (await _context.Inquires.FirstOrDefaultAsync(e => e.Id == order.InquireId))!;
             apiOrders.Add((ApiOrder)order);

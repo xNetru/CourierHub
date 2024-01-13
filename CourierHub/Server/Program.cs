@@ -36,9 +36,8 @@ public class Program {
             return new AzureCommunicationService(connection, sender);
         });
 
-        builder.Services.AddSingleton(provider => {
-            return new InquireCodeContainer();
-        });
+        builder.Services.AddSingleton<InquireCodeContainer>();
+        builder.Services.AddSingleton<WebApiContainer>();
 
         var app = builder.Build();
 
