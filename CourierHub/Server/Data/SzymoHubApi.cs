@@ -17,18 +17,14 @@ public class SzymoHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
     private readonly AccessTokenContainer _accessTokenContainer;
     private static string _tokenEndPoint = "/connect/token";
-    private readonly CourierHubDbContext _context;
     public string ServiceName { get; set; }
 
-    public SzymoHubApi(ApiService service, IConfiguration config, AccessTokenContainer accessTokenContainer, CourierHubDbContext context)
+    public SzymoHubApi(ApiService service, AccessTokenContainer accessTokenContainer)
     {
         _service = service;
-        _service.BaseAddress = config.GetValue<string>("SzymoAddress") ??
-            throw new NullReferenceException("Base address could not be loaded!");
         ServiceName = _service.Name;
         _httpClient.BaseAddress = new Uri(_service.BaseAddress);
         _accessTokenContainer = accessTokenContainer;
-        _context = context;
     }
 
     public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {

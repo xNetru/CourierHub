@@ -14,7 +14,7 @@ namespace CourierHub.Shared.Data
         private static Dictionary<string, (string token, DateTime expiration)> tokens = new();
         public bool IsServiceTokenCachedAndNotExpired(ApiService service)
         {
-            return tokens.TryGetValue(service.Name, out var tokenData) && DateTime.Now < tokenData.expiration);
+            return tokens.TryGetValue(service.Name, out var tokenData) && DateTime.Now < tokenData.expiration;
         }
         public string? GetToken(ApiService service, string clientId, string clientSecret, string tokenEndPoint)
         {
