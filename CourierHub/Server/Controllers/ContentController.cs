@@ -17,7 +17,7 @@ public class ContentController : ControllerBase {
         ICloudStorage storage, ICloudCommunicationService communicationService) {
         _storage = storage;
         _communicationService = communicationService;
-        string serviceName = config.GetValue<string>("ServiceName") ??
+        string serviceName = config["ServiceName"] ??
             throw new NullReferenceException("Service name could not be loaded!");
         var service = (ApiService)context.Services.Where(s => s.Name == serviceName).FirstOrDefault()!;
         _creator = new ContentCreator(service);
@@ -29,7 +29,6 @@ public class ContentController : ControllerBase {
         if (contract == null) { return BadRequest(); }
 
         string content = _creator.CreateContract(contract);
-        // code musi być z ApiContract
         await _storage.PutBlobAsync($"{contract.Code}/contract_{contract.Code}.txt", "data", content, false);
         return Ok();
     }
@@ -40,7 +39,6 @@ public class ContentController : ControllerBase {
         if (receipt == null) { return BadRequest(); }
 
         string content = _creator.CreateReceipt(receipt);
-        // code musi być z ApiReceipt
         await _storage.PutBlobAsync($"{receipt.Code}/receipt_{receipt.Code}.txt", "data", content, false);
         return Ok();
     }
