@@ -303,6 +303,9 @@
     protected override async Task OnInitializedAsync()
     {
         Order = Container.Orders.Last();
+        Order.ClientPhone = Order.ClientPhone.TrimEnd();
+        Order.ClientAddress.Number = Order.ClientAddress.Number.TrimEnd();
+        Order.ClientAddress.Flat = Order.ClientAddress.Flat.TrimEnd();
         var response = await Http.GetAsync($"{Http.BaseAddress}Inquire/{Order.Code}/code");
         Console.WriteLine("GET INQUIRE: " + response.StatusCode);
         if (response.IsSuccessStatusCode)
@@ -311,6 +314,10 @@
             if(inq != null)
             {
                 Inquire = inq;
+                Inquire.Source.Flat = Inquire.Source.Flat.TrimEnd();
+                Inquire.Source.Number = Inquire.Source.Number.TrimEnd();
+                Inquire.Destination.Flat = Inquire.Destination.Flat.TrimEnd();
+                Inquire.Destination.Number = Inquire.Destination.Number.TrimEnd();
             }
             else
             {
@@ -350,16 +357,16 @@
                 Surname = Order.ClientSurname,
                 Address = new ApiAddress
                 {
-                    City = "abc",
-                    Number = "2a",
-                    Street = "abc",
+                    City = "Miasto",
+                    Number = "2",
+                    Street = "Ulica",
                     PostalCode = "00-000"
                 },
                 SourceAddress = new ApiAddress
                 {
-                    City = "abc",
-                    Number = "2a",
-                    Street = "abc",
+                    City = "Miasto",
+                    Number = "2",
+                    Street = "Ulica",
                     PostalCode = "00-000"
                 },
             };

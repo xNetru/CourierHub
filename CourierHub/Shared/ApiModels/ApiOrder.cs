@@ -10,7 +10,7 @@ public class ApiOrder {
 
     [Required(ErrorMessage = "Email jest wymagany")]
     [MaxLength(50)]
-    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Niepoprawny format maila")]
+    [EmailAddress(ErrorMessage = "Niepoprawny format maila")]
     public string ClientEmail { get; set; } = null!;
 
     [Required(ErrorMessage = "Imię jest wymagane")]
@@ -25,11 +25,11 @@ public class ApiOrder {
 
     [Required(ErrorMessage = "Numer telefonu jest wymagany")]
     [MaxLength(12)]
-    [RegularExpression(@"^[0-9]+", ErrorMessage = "Błędny format numeru telefonu")]
+    [RegularExpression(@"^\d*$", ErrorMessage = "Błędny format numeru telefonu")]
     public string ClientPhone { get; set; } = null!;
 
     [MaxLength(50)]
-    [RegularExpression(@"^[A-Za-z0-9]", ErrorMessage = "Błędny format numeru nazwy firmy")]
+    [RegularExpression(@"^[A-Za-z0-9]*$", ErrorMessage = "Błędny format nazwy firmy")]
     public string? ClientCompany { get; set; }
 
     [ValidateComplexType]
