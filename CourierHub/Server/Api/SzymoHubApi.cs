@@ -1,17 +1,8 @@
-﻿using CourierHub.CourierHubApiModels;
-using CourierHub.Shared.Abstractions;
-using CourierHub.Shared.ApiModels;
+﻿using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
-using CourierHub.Shared.SzymoApiModels;
-using CourierHub.Shared.Data;
-using CourierHub.Shared.Models;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using System.Net.Http;
 using System.Net;
-using CourierHubWebApi.Models;
-using System;
 
-namespace CourierHub.Server.Data;
+namespace CourierHub.Server.Api;
 public class SzymoHubApi : IWebApi {
     private readonly ApiService _service;
     private readonly HttpClient _httpClient = new();
@@ -19,8 +10,7 @@ public class SzymoHubApi : IWebApi {
     private static string _tokenEndPoint = "/connect/token";
     public string ServiceName { get; set; }
 
-    public SzymoHubApi(ApiService service, AccessTokenContainer accessTokenContainer)
-    {
+    public SzymoHubApi(ApiService service, AccessTokenContainer accessTokenContainer) {
         _service = service;
         ServiceName = _service.Name;
         _httpClient.BaseAddress = new Uri(_service.BaseAddress);
@@ -32,34 +22,22 @@ public class SzymoHubApi : IWebApi {
 
         SzymoGetOfferStatusResponse? response = null;
         var cancelToken = new CancellationTokenSource(30 * 1000);
-        try
-        {
+        try {
             response = await _httpClient.GetFromJsonAsync<SzymoGetOfferStatusResponse?>($"/offer/request/{code}/status", cancelToken.Token);
-        }
-        catch (HttpRequestException ex)
-        {
-            if (ex.Message.Contains(HttpStatusCode.NotFound.ToString()))
-            {
+        } catch (HttpRequestException ex) {
+            if (ex.Message.Contains(HttpStatusCode.NotFound.ToString())) {
                 return (StatusType.Cancelled, StatusCodes.Status200OK, null);
             }
-        }
-        catch (TaskCanceledException e)
-        {
+        } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
 
-        if (response == null)
-        {
+        if (response == null) {
             return (null, (int)HttpStatusCode.GatewayTimeout, null);
-        }
-        else
-        {
-            if(response.isReady)
-            {
+        } else {
+            if (response.isReady) {
                 return (StatusType.Confirmed, StatusCodes.Status200OK, response.offerId);
-            }
-            else
-            {
+            } else {
                 return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
             }
         }
@@ -100,13 +78,12 @@ public class SzymoHubApi : IWebApi {
             inquire.SourceDate,
             inquire.DestinationDate,
             inquire.IsWeekend,
-            inquire.Priority switch
-            {
+            inquire.Priority switch {
                 (int)PriorityType.High => "High",
                 (int)PriorityType.Low => "Low",
                 (int)PriorityType.Medium => "Medium",
                 _ => "Unknown"
-            }, 
+            },
             true,
             inquire.IsCompany);
 
@@ -114,36 +91,26 @@ public class SzymoHubApi : IWebApi {
 
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
-        try
-        {
+        try {
             response = await _httpClient.PostAsJsonAsync("/Inquires", szymoInquiry, cancelToken.Token);
-        }
-        catch (TaskCanceledException e)
-        {
+        } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
 
-        if (response.IsSuccessStatusCode)
-        {
+        if (response.IsSuccessStatusCode) {
             var inquireResponse = await response.Content.ReadFromJsonAsync<SzymoInquireResponse>();
-            if (inquireResponse != null)
-            {
-                var offer = new ApiOffer
-                {
+            if (inquireResponse != null) {
+                var offer = new ApiOffer {
                     Price = (decimal)inquireResponse.totalPrice,
                     Code = inquireResponse.inquiryId,
                     ServiceName = ServiceName,
                     ExpirationDate = inquireResponse.expiringAt
                 };
                 return (offer, (int)response.StatusCode);
-            }
-            else
-            {
+            } else {
                 return (null, StatusCodes.Status503ServiceUnavailable);
             }
-        }
-        else
-        {
+        } else {
             return (null, (int)response.StatusCode);
         }
     }
@@ -169,24 +136,17 @@ public class SzymoHubApi : IWebApi {
 
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
-        try
-        {
+        try {
             response = await _httpClient.PostAsJsonAsync("/Offers", apiOrder, cancelToken.Token);
-        }
-        catch (TaskCanceledException e)
-        {
+        } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
 
-        if (response.IsSuccessStatusCode)
-        {
+        if (response.IsSuccessStatusCode) {
             var orderResponse = await response.Content.ReadFromJsonAsync<SzymoPostOfferResponse>();
-            if (orderResponse != null)
-            {
+            if (orderResponse != null) {
                 return ((int)response.StatusCode, orderResponse.offerRequestId);
-            }
-            else
-            {
+            } else {
                 return (StatusCodes.Status503ServiceUnavailable, null);
             }
         }
@@ -200,21 +160,16 @@ public class SzymoHubApi : IWebApi {
 
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
-        try
-        {
+        try {
             response = await _httpClient.DeleteAsync($"/offer/{code}/cancel", cancelToken.Token);
-        }
-        catch (TaskCanceledException e)
-        {
+        } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
         return (int)response.StatusCode;
     }
 
-    private bool AddTokenToClient(HttpClient client)
-    {
-        if(!_accessTokenContainer.IsServiceTokenCachedAndNotExpired(_service))
-        {
+    private bool AddTokenToClient(HttpClient client) {
+        if (!_accessTokenContainer.IsServiceTokenCachedAndNotExpired(_service)) {
             string[] userCredentials = _service.ApiKey.Split(';');
             if (userCredentials.Length < 2)
                 return false;
@@ -232,10 +187,9 @@ public class SzymoHubApi : IWebApi {
     }
 }
 
-class AccessTokenResponse
-{
+class AccessTokenResponse {
     public string? access_token { get; set; }
 
     // seems to be number of seconds untill the token is expired
-    public int expires_in { get; set; } 
+    public int expires_in { get; set; }
 }

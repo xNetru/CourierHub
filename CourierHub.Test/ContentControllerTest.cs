@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace CourierHub.Test; 
+namespace CourierHub.Test;
 public class ContentControllerTest {
     private readonly ContentController _controller;
 

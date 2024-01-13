@@ -1,5 +1,5 @@
-﻿using CourierHub.Server.Data;
-using CourierHub.Shared.Abstractions;
+﻿using CourierHub.Server.Api;
+using CourierHub.Server.Containers;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
@@ -78,15 +78,18 @@ public class ApiController : ControllerBase {
 
         foreach (var webapi in _webApis) {
             if (webapi.ServiceName == serviceName) {
-                int status = await webapi.PostOrder(order);
+                (int status, string? code) = await webapi.PostOrder(order);
 
                 // retrieve cashed id
                 int inquireId = _container.InquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
 
                 var inquireDB = _context.Inquires.FirstOrDefault(e => e.Id == inquireId);
                 if (inquireDB == null) { return NotFound(); }
-                // for now this code, but in case of e.g. SzymoAPI it must be retrived from webapi.PostOrder(order)
-                inquireDB.Code = order.Code;
+                if (code != null) {
+                    inquireDB.Code = code;
+                } else {
+                    inquireDB.Code = order.Code;
+                }
 
                 Order orderDB = (Order)order;
                 orderDB.InquireId = inquireId;
