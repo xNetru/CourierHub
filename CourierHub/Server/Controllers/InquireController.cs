@@ -33,11 +33,6 @@ public class InquireController : ControllerBase {
         return Ok(apiInquires);
     }
 
-<<<<<<< HEAD
-    /* 
-     * === UNUSED ===
-     * 
-=======
     // GET: <InquireController>/q1w2-e3r4-t5y6-u7i8-o9p0
     [HttpGet("{code}")]
     public async Task<ActionResult<ApiInquire>> GetInquireByCode(string code) {
@@ -49,7 +44,9 @@ public class InquireController : ControllerBase {
         return Ok((ApiInquire)inquire);
     }
 
->>>>>>> 9f7816424c4409503aafb1bc3ac537dcfb310732
+    /* 
+     * === UNUSED ===
+     * 
     // POST: <InquireController>/email@gmail.com/{...}
     [HttpPost("{email}")]
     public async Task<ActionResult<int>> Post(string email, [FromBody] ApiInquire? inquire) {

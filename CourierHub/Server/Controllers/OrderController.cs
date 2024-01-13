@@ -95,87 +95,6 @@ public class OrderController : ControllerBase {
         return Ok();
     }
 
-    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/review/{...}
-    [HttpPatch("{code}/review")]
-    public async Task<ActionResult> PatchReview(string code, [FromBody] ApiReview? review) {
-        if (review == null) { return BadRequest(); }
-
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-
-        var reviewDB = (Review)review;
-        await _context.Reviews.AddAsync(reviewDB);
-        await _context.SaveChangesAsync();
-
-        order.ReviewId = reviewDB.Id;
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
-    /* 
-     * === UNUSED ===
-     * 
-    private async Task<ActionResult> AddOrder(ApiOrder? order) {
-        if (order == null) { return BadRequest(); }
-        var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
-        if (inquire == null) { return NotFound(); }
-
-        var orderDB = (Order)order;
-        orderDB.InquireId = inquire.Id;
-        orderDB.ServiceId = _serviceId;
-        orderDB.StatusId = (int)StatusType.NotConfirmed;
-
-        await _context.Orders.AddAsync(orderDB);
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
-    // POST: <OrderController>/{...}
-    [HttpPost]
-    public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
-        return await AddOrder(order);
-    }
-
-    // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
-    [HttpPut("{code}")]
-    public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
-        if (order == null) { return BadRequest(); }
-        var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (entity == null) {
-            return await AddOrder(order);
-        } else {
-            var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == entity.ClientAddressId))!;
-
-            entity.Price = order.Price;
-            entity.ClientEmail = order.ClientEmail;
-            entity.ClientName = order.ClientName;
-            entity.ClientSurname = order.ClientSurname;
-            entity.ClientPhone = order.ClientPhone;
-            entity.ClientCompany = order.ClientCompany;
-            entity.ClientAddress.Street = address.Street;
-            entity.ClientAddress.Number = address.Number;
-            entity.ClientAddress.Flat = address.Flat;
-            entity.ClientAddress.PostalCode = address.PostalCode;
-            entity.ClientAddress.City = address.City;
-        }
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-<<<<<<< HEAD
-    */
-=======
-
-    // PATCH: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/status/{...}
-    [HttpPatch("{code}/status")]
-    public async Task<ActionResult> PatchStatus(string code, [FromBody] StatusType? statusType) {
-        if (statusType == null) { return BadRequest(); }
-        var order = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
-        if (order == null) { return NotFound(); }
-        order.StatusId = (int)statusType;
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
-
     // GET: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/evaluation
     [HttpGet("{code}/evaluation")]
     public async Task<ActionResult<ApiParcel>> GetEvaluationByCode(string code) {
@@ -240,6 +159,9 @@ public class OrderController : ControllerBase {
         return Ok();
     }
 
+    /* 
+     * === UNUSED ===
+     * 
     private async Task<ActionResult> AddOrder(ApiOrder? order) {
         if (order == null) { return BadRequest(); }
         var inquire = await _context.Inquires.FirstOrDefaultAsync(e => e.Code == order.Code);
@@ -254,5 +176,37 @@ public class OrderController : ControllerBase {
         await _context.SaveChangesAsync();
         return Ok();
     }
->>>>>>> 9f7816424c4409503aafb1bc3ac537dcfb310732
+
+    // POST: <OrderController>/{...}
+    [HttpPost]
+    public async Task<ActionResult> Post([FromBody] ApiOrder? order) {
+        return await AddOrder(order);
+    }
+
+    // PUT: <OrderController>/q1w2-e3r4-t5y6-u7i8-o9p0/{...}
+    [HttpPut("{code}")]
+    public async Task<ActionResult> Put(string code, [FromBody] ApiOrder? order) {
+        if (order == null) { return BadRequest(); }
+        var entity = await _context.Orders.FirstOrDefaultAsync(e => e.Inquire.Code == code);
+        if (entity == null) {
+            return await AddOrder(order);
+        } else {
+            var address = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == entity.ClientAddressId))!;
+
+            entity.Price = order.Price;
+            entity.ClientEmail = order.ClientEmail;
+            entity.ClientName = order.ClientName;
+            entity.ClientSurname = order.ClientSurname;
+            entity.ClientPhone = order.ClientPhone;
+            entity.ClientCompany = order.ClientCompany;
+            entity.ClientAddress.Street = address.Street;
+            entity.ClientAddress.Number = address.Number;
+            entity.ClientAddress.Flat = address.Flat;
+            entity.ClientAddress.PostalCode = address.PostalCode;
+            entity.ClientAddress.City = address.City;
+        }
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+    */
 }
