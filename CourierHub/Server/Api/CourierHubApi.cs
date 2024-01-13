@@ -1,11 +1,9 @@
-﻿using CourierHub.CourierHubApiModels;
-using CourierHub.Shared.Abstractions;
+﻿using CourierHub.Api.Models.CourierHubApi;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
-using CourierHubWebApi.Models;
 using System.Net;
 
-namespace CourierHub.Server.Data;
+namespace CourierHub.Server.Api;
 public class CourierHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
 

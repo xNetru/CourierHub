@@ -1,4 +1,4 @@
-﻿namespace CourierHub.CourierHubApiModels;
+﻿namespace CourierHub.Api.Models.CourierHubApi;
 
 public record CreateInquireRequest(
     int Depth,

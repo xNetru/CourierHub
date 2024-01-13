@@ -1,5 +1,5 @@
-﻿using CourierHub.Server.Data;
-using CourierHub.Shared.Abstractions;
+﻿using CourierHub.Server.Api;
+using CourierHub.Server.Containers;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
@@ -12,26 +12,13 @@ namespace CourierHub.Shared.Controllers;
 [Route("[controller]")]
 public class ApiController : ControllerBase {
     private readonly CourierHubDbContext _context;
-    private readonly InquireCodeContainer _container;
-    private readonly IEnumerable<IWebApi> _webApis;
+    private readonly IList<(List<string>, int)> _inquireCodes;
+    private readonly IList<IWebApi> _webApis;
 
-    public ApiController(CourierHubDbContext context, IConfiguration config, InquireCodeContainer container) {
+    public ApiController(CourierHubDbContext context, WebApiContainer apiContainer, InquireCodeContainer inquireContainer) {
         _context = context;
-        _container = container;
-        // w przyszłości z bazy danych, na czas testów z configa
-        // -----
-        string adres = config.GetValue<string>("ApiAddress") ??
-            throw new NullReferenceException("Base address could not be loaded!");
-        var service = new ApiService {
-            Name = "CourierHub",
-            ApiKey = "1fbbdd4f48fb4c87890cef420d865b86",
-            BaseAddress = adres
-        };
-        // -----
-        var webApis = new List<IWebApi> {
-            new CourierHubApi(service)
-        };
-        _webApis = webApis;
+        _inquireCodes = inquireContainer.InquireCodes;
+        _webApis = apiContainer.WebApis;
     }
 
     // POST: <ApiController>/inquire/{...}
@@ -60,7 +47,7 @@ public class ApiController : ControllerBase {
 
             // cash inquire with codes
             var codeList = offers.Select(e => e.Code).ToList();
-            _container.InquireCodes.Add((codeList, inquireDB.Id));
+            _inquireCodes.Add((codeList, inquireDB.Id));
 
             return Ok(offers);
         } else {
@@ -78,15 +65,18 @@ public class ApiController : ControllerBase {
 
         foreach (var webapi in _webApis) {
             if (webapi.ServiceName == serviceName) {
-                int status = await webapi.PostOrder(order);
+                (int status, string? code) = await webapi.PostOrder(order);
 
                 // retrieve cashed id
-                int inquireId = _container.InquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
+                int inquireId = _inquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
 
                 var inquireDB = _context.Inquires.FirstOrDefault(e => e.Id == inquireId);
                 if (inquireDB == null) { return NotFound(); }
-                // for now this code, but in case of e.g. SzymoAPI it must be retrived from webapi.PostOrder(order)
-                inquireDB.Code = order.Code;
+                if (code != null) {
+                    inquireDB.Code = code;
+                } else {
+                    inquireDB.Code = order.Code;
+                }
 
                 Order orderDB = (Order)order;
                 orderDB.InquireId = inquireId;

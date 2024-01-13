@@ -14,5 +14,7 @@ public partial class Service {
 
     public string Statute { get; set; } = null!;
 
+    public string BaseAddress { get; set; } = null!;
+
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 }

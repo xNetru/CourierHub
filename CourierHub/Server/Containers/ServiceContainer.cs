@@ -1,6 +1,6 @@
 ﻿using CourierHub.Shared.ApiModels;
 
-namespace CourierHub.Shared.Data;
+namespace CourierHub.Server.Containers;
 public class ServiceContainer {
     public IDictionary<string, ApiService> Services { get; } = new Dictionary<string, ApiService>();
 

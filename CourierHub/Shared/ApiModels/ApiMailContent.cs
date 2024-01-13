@@ -7,7 +7,7 @@ namespace CourierHub.Shared.ApiModels {
         public string Link { get; set; } = null!;
 
         public ApiClient Client { get; set; } = null!;
-        
+
         public StatusType Status { get; set; }
 
         public ApiContract? Contract { get; set; }
