@@ -62,8 +62,32 @@ namespace CourierHubWebApi.Services {
             inquire.Code = System.Convert.ToBase64String(plainTextBytes);
         }
         private decimal CalculatePrice(Inquire inquire) {
-            // TODO: implement price calculation
-            return 0m;
+
+            Scaler? scaler = _dbContext.Scalers.Where(x => x.Id == 0).FirstOrDefault();
+            if (scaler == null)
+                return 0m;
+
+            decimal price = (scaler.Width == null ? 1m : (decimal)scaler.Width) * inquire.Width +
+                (scaler.Depth == null ? 1m : (decimal)scaler.Depth) * inquire.Depth +
+                (scaler.Length == null ? 1m : (decimal)scaler.Length) * inquire.Length +
+                (scaler.Mass == null ? 1m : (decimal)scaler.Mass) * inquire.Mass;
+
+            if (inquire.IsCompany && scaler.Company != null)
+                price *= (decimal)scaler.Company;
+
+            if (inquire.IsWeekend && scaler.Weekend != null)
+                price *= (decimal)scaler.Weekend;
+
+            if (scaler.Priority != null)
+                price += inquire.Priority * (decimal)scaler.Priority;
+
+            if(scaler.Fee != null)
+                price *= (decimal)scaler.Fee;
+
+            if (scaler.Tax != null)
+                price *= (decimal)scaler.Tax;
+
+            return price;
         }
         private async Task<Error?> AddInquireToDataBase(Inquire inquire) {
             try {
