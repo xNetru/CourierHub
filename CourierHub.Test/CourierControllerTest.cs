@@ -110,8 +110,9 @@ public class CourierControllerTest {
             DeliveryDatetime = DateTime.Now.AddDays(1),
             UndeliveredReason = "Pozdrowienia do Więzienia"
         };
+        int orderStatus = 1;
         // Act
-        var result = await _controller.PatchParcel(email, code, parcel);
+        var result = await _controller.PatchParcel(email, code, orderStatus, parcel);
         // Assert
         var status = Assert.IsType<OkResult>(result);
         Assert.Equal(200, status.StatusCode);

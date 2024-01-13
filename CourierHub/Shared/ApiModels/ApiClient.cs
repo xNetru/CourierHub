@@ -7,18 +7,23 @@ public class ApiClient {
     public string Email { get; set; } = null!;
 
     [Required(ErrorMessage = "Imię jest wymagane")]
+    [MaxLength(50)]
     [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Imię musi się zaczynać od duzej litery")]
     public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "Nazwisko jest wymagane")]
+    [MaxLength(50)]
     [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Nazwisko musi się zaczynać od duzej litery")]
     public string Surname { get; set; } = null!;
 
     public byte[]? Photo { get; set; }
 
-    [Phone]
+    [MaxLength(12)]
+    [RegularExpression(@"^[0-9]+", ErrorMessage = "Błędny format numeru telefonu")]
     public string? Phone { get; set; }
 
+    [MaxLength(50)]
+    [RegularExpression(@"^[A-Za-z0-9]", ErrorMessage = "Błędny format numeru nazwy firmy")]
     public string? Company { get; set; }
 
     [ValidateComplexType]

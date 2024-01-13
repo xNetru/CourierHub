@@ -16,9 +16,41 @@ public class ContentCreator {
     }
 
     public EmailContent CreateMailContent(ApiMailContent content) {
-        // tu trzeba stworzyć zawartość maila z linkiem
-        // coś dla ciebie Maks
-        throw new NotImplementedException();
+        int index = content.Link.LastIndexOf('/');
+        string code = content.Link.Substring(index + 1);
+        string htmlContent =
+        $@"
+            <!DOCTYPE html>
+            <html lang=""pl"">
+            <head>
+                <meta charset=""UTF-8"">
+                <meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
+                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                <title>Status paczki</title>
+            </head>
+            <body style=""font-family: Arial, sans-serif;"">
+            
+                <h2>Szanowny/a {content.Client.Name} {content.Client.Surname},</h2>
+            
+                <p>Mamy nadzieję, że niniejsza wiadomość znajdzie Cię w dobrym zdrowiu. Chcielibyśmy poinformować Cię o aktualnym statusie Twojego zamówienia o kodzie {code}.</p>
+            
+                <p>Możesz sprawdzić aktualny status swojego zamówienia, klikając na poniższy link:</p>
+            
+                <p><a href=""{content.Link}"">Sprawdź Status Zamówienia</a></p>
+            
+                <p>Jeśli masz jakiekolwiek pytania lub obawy, prosimy o kontakt z naszym działem obsługi klienta.</p>
+            
+                <p>Dziękujemy za wybór naszych usług!</p>
+            
+                <p>Z poważaniem,<br>
+                CourierHub</p>
+            
+            </body>
+            </html>
+        ";
+        EmailContent email = new EmailContent($"Status zamówienia {code}");
+        email.Html = htmlContent;
+        return email;
     }
 
     public string CreateContract(ApiContract contract) {
