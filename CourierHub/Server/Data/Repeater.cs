@@ -45,6 +45,9 @@ public class Repeater {
                 (StatusType? status, int response, string? code) = await api.GetOrderStatus(order.Inquire.Code);
                 if (status != null && response >= 200 && response < 300) {
                     order.StatusId = (int)status;
+                    if (code != null) {
+                        order.Inquire.Code = code;
+                    }
                     await _context.SaveChangesAsync();
                 }
             }
