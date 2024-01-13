@@ -42,7 +42,7 @@ public class InquireController : ControllerBase {
         if (inquire == null) { return NotFound(); }
 
         var source = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.SourceId);
-        if(source == null) { return NotFound(); }
+        if (source == null) { return NotFound(); }
 
         var destination = await _context.Addresses.FirstOrDefaultAsync(e => e.Id == inquire.DestinationId);
         if (destination == null) { return NotFound(); }

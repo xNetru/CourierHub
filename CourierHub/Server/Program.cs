@@ -1,5 +1,5 @@
 using CourierHub.Cloud;
-using CourierHub.Server.Data;
+using CourierHub.Server.Containers;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +36,8 @@ public class Program {
             return new AzureCommunicationService(connection, sender);
         });
 
-        builder.Services.AddSingleton(provider => {
-            return new InquireCodeContainer();
-        });
+        builder.Services.AddSingleton<InquireCodeContainer>();
+        builder.Services.AddSingleton<WebApiContainer>();
 
         var app = builder.Build();
 
