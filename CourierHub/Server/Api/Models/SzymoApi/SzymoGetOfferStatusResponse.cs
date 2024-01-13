@@ -1,4 +1,4 @@
-﻿namespace CourierHub.Api.Models.SzymonApi;
+﻿namespace CourierHub.Api.Models.SzymoApi;
 
 public record SzymoGetOfferStatusResponse(
     string offerId,

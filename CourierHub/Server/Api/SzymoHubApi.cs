@@ -1,4 +1,5 @@
-﻿using CourierHub.Shared.ApiModels;
+﻿using CourierHub.Api.Models.SzymoApi;
+using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using System.Net;
 
@@ -7,7 +8,7 @@ public class SzymoHubApi : IWebApi {
     private readonly ApiService _service;
     private readonly HttpClient _httpClient = new();
     private readonly AccessTokenContainer _accessTokenContainer;
-    private static string _tokenEndPoint = "/connect/token";
+    private static readonly string _tokenEndPoint = "/connect/token";
     public string ServiceName { get; set; }
 
     public SzymoHubApi(ApiService service, AccessTokenContainer accessTokenContainer) {
@@ -185,11 +186,4 @@ public class SzymoHubApi : IWebApi {
         }
         return true;
     }
-}
-
-class AccessTokenResponse {
-    public string? access_token { get; set; }
-
-    // seems to be number of seconds untill the token is expired
-    public int expires_in { get; set; }
 }

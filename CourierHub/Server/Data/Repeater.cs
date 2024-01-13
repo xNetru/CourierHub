@@ -1,4 +1,4 @@
-﻿using CourierHub.Shared.Abstractions;
+﻿using CourierHub.Server.Api;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;

@@ -2,10 +2,19 @@
 
 namespace CourierHub.Server.Api {
     public class AccessTokenContainer {
-        private static Dictionary<string, (string token, DateTime expiration)> tokens = new();
+        private class AccessTokenResponse {
+            public string? access_token { get; set; }
+
+            // seems to be number of seconds untill the token is expired
+            public int expires_in { get; set; }
+        }
+
+        private static readonly Dictionary<string, (string token, DateTime expiration)> tokens = new();
+
         public bool IsServiceTokenCachedAndNotExpired(ApiService service) {
             return tokens.TryGetValue(service.Name, out var tokenData) && DateTime.Now < tokenData.expiration;
         }
+
         public string? GetToken(ApiService service, string clientId, string clientSecret, string tokenEndPoint) {
             if (tokens.TryGetValue(service.Name, out var tokenData)) {
                 if (DateTime.Compare(DateTime.Now, tokenData.expiration) > 0) {
@@ -26,6 +35,7 @@ namespace CourierHub.Server.Api {
             }
             return null;
         }
+
         private static async Task<AccessTokenResponse?> GetAccessToken(string clientId, string clientSecret, string tokenEndpoint) {
             using var client = new HttpClient();
             var credentials = $"{clientId}:{clientSecret}";
@@ -45,12 +55,5 @@ namespace CourierHub.Server.Api {
                 return null;
             }
         }
-    }
-
-    class AccessTokenResponse {
-        public string? access_token { get; set; }
-
-        // seems to be number of seconds untill the token is expired
-        public int expires_in { get; set; }
     }
 }

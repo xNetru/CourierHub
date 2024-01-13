@@ -1,4 +1,5 @@
-﻿using CourierHub.Shared.ApiModels;
+﻿using CourierHub.Api.Models.CourierHubApi;
+using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using System.Net;
 
