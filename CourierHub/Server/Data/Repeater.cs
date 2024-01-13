@@ -1,4 +1,4 @@
-﻿using CourierHub.Shared.Abstractions;
+﻿using CourierHub.Server.Api;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
@@ -42,9 +42,12 @@ public class Repeater {
         foreach (var group in orders) {
             IWebApi api = _webApis[group.Key];
             foreach (Order order in group.ToArray()) {
-                (StatusType? status, int response) = await api.GetOrderStatus(order.Inquire.Code);
+                (StatusType? status, int response, string? code) = await api.GetOrderStatus(order.Inquire.Code);
                 if (status != null && response >= 200 && response < 300) {
                     order.StatusId = (int)status;
+                    if (code != null) {
+                        order.Inquire.Code = code;
+                    }
                     await _context.SaveChangesAsync();
                 }
             }

@@ -269,6 +269,7 @@ public partial class CourierHubDbContext : DbContext {
                 .HasColumnName("Api_key");
             entity.Property(e => e.Name).HasMaxLength(50);
             entity.Property(e => e.Statute).HasMaxLength(100);
+            entity.Property(e => e.BaseAddress).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Status>(entity => {

@@ -15,7 +15,8 @@ public class ApiService {
         return new ApiService {
             Name = service.Name,
             ApiKey = service.ApiKey,
-            Statute = service.Statute
+            Statute = service.Statute,
+            BaseAddress = service.BaseAddress
         };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CourierHub.Shared.Validation {
     public enum ComparisonType {
@@ -9,6 +10,7 @@ namespace CourierHub.Shared.Validation {
         GreaterThanOrEqualTo
     }
 
+    [ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
     public class ComparisonAttribute : ValidationAttribute {
         private readonly string _comparisonProperty;
