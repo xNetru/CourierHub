@@ -18,7 +18,7 @@ public class CourierHubApi : IWebApi {
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 
-    public async Task<(StatusType?, int)> GetOrderStatus(string code) {
+    public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in CourierHubApi.");
 
         StatusType? status = null;
@@ -30,9 +30,9 @@ public class CourierHubApi : IWebApi {
         }
 
         if (status == null) {
-            return (null, 504);
+            return (null, 504, null);
         } else {
-            return (status, 200);
+            return (status, 200, null);
         }
     }
 
@@ -93,7 +93,7 @@ public class CourierHubApi : IWebApi {
         }
     }
 
-    public async Task<int> PostOrder(ApiOrder order) {
+    public async Task<(int, string?)> PostOrder(ApiOrder order) {
         /*
         Console.WriteLine("PostOrder was invoked in CourierHubApi.");
 
@@ -125,7 +125,7 @@ public class CourierHubApi : IWebApi {
 
         // we decided that order from our clients are saved in backend
         await Task.Delay(1);
-        return 200;
+        return (200, null);
     }
 
     public async Task<int> PutOrderWithrawal(string code) {

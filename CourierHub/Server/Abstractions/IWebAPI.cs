@@ -9,11 +9,11 @@ public interface IWebApi {
     Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire);
 
     // client creates and sends an order, receives status
-    Task<int> PostOrder(ApiOrder order);
+    Task<(int, string?)> PostOrder(ApiOrder order);
 
     // client withraws the order, receives status
     Task<int> PutOrderWithrawal(string code);
 
     // client checks the status of order, receives status
-    Task<(StatusType?, int)> GetOrderStatus(string code);
+    Task<(StatusType?, int, string?)> GetOrderStatus(string code);
 }

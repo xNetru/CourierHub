@@ -12,9 +12,9 @@ public class WeraHubApi : IWebApi {
         _service = service;
         ServiceName = _service.Name;
     }
-    public async Task<(StatusType?, int)> GetOrderStatus(string code) {
+    public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in WeronikaHubApi.");
-        return (null, 400);
+        return (null, 400, null);
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
@@ -22,9 +22,9 @@ public class WeraHubApi : IWebApi {
         return (null, 400);
     }
 
-    public async Task<int> PostOrder(ApiOrder order) {
+    public async Task<(int, string?)> PostOrder(ApiOrder order) {
         Console.WriteLine("PostOrder was invoked in WeronikaHubApi.");
-        return 400;
+        return (400, null);
     }
 
     public async Task<int> PutOrderWithrawal(string code) {
