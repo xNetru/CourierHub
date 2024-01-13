@@ -42,7 +42,7 @@ public class Repeater {
         foreach (var group in orders) {
             IWebApi api = _webApis[group.Key];
             foreach (Order order in group.ToArray()) {
-                (StatusType? status, int response) = await api.GetOrderStatus(order.Inquire.Code);
+                (StatusType? status, int response, string abc) = await api.GetOrderStatus(order.Inquire.Code);
                 if (status != null && response >= 200 && response < 300) {
                     order.StatusId = (int)status;
                     await _context.SaveChangesAsync();

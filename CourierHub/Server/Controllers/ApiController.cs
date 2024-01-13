@@ -78,7 +78,7 @@ public class ApiController : ControllerBase {
 
         foreach (var webapi in _webApis) {
             if (webapi.ServiceName == serviceName) {
-                int status = await webapi.PostOrder(order);
+                (int status, string abc) = await webapi.PostOrder(order);
 
                 // retrieve cashed id
                 int inquireId = _container.InquireCodes.FirstOrDefault(e => e.Item1.Contains(order.Code)).Item2;
