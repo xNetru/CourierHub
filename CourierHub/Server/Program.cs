@@ -65,14 +65,14 @@ public class Program {
         app.MapControllers();
         app.MapFallbackToFile("index.html");
 
+       var off = new ApiOffer {
+           Price = 20.696256m,
+           Code = "MjAyNWEybzMxNDEyMDIwMA==",
+           ExpirationDate = default
 
-        // TODO
-        //var off = new ApiOffer {
-        //    Price = 20.696256m,
-
-        //};
-        //string json = JsonSerializer.Serialize(off);
-        //Console.WriteLine(json);
+       };
+        string json = JsonSerializer.Serialize(off);
+        Console.WriteLine(json);
 
 
         app.Run();

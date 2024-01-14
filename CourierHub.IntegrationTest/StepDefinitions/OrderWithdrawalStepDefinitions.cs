@@ -3,6 +3,7 @@
 public sealed class OrderWithdrawalStepDefinitions {
     [Given("a user having an order with code (.*)")]
     public void GivenAUserHavingAnOrderWithCode(string code) {
+        // before calling cancelation, change status to cancelable (eg. 1)
         throw new PendingStepException();
     }
 
