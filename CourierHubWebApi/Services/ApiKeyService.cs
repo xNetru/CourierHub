@@ -22,7 +22,12 @@ namespace CourierHubWebApi.Services {
             if (_apiKeyToServiceIdDictionary == null) {
                 throw new InvalidOperationException("Trying to get value from not initialized object");
             }
-            return _apiKeyToServiceIdDictionary.TryGetValue(apiKey, out serviceId);
+            if(!_apiKeyToServiceIdDictionary.TryGetValue(apiKey, out serviceId))
+            {
+                serviceId = -1;
+                return false;
+            }
+            return true;
         }
         public bool TryExtractApiKey(HttpContext context, out string apiKey) {
             if (context.Request.Headers.TryGetValue(_apiKeyName, out StringValues key)) {

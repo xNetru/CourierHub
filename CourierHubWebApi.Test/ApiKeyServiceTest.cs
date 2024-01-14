@@ -32,9 +32,8 @@ namespace CourierHubWebApi.Test
         {
             // Arrange
             string apiKey = "Bydgoszcz";
-            int serviceId = -1;
             // Act
-            bool result = _apiKeyService.TryGetServiceId(apiKey, out serviceId);
+            bool result = _apiKeyService.TryGetServiceId(apiKey, out int serviceId);
             // Assert
             Assert.False(result);
             Assert.Equal(-1, serviceId);
@@ -80,12 +79,11 @@ namespace CourierHubWebApi.Test
         {
             // Arrange
             HttpContext context = new DefaultHttpContext();
-            string apiKey = "Empty";
             // Act
-            bool result = _apiKeyService.TryExtractApiKey(context, out apiKey);
+            bool result = _apiKeyService.TryExtractApiKey(context, out string apiKey);
             // Assert
             Assert.False(result);
-            Assert.Equal("Empty", apiKey);
+            Assert.Equal(default, apiKey);
         }
 
         [Fact]

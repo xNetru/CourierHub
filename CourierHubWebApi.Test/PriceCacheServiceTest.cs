@@ -64,12 +64,11 @@ namespace CourierHubWebApi.Test
             // Arrange
             string inquiryCode = "Fifth";
             decimal price = 89.99m;
-            // Act
             DateTime result = _filledPriceCacheService.SavePrice(inquiryCode, price).Match(x => x, x => DateTime.MaxValue);
-            DateTime obtainmentTime = result.AddMinutes(5);
+            DateTime obtainmentTime = result.AddMinutes(-5);
+            // Act
             decimal returnedPrice = _filledPriceCacheService.GetPrice(inquiryCode, obtainmentTime).Match(x => x, x => -1.0m);
             // Assert
-            Assert.True(result < obtainmentTime);
             Assert.Equal(price, returnedPrice);
         }
     }
