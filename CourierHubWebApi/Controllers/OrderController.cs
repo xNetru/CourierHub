@@ -36,11 +36,10 @@ namespace CourierHubWebApi.Controllers {
             ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
-
+            
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.WithdrawOrder(request, serviceId).Result.Match(
-                    statusCode => Ok(statusCode), errors => Problem(detail: errors.First().Description,
-                    statusCode: errors.First().NumericType)),
+                    statusCode => Ok(statusCode), errors => Problem(statusCode: StatusCodes.Status400BadRequest)),
                 errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
 
