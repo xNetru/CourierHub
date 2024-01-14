@@ -10,5 +10,8 @@ namespace CourierHubWebApi.Test
     public class CreateInquireRequestValidatorTest
     {
         private CreateInquireRequestValidator _validator = new();
+
+        //[Fact]
+        //void async Task 
     }
 }
