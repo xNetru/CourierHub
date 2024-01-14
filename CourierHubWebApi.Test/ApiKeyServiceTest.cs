@@ -8,6 +8,7 @@ using CourierHub.Shared.Models;
 using CourierHub.Shared.Data;
 using Moq;
 using Moq.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace CourierHubWebApi.Test
 {
@@ -30,10 +31,10 @@ namespace CourierHubWebApi.Test
         public void TryGetServiceId_ShouldReturnFalse_WhenWrongApiKeyIsGiven()
         {
             // Arrange
-            string apikKey = "Bydgoszcz";
+            string apiKey = "Bydgoszcz";
             int serviceId = -1;
             // Act
-            bool result = _apiKeyService.TryGetServiceId(apikKey, out serviceId);
+            bool result = _apiKeyService.TryGetServiceId(apiKey, out serviceId);
             // Assert
             Assert.False(result);
             Assert.Equal(-1, serviceId);
@@ -52,7 +53,53 @@ namespace CourierHubWebApi.Test
             Assert.Equal(1, serviceId);
         }
 
-        // public void IsOurServiceRequest_ShouldReturnFalse_When
+        [Fact]
+        public void IsOurServiceRequest_ShouldReturnFalse_WhenIdOfOtherServiceIsGiven()
+        {
+            // Arrange
+            int serviceId = 2;
+            // Act
+            bool result = _apiKeyService.IsOurServiceRequest(serviceId);
+            // Assert
+            Assert.False(result);
+        }
 
+        [Fact]
+        public void IsOurServiceRequest_ShouldReturnTrue_WhenOurServiceIdIsGiven()
+        {
+            // Arrange
+            int serviceId = 1;
+            // Act
+            bool result = _apiKeyService.IsOurServiceRequest(serviceId);
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void TryExtractApiKey_ShouldReturnFalse_WhenApiKeyIsNotProvidedInHttpContext()
+        {
+            // Arrange
+            HttpContext context = new DefaultHttpContext();
+            string apiKey = "Empty";
+            // Act
+            bool result = _apiKeyService.TryExtractApiKey(context, out apiKey);
+            // Assert
+            Assert.False(result);
+            Assert.Equal("Empty", apiKey);
+        }
+
+        [Fact]
+        public void TryExtractApiKey_ShouldReturnTrueAndApiKey_WhenApiKeyIsProvidedInHttpContext()
+        {
+            // Arrange
+            HttpContext context = new DefaultHttpContext();
+            context.Request.Headers.TryAdd("X-Api-Key", "apikey");
+            string apiKey = "";
+            // Act 
+            bool result = _apiKeyService.TryExtractApiKey(context, out apiKey);
+            // Assert
+            Assert.True(result);
+            Assert.Equal("apikey", apiKey);
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace CourierHubWebApi.Services {
         private CourierHubDbContext _dbContext;
         private IPriceCacheService _priceCacheService; // Must be changed if only database is updated
         private IApiKeyService _apiKeyService;
-        public InquireService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService = null) {
+        public InquireService(CourierHubDbContext dbContext, IPriceCacheService priceCacheService, IApiKeyService apiKeyService) {
             _dbContext = dbContext;
             _priceCacheService = priceCacheService;
             _apiKeyService = apiKeyService;
