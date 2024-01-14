@@ -21,7 +21,7 @@ namespace CourierHub.Validation
             var addressValidator = new SzymoAddressValidator();
             RuleFor(x => x.source).SetValidator(addressValidator);
             RuleFor(x => x.destination).SetValidator(addressValidator);
-            RuleFor(x => x.pickupDate).Must((x, pickupDate) => x.deliveryDay >= pickupDate);
+            RuleFor(x => x.pickupDate).Must((x, pickupDate) => x.deliveryDay >= pickupDate && pickupDate.Date > DateTime.Now.Date);
         }
     }
 }

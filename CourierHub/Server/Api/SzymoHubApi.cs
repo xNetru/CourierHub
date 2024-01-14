@@ -52,83 +52,84 @@ public class SzymoHubApi : IWebApi {
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
         Console.WriteLine("PostInquireGetOffer was invoked in SzymoHubApi.");
 
-        //var source = new SzymoAddress(
-        //    inquire.Source.Number,
-        //    inquire.Source.Flat,
-        //    inquire.Source.Street,
-        //    inquire.Source.City,
-        //    inquire.Source.PostalCode,
-        //    "Poland");
-
-        //var destination = new SzymoAddress(
-        //    inquire.Destination.Number,
-        //    inquire.Destination.Flat,
-        //    inquire.Destination.Street,
-        //    inquire.Destination.City,
-        //    inquire.Destination.PostalCode,
-        //    "Poland");
-
-        //var dimensions = new SzymoDimensions(
-        //    inquire.Width / 100.0f,
-        //    inquire.Length / 100.0f,
-        //    inquire.Depth / 100.0f,
-        //    "Meters");
-
-        //var szymoInquiry = new SzymoInquiry(
-        //    dimensions,
-        //    "Pln",
-        //    inquire.Mass / 1000.0f,
-        //    "Kilograms",
-        //    source,
-        //    destination,
-        //    inquire.SourceDate,
-        //    inquire.DestinationDate,
-        //    inquire.IsWeekend,
-        //    inquire.Priority switch {
-        //        (int)PriorityType.High => "High",
-        //        (int)PriorityType.Low => "Low",
-        //        (int)PriorityType.Medium => "Medium",
-        //        _ => "Unknown"
-        //    },
-        //    true,
-        //    inquire.IsCompany);
-
-
         var source = new SzymoAddress(
-            "12",
-            "31",
-            "Bydgoska",
-            "Warszawa",
-            "02-102",
+            inquire.Source.Number,
+            inquire.Source.Flat,
+            inquire.Source.Street,
+            inquire.Source.City,
+            inquire.Source.PostalCode,
             "Poland");
 
         var destination = new SzymoAddress(
-            "12",
-            "12",
-            "Warszawska",
-            "Bydgoszcz",
-            "90-930",
+            inquire.Destination.Number,
+            inquire.Destination.Flat,
+            inquire.Destination.Street,
+            inquire.Destination.City,
+            inquire.Destination.PostalCode,
             "Poland");
 
         var dimensions = new SzymoDimensions(
-            1.0f,
-            1.0f,
-            1.0f,
+            inquire.Width / 100.0f,
+            inquire.Length / 100.0f,
+            inquire.Depth / 100.0f,
             "Meters");
 
         var szymoInquiry = new SzymoInquiry(
             dimensions,
             "Pln",
-            2.0f,
+            inquire.Mass / 1000.0f,
             "Kilograms",
             source,
             destination,
-            DateTime.Now.AddDays(1),
-            DateTime.Now.AddDays(16),
+            inquire.SourceDate,
+            inquire.DestinationDate,
+            inquire.IsWeekend,
+            inquire.Priority switch
+            {
+                (int)PriorityType.High => "High",
+                (int)PriorityType.Low => "Low",
+                (int)PriorityType.Medium => "Medium",
+                _ => "Unknown"
+            },
             true,
-            "High",
-            true,
-            false);
+            inquire.IsCompany);
+
+
+        //var source = new SzymoAddress(
+        //    "12",
+        //    "31",
+        //    "Bydgoska",
+        //    "Warszawa",
+        //    "02-102",
+        //    "Poland");
+
+        //var destination = new SzymoAddress(
+        //    "12",
+        //    "12",
+        //    "Warszawska",
+        //    "Bydgoszcz",
+        //    "90-930",
+        //    "Poland");
+
+        //var dimensions = new SzymoDimensions(
+        //    1.0f,
+        //    1.0f,
+        //    1.0f,
+        //    "Meters");
+
+        //var szymoInquiry = new SzymoInquiry(
+        //    dimensions,
+        //    "Pln",
+        //    2.0f,
+        //    "Kilograms",
+        //    source,
+        //    destination,
+        //    DateTime.Now.AddDays(1),
+        //    DateTime.Now.AddDays(16),
+        //    true,
+        //    "High",
+        //    true,
+        //    false);
 
 
         if (!inquiryValidator.Validate(szymoInquiry).IsValid)

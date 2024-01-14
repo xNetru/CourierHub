@@ -20,7 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierHub.Test", "CourierH
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierHub.Cloud", "CourierHub.Cloud\CourierHub.Cloud.csproj", "{2C994E29-E99D-4893-9DE6-F539FA2CA818}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierHub.IntegrationTest", "CourierHub.IntegrationTest\CourierHub.IntegrationTest.csproj", "{6C0C5731-9643-4101-92C5-5793BC88DB4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierHub.IntegrationTest", "CourierHub.IntegrationTest\CourierHub.IntegrationTest.csproj", "{6C0C5731-9643-4101-92C5-5793BC88DB4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierHubWebApi.Test", "CourierHubWebApi.Test\CourierHubWebApi.Test.csproj", "{638FBB0D-2319-43F0-A0DD-2E64FC11EAF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +58,10 @@ Global
 		{6C0C5731-9643-4101-92C5-5793BC88DB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C0C5731-9643-4101-92C5-5793BC88DB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C0C5731-9643-4101-92C5-5793BC88DB4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{638FBB0D-2319-43F0-A0DD-2E64FC11EAF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{638FBB0D-2319-43F0-A0DD-2E64FC11EAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{638FBB0D-2319-43F0-A0DD-2E64FC11EAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{638FBB0D-2319-43F0-A0DD-2E64FC11EAF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

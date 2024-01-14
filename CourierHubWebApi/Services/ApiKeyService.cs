@@ -9,11 +9,12 @@ namespace CourierHubWebApi.Services {
         private static readonly string _apiKeyName = "X-Api-Key";
         private static int _ourServiceId = 1;
         public string ApiKeyName { get => _apiKeyName; }
-        public ApiKeyService(CourierHubDbContext dbContext, IConfiguration configuration) {
+        public ApiKeyService(CourierHubDbContext dbContext, IConfiguration? configuration = null) {
             _dbContext = dbContext;
             if (_apiKeyToServiceIdDictionary == null) {
                 FillDictionary();
-                SetOurServiceId(configuration);
+                if(configuration != null )
+                    SetOurServiceId(configuration);
             }
 
         }
@@ -44,10 +45,7 @@ namespace CourierHubWebApi.Services {
                     foreach (var service in services) {
                         _apiKeyToServiceIdDictionary.Add(service.ApiKey, service.Id);
                     }
-                } catch {
-                    // TODO: Database error handling
-                }
-
+                } catch { }
             }
 
         }
