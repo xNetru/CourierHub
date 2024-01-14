@@ -26,12 +26,22 @@ namespace CourierHub.Test {
             return request;
         }
 
-        public static MockedRequest RespondJson<T>(this MockedRequest request, Func<T> contentProvider) {
-            request.Respond(req => {
-                var response = new HttpResponseMessage(HttpStatusCode.OK) {
-                    Content = new StringContent(JsonSerializer.Serialize(contentProvider()))
-                };
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        public static MockedRequest RespondString(this MockedRequest request, string content)
+        {
+            request.Respond(req =>
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new StringContent(content);
+                return response;
+            });
+            return request;
+        }
+
+        public static MockedRequest SendJson(this MockedRequest request)
+        {
+            request.Respond(req =>
+            {
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
                 return response;
             });
             return request;
