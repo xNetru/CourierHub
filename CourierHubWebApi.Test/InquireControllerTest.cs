@@ -19,6 +19,10 @@ namespace CourierHubWebApi.Test
         public InquireControllerTest()
         {
             _mockContext = new Mock<CourierHubDbContext>();
+            IList<Inquire> inquires = new List<Inquire>();
+            _mockContext.Setup(x => x.Inquires).ReturnsDbSet(inquires);
+
+            
         }
     }
 }

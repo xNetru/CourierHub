@@ -26,6 +26,40 @@ public class ApiController : ControllerBase {
     public async Task<ActionResult<IEnumerable<ApiOffer>>> PostInquireGetOffers([FromBody] ApiInquire? inquire) {
         if (inquire == null) { return BadRequest(Array.Empty<ApiOffer>()); }
 
+        // 
+        inquire = new ApiInquire
+        {
+            Depth = 100,
+            Width = 100,
+            Length = 50,
+            Mass = 49,
+            Source = new ApiAddress
+            {
+                City = "Toronto",
+                PostalCode = "30-182",
+                Street = "Ursynowska",
+                Number = "2",
+                Flat = "10"
+            },
+            Destination = new ApiAddress
+            {
+                City = "Warszawa",
+                PostalCode = "20-192",
+                Street = "Solna",
+                Number = "20",
+                Flat = "1a"
+            },
+            SourceDate = new DateTime(2025, 3, 13),
+            DestinationDate = new DateTime(2025, 3, 15),
+            Datetime = new DateTime(2025, 2, 14),
+            IsCompany = true,
+            IsWeekend = true,
+            Priority = 1,
+            Code = "",
+            Email = null
+        };
+        //
+
         var offers = new List<ApiOffer>();
         foreach (var webapi in _webApis) {
             (ApiOffer? offer, int status) = await webapi.PostInquireGetOffer(inquire);

@@ -58,6 +58,7 @@ namespace CourierHubWebApi.Test
             // Assert
             Assert.True(result > DateTime.Now);
         }
+
         [Fact]
         public void GetPrice_ShouldReturnPrice_WhenValidObtainmentTimeIsGiven()
         {
@@ -70,6 +71,21 @@ namespace CourierHubWebApi.Test
             decimal returnedPrice = _filledPriceCacheService.GetPrice(inquiryCode, obtainmentTime).Match(x => x, x => -1.0m);
             // Assert
             Assert.Equal(price, returnedPrice);
+        }
+
+        [Fact]
+        public void GetPrice_ShouldReturnError_WhenGivenObtainmentTimeIsAfterExpirationTime()
+        {
+            // Arrange
+            string inquiryCode = "Sixth";
+            decimal price = 1256.00m;
+            DateTime result = _filledPriceCacheService.SavePrice(inquiryCode, price).Match(x => x, x => DateTime.MaxValue);
+            DateTime obtainmentTime = result.AddMinutes(1);
+            decimal expectedPrice = -1.0m;
+            // Act
+            decimal returnedPrice = _filledPriceCacheService.GetPrice(inquiryCode, obtainmentTime).Match(x => x, x => expectedPrice);
+            // Assert
+            Assert.Equal(expectedPrice, returnedPrice);
         }
     }
 }
