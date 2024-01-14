@@ -1,33 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourierHubWebApi.Services;
-using CourierHub.Shared.Models;
-using CourierHub.Shared.Data;
-using Moq;
-using Moq.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using ErrorOr;
+﻿using CourierHubWebApi.Services;
 
-namespace CourierHubWebApi.Test
-{
-    public class PriceCacheServiceTest
-    {
+namespace CourierHubWebApi.Test {
+    public class PriceCacheServiceTest {
         PriceCacheService _emptyPriceCacheService = new PriceCacheService();
         PriceCacheService _filledPriceCacheService;
-        public PriceCacheServiceTest()
-        {
+        public PriceCacheServiceTest() {
             _filledPriceCacheService = new PriceCacheService();
             _filledPriceCacheService.SavePrice("First", 20.12m);
             _filledPriceCacheService.SavePrice("Second", 29.99m);
         }
 
         [Fact]
-        public void SavePrice_ShouldReturnTimestamp_WhenNewInquiryIsPassed()
-        {
+        public void SavePrice_ShouldReturnTimestamp_WhenNewInquiryIsPassed() {
             // Arrange 
             string inquiryCode = "Third";
             decimal price = 45.99m;
@@ -37,8 +21,7 @@ namespace CourierHubWebApi.Test
             Assert.True(result);
         }
         [Fact]
-        public void SavePrice_ShouldReturnError_WhenExistingInquiryIsPassed()
-        {
+        public void SavePrice_ShouldReturnError_WhenExistingInquiryIsPassed() {
             // Arrange 
             string inquiryCode = "First";
             decimal price = 23.99m;
@@ -48,8 +31,7 @@ namespace CourierHubWebApi.Test
             Assert.True(result);
         }
         [Fact]
-        public void SavePrice_ShouldReturnFutureTimeStamp_WhenNewInquiryIsPassed()
-        {
+        public void SavePrice_ShouldReturnFutureTimeStamp_WhenNewInquiryIsPassed() {
             // Arrange
             string inquiryCode = "Fourth";
             decimal price = 43.56m;
@@ -60,8 +42,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void GetPrice_ShouldReturnPrice_WhenValidObtainmentTimeIsGiven()
-        {
+        public void GetPrice_ShouldReturnPrice_WhenValidObtainmentTimeIsGiven() {
             // Arrange
             string inquiryCode = "Fifth";
             decimal price = 89.99m;

@@ -8,13 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 using System.Security.Claims;
 
-namespace CourierHub.Test
-{
-    public class OfficeWorkerReviewOrderTest
-    {
+namespace CourierHub.Test {
+    public class OfficeWorkerReviewOrderTest {
         [Fact]
-        public void RendersCorrectly()
-        {
+        public void RendersCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -29,7 +26,7 @@ namespace CourierHub.Test
             var httpClient = ctx.Services.AddMockHttpClient();
             httpClient
                 .When($"http://localhost:7008/Inquire/{orderCode}/code")
-                .RespondJson(new ApiInquire { Source = new ApiAddress { Number = "", Flat = "" } , Destination = new ApiAddress { Number = "", Flat = "" } });
+                .RespondJson(new ApiInquire { Source = new ApiAddress { Number = "", Flat = "" }, Destination = new ApiAddress { Number = "", Flat = "" } });
 
             httpClient
                 .When($"http://localhost:7008/Client/{mail}")
@@ -44,8 +41,7 @@ namespace CourierHub.Test
         }
 
         [Fact]
-        public void AcceptCorrectly()
-        {
+        public void AcceptCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -94,8 +90,7 @@ namespace CourierHub.Test
         }
 
         [Fact]
-        public void DenyCorrectly()
-        {
+        public void DenyCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";

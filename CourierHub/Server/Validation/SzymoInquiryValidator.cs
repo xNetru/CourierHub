@@ -1,17 +1,9 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CourierHub.Validation
-{
-    public class SzymoInquiryValidator: AbstractValidator<SzymoInquiry>
-    {
-        public SzymoInquiryValidator()
-        {
+namespace CourierHub.Validation {
+    public class SzymoInquiryValidator : AbstractValidator<SzymoInquiry> {
+        public SzymoInquiryValidator() {
             RuleFor(x => x.weight).GreaterThanOrEqualTo(0.2f).LessThanOrEqualTo(8.0f);
             RuleFor(x => x.weightUnit).Matches("^(Kilograms|Pounds)$");
             RuleFor(x => x.currency).Matches("^(Usd|Pln|Eur|Gbp)$");

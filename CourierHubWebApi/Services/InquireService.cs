@@ -85,7 +85,7 @@ namespace CourierHubWebApi.Services {
             if (scaler.Priority != null)
                 price += inquire.Priority * (decimal)scaler.Priority;
 
-            if(scaler.Fee != null)
+            if (scaler.Fee != null)
                 price *= (decimal)scaler.Fee;
 
             if (scaler.Tax != null)

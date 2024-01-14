@@ -109,10 +109,10 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 4
-testRunner.Given("a user having an order with code code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+testRunner.Given("a user having an order with code MjAyNDExNDE4MjAxNjM=", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 5
-testRunner.When("he requests withrawal at Api/serviceName/cancel/code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+testRunner.When("he requests withdrawal at Api/CourierHub/cancel/MjAyNDExNDE4MjAxNjM=", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 6
 testRunner.Then("he receives an anwser 201", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

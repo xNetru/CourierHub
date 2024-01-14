@@ -26,10 +26,8 @@ namespace CourierHub.Test {
             return request;
         }
 
-        public static MockedRequest RespondString(this MockedRequest request, string content)
-        {
-            request.Respond(req =>
-            {
+        public static MockedRequest RespondString(this MockedRequest request, string content) {
+            request.Respond(req => {
                 var response = new HttpResponseMessage(HttpStatusCode.OK);
                 response.Content = new StringContent(content);
                 return response;
@@ -37,10 +35,8 @@ namespace CourierHub.Test {
             return request;
         }
 
-        public static MockedRequest SendJson(this MockedRequest request)
-        {
-            request.Respond(req =>
-            {
+        public static MockedRequest SendJson(this MockedRequest request) {
+            request.Respond(req => {
                 var response = new HttpResponseMessage(HttpStatusCode.OK);
                 return response;
             });
