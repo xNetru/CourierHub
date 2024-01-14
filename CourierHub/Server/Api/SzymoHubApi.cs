@@ -1,9 +1,8 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
-using System.Net;
-using FluentValidation;
 using CourierHub.Validation;
+using System.Net;
 
 namespace CourierHub.Server.Api;
 public class SzymoHubApi : IWebApi {
@@ -84,8 +83,7 @@ public class SzymoHubApi : IWebApi {
             inquire.SourceDate,
             inquire.DestinationDate,
             inquire.IsWeekend,
-            inquire.Priority switch
-            {
+            inquire.Priority switch {
                 (int)PriorityType.High => "High",
                 (int)PriorityType.Low => "Low",
                 (int)PriorityType.Medium => "Medium",

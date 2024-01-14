@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourierHubWebApi.Services;
+﻿using CourierHub.Shared.Data;
 using CourierHub.Shared.Models;
-using CourierHub.Shared.Data;
+using CourierHubWebApi.Services;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Moq.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 
-namespace CourierHubWebApi.Test
-{
-    public class ApiKeyServiceTest
-    {
+namespace CourierHubWebApi.Test {
+    public class ApiKeyServiceTest {
         private ApiKeyService _apiKeyService;
         private Mock<CourierHubDbContext> _mockContext;
-        public ApiKeyServiceTest()
-        {
+        public ApiKeyServiceTest() {
             _mockContext = new Mock<CourierHubDbContext>();
             IList<Service> services = new List<Service>(){
                 new Service() {Id = 1, Name = "SusCourierHub", ApiKey = "a1"},
@@ -28,8 +20,7 @@ namespace CourierHubWebApi.Test
             _apiKeyService = new ApiKeyService(_mockContext.Object);
         }
         [Fact]
-        public void TryGetServiceId_ShouldReturnFalse_WhenWrongApiKeyIsGiven()
-        {
+        public void TryGetServiceId_ShouldReturnFalse_WhenWrongApiKeyIsGiven() {
             // Arrange
             string apiKey = "Bydgoszcz";
             // Act
@@ -40,11 +31,10 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void TryGetServiceId_ShouldReturnTrueAndServiceId_WhenCorrectApiKeyIsGiven()
-        {
+        public void TryGetServiceId_ShouldReturnTrueAndServiceId_WhenCorrectApiKeyIsGiven() {
             // Arrange
             string apiKey = "a1";
-            int serviceId = -1; 
+            int serviceId = -1;
             // Act
             bool result = _apiKeyService.TryGetServiceId(apiKey, out serviceId);
             // Assert
@@ -53,8 +43,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void IsOurServiceRequest_ShouldReturnFalse_WhenIdOfOtherServiceIsGiven()
-        {
+        public void IsOurServiceRequest_ShouldReturnFalse_WhenIdOfOtherServiceIsGiven() {
             // Arrange
             int serviceId = 2;
             // Act
@@ -64,8 +53,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void IsOurServiceRequest_ShouldReturnTrue_WhenOurServiceIdIsGiven()
-        {
+        public void IsOurServiceRequest_ShouldReturnTrue_WhenOurServiceIdIsGiven() {
             // Arrange
             int serviceId = 1;
             // Act
@@ -75,8 +63,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void TryExtractApiKey_ShouldReturnFalse_WhenApiKeyIsNotProvidedInHttpContext()
-        {
+        public void TryExtractApiKey_ShouldReturnFalse_WhenApiKeyIsNotProvidedInHttpContext() {
             // Arrange
             HttpContext context = new DefaultHttpContext();
             // Act
@@ -87,8 +74,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void TryExtractApiKey_ShouldReturnTrueAndApiKey_WhenApiKeyIsProvidedInHttpContext()
-        {
+        public void TryExtractApiKey_ShouldReturnTrueAndApiKey_WhenApiKeyIsProvidedInHttpContext() {
             // Arrange
             HttpContext context = new DefaultHttpContext();
             context.Request.Headers.TryAdd("X-Api-Key", "apikey");
