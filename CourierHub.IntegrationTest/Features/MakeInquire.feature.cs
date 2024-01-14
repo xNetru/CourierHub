@@ -75,6 +75,15 @@ namespace CourierHub.IntegrationTest.Features
             testRunner.CollectScenarioErrors();
         }
         
+        public virtual void FeatureBackground()
+        {
+#line 3
+#line hidden
+#line 4
+    testRunner.Given("the base address for MakeInquire is https://localhost:7008", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+        }
+        
         void System.IDisposable.Dispose()
         {
             this.TestTearDown();
@@ -88,7 +97,7 @@ namespace CourierHub.IntegrationTest.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User makes an inquire and receives an offer", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 3
+#line 6
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -108,14 +117,18 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 4
-testRunner.Given(@"a user with inquire """"""{""Email"":null,""Depth"":100,""Width"":100,""Length"":50,""Mass"":49,""SourceDate"":""2025-03-13T00:00:00"",""DestinationDate"":""2025-03-15T00:00:00"",""Datetime"":""2025-02-14T00:00:00"",""IsCompany"":true,""IsWeekend"":true,""Priority"":1,""Code"":"""",""Destination"":{""Street"":""Solna"",""Number"":""20"",""Flat"":""1a"",""PostalCode"":""20-192"",""City"":""Warszawa""},""Source"":{""Street"":""Ursynowska"",""Number"":""2"",""Flat"":""10"",""PostalCode"":""30-182"",""City"":""Toronto""}}""""""", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 3
+this.FeatureBackground();
 #line hidden
-#line 5
+#line 7
+testRunner.Given(@"a user with inquire {""Email"":null,""Depth"":100,""Width"":100,""Length"":50,""Mass"":49,""SourceDate"":""2025-03-13T00:00:00"",""DestinationDate"":""2025-03-15T00:00:00"",""Datetime"":""2025-02-14T00:00:00"",""IsCompany"":true,""IsWeekend"":true,""Priority"":1,""Code"":"""",""Destination"":{""Street"":""Solna"",""Number"":""20"",""Flat"":""1a"",""PostalCode"":""20-192"",""City"":""Warszawa""},""Source"":{""Street"":""Ursynowska"",""Number"":""2"",""Flat"":""10"",""PostalCode"":""30-182"",""City"":""Toronto""}}", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 8
 testRunner.When("he makes a request to Api/inquire", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 6
-testRunner.Then("he receives an offer \"\"\" \"\"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 9
+testRunner.Then("he receives an offer {\"Price\":20.696256,\"Code\":\"MjAyNDExNDIxNDY1ODM4Mw==\",\"Servic" +
+                        "eName\":null,\"ExpirationDate\":\"0001-01-01T00:00:00\"}", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
