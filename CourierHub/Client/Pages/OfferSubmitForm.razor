@@ -274,7 +274,14 @@
         @if (displayOfferConfirmed)
         {
             <div class="row bg-success text-white" style="margin-top:10px; height:40px">
-                <label class="p-2">Oferta przesłana do akceptacji :) </label>
+                <label class="p-2">Oferta przesłana do akceptacji</label>
+            </div>
+        }
+
+        @if (displayOfferExpired)
+        {
+            <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+                <label class="p-2">Oferta jest już nieaktualna</label>
             </div>
         }
 
@@ -302,10 +309,18 @@
     };
 
     private bool displayOfferConfirmed = false;
+    private bool displayOfferExpired = false;
     private bool isButtonDisabled = false;
 
     private async void HandleValidSubmit(EditContext context)
     {
+        if (Offer.ExpirationDate < DateTime.Now)
+        {
+            displayOfferExpired = true;
+            isButtonDisabled = true;
+            return;
+        }
+
         var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/{Offer.ServiceName}/order/", NewOrder);
         Console.WriteLine("POST ORDER STATUS : " + response.StatusCode);
         if (response.IsSuccessStatusCode) {

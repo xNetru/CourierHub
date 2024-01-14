@@ -34,7 +34,7 @@ public class CourierController : ControllerBase {
 
     // GET: <CourierController>/email@gmail.com/order
     [HttpGet("{mail}/order")]
-    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrder(string mail) {
+    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrders(string mail) {
         if (mail == null) { return BadRequest(); }
         var orders = await _context.Orders.Where(e =>
             e.StatusId == (int)StatusType.PickedUp &&
