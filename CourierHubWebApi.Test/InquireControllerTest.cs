@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Moq.EntityFrameworkCore;
-using CourierHub.Shared.Data;
+﻿using CourierHub.Shared.Data;
 using CourierHubWebApi.Controllers;
-using CourierHub.Shared.Models;
+using Moq;
 
-namespace CourierHubWebApi.Test
-{
-    internal class InquireControllerTest
-    {
+namespace CourierHubWebApi.Test {
+    internal class InquireControllerTest {
         Mock<CourierHubDbContext> _mockContext;
         InquireController _controller;
 
-        public InquireControllerTest()
-        {
+        public InquireControllerTest() {
             _mockContext = new Mock<CourierHubDbContext>();
         }
     }

@@ -109,13 +109,13 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 4
-testRunner.Given("a user with inquire", "", ((TechTalk.SpecFlow.Table)(null)), "Given ");
+testRunner.Given(@"a user with inquire """"""{""Email"":null,""Depth"":100,""Width"":100,""Length"":50,""Mass"":49,""SourceDate"":""2025-03-13T00:00:00"",""DestinationDate"":""2025-03-15T00:00:00"",""Datetime"":""2025-02-14T00:00:00"",""IsCompany"":true,""IsWeekend"":true,""Priority"":1,""Code"":"""",""Destination"":{""Street"":""Solna"",""Number"":""20"",""Flat"":""1a"",""PostalCode"":""20-192"",""City"":""Warszawa""},""Source"":{""Street"":""Ursynowska"",""Number"":""2"",""Flat"":""10"",""PostalCode"":""30-182"",""City"":""Toronto""}}""""""", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 8
+#line 5
 testRunner.When("he makes a request to Api/inquire", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 9
-testRunner.Then("he receives an offer", "", ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 6
+testRunner.Then("he receives an offer \"\"\" \"\"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

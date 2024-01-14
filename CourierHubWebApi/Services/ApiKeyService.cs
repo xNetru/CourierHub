@@ -13,7 +13,7 @@ namespace CourierHubWebApi.Services {
             _dbContext = dbContext;
             if (_apiKeyToServiceIdDictionary == null) {
                 FillDictionary();
-                if(configuration != null )
+                if (configuration != null)
                     SetOurServiceId(configuration);
             }
 
@@ -22,8 +22,7 @@ namespace CourierHubWebApi.Services {
             if (_apiKeyToServiceIdDictionary == null) {
                 throw new InvalidOperationException("Trying to get value from not initialized object");
             }
-            if(!_apiKeyToServiceIdDictionary.TryGetValue(apiKey, out serviceId))
-            {
+            if (!_apiKeyToServiceIdDictionary.TryGetValue(apiKey, out serviceId)) {
                 serviceId = -1;
                 return false;
             }

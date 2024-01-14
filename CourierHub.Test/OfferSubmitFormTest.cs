@@ -1,17 +1,14 @@
 ﻿using Bunit;
+using CourierHub.Client.Data;
 using CourierHub.Client.Pages;
 using CourierHub.Shared.ApiModels;
-using RichardSzalay.MockHttp;
 using Microsoft.Extensions.DependencyInjection;
-using CourierHub.Client.Data;
+using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test
-{
-    public class OfferSubmitFormTest
-    {
+namespace CourierHub.Test {
+    public class OfferSubmitFormTest {
         [Fact]
-        public void RendersCorrectly()
-        {
+        public void RendersCorrectly() {
             // Arrange
             var mail = "test@mail.com";
             var orderCode = "123";

@@ -5,4 +5,4 @@ public record SzymoInquireResponse(
     double totalPrice,
     string? currency,
     DateTime expiringAt);//,
-    //SzymoPriceBreakDown? priceBreakDown);
+                         //SzymoPriceBreakDown? priceBreakDown);
