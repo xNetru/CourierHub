@@ -124,10 +124,10 @@ this.FeatureBackground();
 testRunner.Given("a user having an order with code MjAyNDExNDE4MjAxNjM=", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 8
-testRunner.When("he requests withdrawal at Api/CourierHub/cancel/MjAyNDExNDE4MjAxNjM=", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+testRunner.When("he requests withdrawal at Api/CourierHub/cancel/", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 9
-testRunner.Then("he receives an anwser 201", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+testRunner.Then("he receives an anwser 200", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -168,7 +168,7 @@ this.FeatureBackground();
 testRunner.Given("a user having an order with code 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 13
-testRunner.When("he requests withdrawal at Api/CourierHub/cancel/0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+testRunner.When("he requests withdrawal at Api/CourierHub/cancel/", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 14
 testRunner.Then("he receives an anwser 400", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

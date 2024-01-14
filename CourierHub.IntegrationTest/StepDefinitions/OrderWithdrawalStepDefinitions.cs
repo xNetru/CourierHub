@@ -22,7 +22,9 @@ public sealed class OrderWithdrawalStepDefinitions {
             $"{_httpClient.BaseAddress}Order/{code}/status", 
             new StringContent(status, Encoding.UTF8, "application/json")
         );
-        response.EnsureSuccessStatusCode();
+        if (code != "0") {
+            response.EnsureSuccessStatusCode();
+        }
         _code = code;
     }
 
@@ -36,7 +38,7 @@ public sealed class OrderWithdrawalStepDefinitions {
         if (_response == null) {
             throw new Exception("The response of the PutOrderWithrawal request was null.");
         }
-        if (_response.StatusCode.ToString() != status.ToString()) {
+        if ((int)_response.StatusCode != status) {
             throw new Exception("The status code of the response of the PutOrderWithrawal request was different then expected.");
         }
     }

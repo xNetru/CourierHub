@@ -126,15 +126,8 @@ testRunner.Given(@"a user with inquire {""Email"":null,""Depth"":100,""Width"":1
 #line 8
 testRunner.When("he makes a request to Api/inquire", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-<<<<<<< HEAD
 #line 9
-testRunner.Then("he receives an offer {\"Price\":20.696256,\"Code\":\"MjAyNDExNDIxNDY1ODM4Mw==\",\"Servic" +
-                        "eName\":null,\"ExpirationDate\":\"0001-01-01T00:00:00\"}", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-=======
-#line 6
-testRunner.Then("he receives an offer \"\"\"{\"Price\":20.696256,\"Code\":\"MjAyNWEybzMxNDEyMDIwMA==\",\"Ser" +
-                        "viceName\":null,\"ExpirationDate\":\"0001-01-01T00:00:00\"}\"\"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
->>>>>>> dev
+testRunner.Then("he receives an offer {\"Price\":20.696256,\"Code\":\"MjAyNWEybzMxNDEyMDIwMA==\"}", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
