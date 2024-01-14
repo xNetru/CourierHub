@@ -1,4 +1,5 @@
-﻿using CourierHubWebApi.Validations;
+﻿using CourierHubWebApi.Models;
+using CourierHubWebApi.Validations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,10 @@ namespace CourierHubWebApi.Test
     {
         private CreateInquireRequestValidator _validator = new();
 
-        //[Fact]
-        //void async Task 
+        [Fact]
+        public async Task Validate_ShouldRejectRequest_WhenWrongAddressIsGiven()
+        {
+            ApiSideAddress address;
+        }
     }
 }
