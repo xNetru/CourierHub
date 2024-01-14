@@ -115,7 +115,8 @@ testRunner.Given(@"a user with inquire """"""{""Email"":null,""Depth"":100,""Wid
 testRunner.When("he makes a request to Api/inquire", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 6
-testRunner.Then("he receives an offer \"\"\" \"\"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+testRunner.Then("he receives an offer \"\"\"{\"Price\":20.696256,\"Code\":\"MjAyNWEybzMxNDEyMDIwMA==\",\"Ser" +
+                        "viceName\":null,\"ExpirationDate\":\"0001-01-01T00:00:00\"}\"\"\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
