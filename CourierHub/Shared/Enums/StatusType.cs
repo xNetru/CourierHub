@@ -15,7 +15,7 @@ public enum StatusTypePL {
     Potwierdzone = 2,
     Anulowane = 3,
     Odrzucone = 4,
-    Odebrana = 5,
-    Dostarczona = 6,
+    Odebrane = 5,
+    Dostarczone = 6,
     Nieudana_dostawa = 7
 }

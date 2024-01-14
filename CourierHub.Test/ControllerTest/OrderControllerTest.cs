@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace CourierHub.Test;
+namespace CourierHub.Test.ControllerTest;
 public class OrderControllerTest {
     private readonly OrderController _controller;
     private readonly Mock<CourierHubDbContext> _mockContext;

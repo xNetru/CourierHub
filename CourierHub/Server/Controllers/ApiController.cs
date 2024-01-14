@@ -78,12 +78,13 @@ public class ApiController : ControllerBase {
                     inquireDB.Code = order.Code;
                 }
 
-                Order orderDB = (Order)order;
-                orderDB.InquireId = inquireId;
-                orderDB.ServiceId = service.Id;
-                orderDB.StatusId = (int)StatusType.NotConfirmed;
-
-                await _context.Orders.AddAsync(orderDB);
+                if (status >= 200 && status < 300) {
+                    Order orderDB = (Order)order;
+                    orderDB.InquireId = inquireId;
+                    orderDB.ServiceId = service.Id;
+                    orderDB.StatusId = (int)StatusType.NotConfirmed;
+                    await _context.Orders.AddAsync(orderDB);
+                }
                 await _context.SaveChangesAsync();
 
                 return StatusCode(status);
