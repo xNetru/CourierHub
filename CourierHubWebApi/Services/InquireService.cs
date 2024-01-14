@@ -51,13 +51,17 @@ namespace CourierHubWebApi.Services {
         }
         private void SetOrderCode(Inquire inquire) {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append(DateTime.Now.Date.Year);
-            stringBuilder.Append(DateTime.Now.Date.Month);
-            stringBuilder.Append(DateTime.Now.Date.Day);
-            stringBuilder.Append(DateTime.Now.Hour);
-            stringBuilder.Append(DateTime.Now.Minute);
-            stringBuilder.Append(DateTime.Now.Second);
-            stringBuilder.Append(DateTime.Now.Millisecond);
+            stringBuilder.Append(inquire.Datetime.Date.Year);
+            stringBuilder.Append(inquire.Destination.City.Last());
+            stringBuilder.Append(inquire.Datetime.Date.Month);
+            stringBuilder.Append(inquire.Source.City.Last());
+            stringBuilder.Append(inquire.Source.PostalCode.First());
+            stringBuilder.Append(inquire.Datetime.Date.Day);
+            stringBuilder.Append(inquire.Datetime.Hour);
+            stringBuilder.Append(inquire.Datetime.Minute);
+            stringBuilder.Append(inquire.Destination.PostalCode.Last());
+            stringBuilder.Append(inquire.Datetime.Second);
+            stringBuilder.Append(inquire.Datetime.Millisecond);
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(stringBuilder.ToString());
             inquire.Code = System.Convert.ToBase64String(plainTextBytes);
         }
