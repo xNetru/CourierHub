@@ -77,7 +77,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/Status");
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
         Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
         var y = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/service");
         Console.WriteLine(x.StatusCode + " GET ORDERS SERVICE");
