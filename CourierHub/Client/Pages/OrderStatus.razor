@@ -122,7 +122,8 @@
                 Evaluation = e;
             }
         }
-        if (z.IsSuccessStatusCode)
+
+        if (v.IsSuccessStatusCode)
         {
             var r = await v.Content.ReadFromJsonAsync<ApiReview>();
             if (r != null)
@@ -156,6 +157,7 @@
 
         if (response.IsSuccessStatusCode) {
             DBsuccess = true;
+            reviewExists = true;
             StateHasChanged();
         }
     }
