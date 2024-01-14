@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace CourierHub.Test;
+namespace CourierHub.Test.ControllerTest;
 public class OfficeWorkerControllerTest {
     private readonly OfficeWorkerController _controller;
     private readonly Mock<CourierHubDbContext> _mockContext;

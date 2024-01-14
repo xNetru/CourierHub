@@ -1,20 +1,16 @@
-﻿using CourierHub.Client.Pages;
-using Bunit;
+﻿using Bunit;
+using CourierHub.Client.Pages;
 using Microsoft.Extensions.DependencyInjection;
-using CourierHub.Shared.Models;
 
-namespace CourierHub.Test
-{
-    public class CourierOrderDetailsTests
-    {
+namespace CourierHub.Test.ControllerTest {
+    public class CourierOrderDetailsTests {
         [Fact]
-        public void RendersSuccessfully()
-        {
+        public void RendersSuccessfully() {
             using var ctx = new TestContext();
 
             var mock = ctx.Services.AddMockHttpClient();
 
-            ctx.Services.AddSingleton<CourierOrderDetails>(new CourierOrderDetails());
+            ctx.Services.AddSingleton(new CourierOrderDetails());
 
             var component = ctx.RenderComponent<CourierOrderDetails>();
 

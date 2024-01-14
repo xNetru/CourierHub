@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace CourierHub.Test;
+namespace CourierHub.Test.ControllerTest;
 public class ClientControllerTest {
     private readonly ClientController _controller;
     private readonly Mock<CourierHubDbContext> _mockContext;
@@ -101,7 +101,7 @@ public class ClientControllerTest {
     }
 
     [Fact]
-    public async Task Get_ShouldReturn404_WhenClienntNotExists() {
+    public async Task Get_ShouldReturn404_WhenClientNotExists() {
         // Arrange
         string email = "edytagórniak@gmail.com";
         // Act
