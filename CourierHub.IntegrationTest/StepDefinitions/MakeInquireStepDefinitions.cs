@@ -11,7 +11,7 @@ public sealed class MakeInquireStepDefinitions {
     private HttpResponseMessage? _response;
 
     [Given("the base address for MakeInquire is (.*)")]
-    public void GivenTheBaseAddressIs(string address) {
+    public void GivenTheBaseAddressForMakeInquireIs(string address) {
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         _httpClient.BaseAddress = new Uri(address);
     }

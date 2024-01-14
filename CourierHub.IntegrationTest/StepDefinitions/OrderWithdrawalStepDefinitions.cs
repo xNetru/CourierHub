@@ -1,4 +1,5 @@
-﻿using static System.Net.WebRequestMethods;
+﻿using System.Net.Http.Json;
+using static System.Net.WebRequestMethods;
 
 namespace CourierHub.IntegrationTest.StepDefinitions;
 
@@ -8,14 +9,14 @@ public sealed class OrderWithdrawalStepDefinitions {
     private HttpResponseMessage? _response;
 
     [Given("the base address for OrderWithdrawal is (.*)")]
-    public void GivenTheBaseAddressIs(string address) {
+    public void GivenTheBaseAddressForOrderWithdrawalIs(string address) {
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
         _httpClient.BaseAddress = new Uri(address);
     }
 
     [Given("a user having an order with code (.*)")]
-    public void GivenAUserHavingAnOrderWithCode(string code) {
-        // before calling cancelation, change status to cancelable (eg. 1)
+    public async Task GivenAUserHavingAnOrderWithCode(string code) {
+        //var response = await _httpClient.PatchAsync($"{_httpClient.BaseAddress}Order/{code}/status", new JsonContent(StatusType.NotConfirmed));
         throw new PendingStepException();
     }
 
@@ -23,7 +24,7 @@ public sealed class OrderWithdrawalStepDefinitions {
     public void HeRequestsWithrawalAt(string endpoint) {
         throw new PendingStepException();
         //var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Api/{service}/cancel/{orderCode}", service); // fake content for PATCH
-        //var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{Order.Code}/status", StatusType.Confirmed);
+        //
     }
 
     [Then("he receives an anwser (.*)")]
