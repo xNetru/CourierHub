@@ -6,6 +6,7 @@ namespace CourierHub.Server.Api {
             public string? access_token { get; set; }
 
             // seems to be number of seconds untill the token is expired
+            public string? token_type { get; set; }
             public int expires_in { get; set; }
         }
 
@@ -15,19 +16,19 @@ namespace CourierHub.Server.Api {
             return tokens.TryGetValue(service.Name, out var tokenData) && DateTime.Now < tokenData.expiration;
         }
 
-        public string? GetToken(ApiService service, string clientId, string clientSecret, string tokenEndPoint) {
+        public string? GetToken(ApiService service, string clientId, string clientSecret, string baseAddress, string tokenEndPoint) {
             if (tokens.TryGetValue(service.Name, out var tokenData)) {
                 if (DateTime.Compare(DateTime.Now, tokenData.expiration) > 0) {
                     return tokenData.token;
                 } else {
-                    var tokenResponse = GetAccessToken(clientId, clientSecret, $"{service.BaseAddress}{tokenEndPoint}").Result;
+                    var tokenResponse = GetAccessToken(clientId, clientSecret, baseAddress, tokenEndPoint).Result;
                     if (tokenResponse != null && tokenResponse.access_token != null) {
                         tokens[service.Name] = (tokenResponse.access_token, DateTime.Now.AddMinutes(tokenResponse.expires_in));
                         return tokenResponse.access_token;
                     }
                 }
             } else {
-                var tokenResponse = GetAccessToken(clientId, clientSecret, $"{service.BaseAddress}{tokenEndPoint}").Result;
+                var tokenResponse = GetAccessToken(clientId, clientSecret, baseAddress, tokenEndPoint).Result;
                 if (tokenResponse != null && tokenResponse.access_token != null) {
                     tokens.Add(service.Name, (tokenResponse.access_token, DateTime.Now.AddMinutes(tokenResponse.expires_in)));
                     return tokenResponse.access_token;
@@ -36,8 +37,9 @@ namespace CourierHub.Server.Api {
             return null;
         }
 
-        private static async Task<AccessTokenResponse?> GetAccessToken(string clientId, string clientSecret, string tokenEndpoint) {
+        private static async Task<AccessTokenResponse?> GetAccessToken(string clientId, string clientSecret, string baseAddress, string tokenEndpoint) {
             using var client = new HttpClient();
+            client.BaseAddress = new Uri(baseAddress);
             var credentials = $"{clientId}:{clientSecret}";
             var base64Credentials = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(credentials));
 
@@ -46,9 +48,9 @@ namespace CourierHub.Server.Api {
             var formData = new FormUrlEncodedContent(new[]
             {
                     new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                });
+            });
 
-            var response = await client.PostAsync(tokenEndpoint, formData);
+            var response = await client.PostAsync($"{tokenEndpoint}", formData);
             if (response.IsSuccessStatusCode) {
                 return await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
             } else {

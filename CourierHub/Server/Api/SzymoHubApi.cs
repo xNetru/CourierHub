@@ -10,7 +10,8 @@ public class SzymoHubApi : IWebApi {
     private readonly ApiService _service;
     private readonly HttpClient _httpClient = new();
     private readonly AccessTokenContainer _accessTokenContainer;
-    private static string _tokenEndPoint = "/connect/token";
+    private static readonly string _tokenBase = "https://indentitymanager.snet.com.pl/";
+    private static readonly string _tokenEndPoint = "/connect/token";
     private SzymoInquiryValidator inquiryValidator = new();
     private SzymoPostOfferRequestValidator offerValidator = new();
     public string ServiceName { get; set; }
@@ -51,46 +52,84 @@ public class SzymoHubApi : IWebApi {
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
         Console.WriteLine("PostInquireGetOffer was invoked in SzymoHubApi.");
 
+        //var source = new SzymoAddress(
+        //    inquire.Source.Number,
+        //    inquire.Source.Flat,
+        //    inquire.Source.Street,
+        //    inquire.Source.City,
+        //    inquire.Source.PostalCode,
+        //    "Poland");
+
+        //var destination = new SzymoAddress(
+        //    inquire.Destination.Number,
+        //    inquire.Destination.Flat,
+        //    inquire.Destination.Street,
+        //    inquire.Destination.City,
+        //    inquire.Destination.PostalCode,
+        //    "Poland");
+
+        //var dimensions = new SzymoDimensions(
+        //    inquire.Width / 100.0f,
+        //    inquire.Length / 100.0f,
+        //    inquire.Depth / 100.0f,
+        //    "Meters");
+
+        //var szymoInquiry = new SzymoInquiry(
+        //    dimensions,
+        //    "Pln",
+        //    inquire.Mass / 1000.0f,
+        //    "Kilograms",
+        //    source,
+        //    destination,
+        //    inquire.SourceDate,
+        //    inquire.DestinationDate,
+        //    inquire.IsWeekend,
+        //    inquire.Priority switch {
+        //        (int)PriorityType.High => "High",
+        //        (int)PriorityType.Low => "Low",
+        //        (int)PriorityType.Medium => "Medium",
+        //        _ => "Unknown"
+        //    },
+        //    true,
+        //    inquire.IsCompany);
+
+
         var source = new SzymoAddress(
-            inquire.Source.Number,
-            inquire.Source.Flat,
-            inquire.Source.Street,
-            inquire.Source.City,
-            inquire.Source.PostalCode,
+            "12",
+            "31",
+            "Bydgoska",
+            "Warszawa",
+            "02-102",
             "Poland");
 
         var destination = new SzymoAddress(
-            inquire.Destination.Number,
-            inquire.Destination.Flat,
-            inquire.Destination.Street,
-            inquire.Destination.City,
-            inquire.Destination.PostalCode,
+            "12",
+            "12",
+            "Warszawska",
+            "Bydgoszcz",
+            "90-930",
             "Poland");
 
         var dimensions = new SzymoDimensions(
-            inquire.Width / 100.0f,
-            inquire.Length / 100.0f,
-            inquire.Depth / 100.0f,
+            1.0f,
+            1.0f,
+            1.0f,
             "Meters");
 
         var szymoInquiry = new SzymoInquiry(
             dimensions,
             "Pln",
-            inquire.Mass / 1000.0f,
+            2.0f,
             "Kilograms",
             source,
             destination,
-            inquire.SourceDate,
-            inquire.DestinationDate,
-            inquire.IsWeekend,
-            inquire.Priority switch {
-                (int)PriorityType.High => "High",
-                (int)PriorityType.Low => "Low",
-                (int)PriorityType.Medium => "Medium",
-                _ => "Unknown"
-            },
+            DateTime.Now.AddDays(1),
+            DateTime.Now.AddDays(16),
             true,
-            inquire.IsCompany);
+            "High",
+            true,
+            false);
+
 
         if (!inquiryValidator.Validate(szymoInquiry).IsValid)
             return (null, StatusCodes.Status400BadRequest);
@@ -188,7 +227,7 @@ public class SzymoHubApi : IWebApi {
             string clientId = userCredentials[0];
             string clientSecret = userCredentials[1];
 
-            string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenEndPoint);
+            string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenBase, _tokenEndPoint);
             if (accessToken == null)
                 return false;
 
