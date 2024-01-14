@@ -2,13 +2,18 @@
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using System.Net;
+using FluentValidation;
+using CourierHub.Validation;
 
 namespace CourierHub.Server.Api;
 public class SzymoHubApi : IWebApi {
     private readonly ApiService _service;
     private readonly HttpClient _httpClient = new();
     private readonly AccessTokenContainer _accessTokenContainer;
+    private static readonly string _tokenBase = "https://indentitymanager.snet.com.pl/";
     private static readonly string _tokenEndPoint = "/connect/token";
+    private SzymoInquiryValidator inquiryValidator = new();
+    private SzymoPostOfferRequestValidator offerValidator = new();
     public string ServiceName { get; set; }
 
     public SzymoHubApi(ApiService service, AccessTokenContainer accessTokenContainer) {
@@ -79,7 +84,8 @@ public class SzymoHubApi : IWebApi {
             inquire.SourceDate,
             inquire.DestinationDate,
             inquire.IsWeekend,
-            inquire.Priority switch {
+            inquire.Priority switch
+            {
                 (int)PriorityType.High => "High",
                 (int)PriorityType.Low => "Low",
                 (int)PriorityType.Medium => "Medium",
@@ -87,6 +93,47 @@ public class SzymoHubApi : IWebApi {
             },
             true,
             inquire.IsCompany);
+
+
+        //var source = new SzymoAddress(
+        //    "12",
+        //    "31",
+        //    "Bydgoska",
+        //    "Warszawa",
+        //    "02-102",
+        //    "Poland");
+
+        //var destination = new SzymoAddress(
+        //    "12",
+        //    "12",
+        //    "Warszawska",
+        //    "Bydgoszcz",
+        //    "90-930",
+        //    "Poland");
+
+        //var dimensions = new SzymoDimensions(
+        //    1.0f,
+        //    1.0f,
+        //    1.0f,
+        //    "Meters");
+
+        //var szymoInquiry = new SzymoInquiry(
+        //    dimensions,
+        //    "Pln",
+        //    2.0f,
+        //    "Kilograms",
+        //    source,
+        //    destination,
+        //    DateTime.Now.AddDays(1),
+        //    DateTime.Now.AddDays(16),
+        //    true,
+        //    "High",
+        //    true,
+        //    false);
+
+
+        if (!inquiryValidator.Validate(szymoInquiry).IsValid)
+            return (null, StatusCodes.Status400BadRequest);
 
         AddTokenToClient(_httpClient);
 
@@ -127,18 +174,21 @@ public class SzymoHubApi : IWebApi {
             order.ClientAddress.City,
             "Poland");
 
-        var apiOrder = new SzymoPostOfferRequest(
+        var szymoOffer = new SzymoPostOfferRequest(
             order.Code,
             order.ClientName,
             order.ClientEmail,
             address);
+
+        if (!offerValidator.Validate(szymoOffer).IsValid)
+            return (StatusCodes.Status400BadRequest, null);
 
         AddTokenToClient(_httpClient);
 
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
-            response = await _httpClient.PostAsJsonAsync("/Offers", apiOrder, cancelToken.Token);
+            response = await _httpClient.PostAsJsonAsync("/Offers", szymoOffer, cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
         }
@@ -178,7 +228,7 @@ public class SzymoHubApi : IWebApi {
             string clientId = userCredentials[0];
             string clientSecret = userCredentials[1];
 
-            string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenEndPoint);
+            string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenBase, _tokenEndPoint);
             if (accessToken == null)
                 return false;
 
