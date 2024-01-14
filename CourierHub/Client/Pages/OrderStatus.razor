@@ -41,11 +41,11 @@
     <hr />
     <h1 style="padding-top: 25px;">Ocena serwisu</h1>
     <br/>
-    <div class="rz-p-6 rz-text-align-center">
-        <RadzenRating @bind-Value=@Review.Value />
+    <div class="rz-p-6 rz-text-align-center" disabled="@reviewExists">
+        <RadzenRating @bind-Value=@Review.Value ReadOnly="@reviewExists"/>
     </div>
     <br/>
-    <textarea id="ReviewTextArea" rows="10" cols="100" @bind=@Review.Description placeholder="Napisz swoją recenzję..."/>
+    <textarea id="ReviewTextArea" rows="10" cols="100" @bind=@Review.Description placeholder="@(reviewExists ? "" : "Napisz swoją recenzję...")" disabled="@reviewExists" />
     <br/>
     @if (DBsuccess) {
         <div class="row bg-success text-white" style="margin-top:10px; height:40px">
@@ -53,7 +53,7 @@
         </div>
     }
     <br/>
-    <button class="btn btn-primary" @onclick="() => Submit()">Zatwierdź ocenę</button>
+    <button class="btn btn-primary" @onclick="() => Submit()" hidden="@reviewExists">Zatwierdź ocenę</button>
 </div>
 
 <div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.Denied)">
@@ -70,31 +70,28 @@
     private string? StatusName;
     private string? service;
     private ApiStatus Status = new ApiStatus();
-    private ApiReview Review = new ApiReview();
+    private ApiReview Review = new ApiReview { Value = -1 };
     private ApiEvaluation Evaluation = new ApiEvaluation();
     private StatusType StatusType;
     private bool DBsuccess = false;
+    private bool reviewExists = false;
 
     protected async override Task OnInitializedAsync()
     {
         var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
         Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
         var y = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/service");
-        Console.WriteLine(x.StatusCode + " GET ORDERS SERVICE");
+        Console.WriteLine(y.StatusCode + " GET ORDERS SERVICE");
         var z = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/evaluation");
-        Console.WriteLine(x.StatusCode + " GET ORDERS EVALUATION");
-        if (x.IsSuccessStatusCode && y.IsSuccessStatusCode && z.IsSuccessStatusCode)
+        Console.WriteLine(z.StatusCode + " GET ORDERS EVALUATION");
+        var v = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/review");
+        Console.WriteLine(z.StatusCode + " GET ORDERS REVIEW");
+        if (x.IsSuccessStatusCode && y.IsSuccessStatusCode)
         {
             var c = await x.Content.ReadFromJsonAsync<ApiStatus>();
             var s = await y.Content.ReadAsStringAsync();
-            var e = await z.Content.ReadFromJsonAsync<ApiEvaluation>();
             if (c != null && s != null)
             {
-                if (e != null)
-                {
-                    Evaluation = e;
-                }
-
                 int startIndex = s.IndexOf("<title>") + "<title>".Length;
                 int endIndex = s.IndexOf("</title>", startIndex);
                 if (startIndex >= 0 && endIndex > startIndex)
@@ -115,6 +112,24 @@
         else
         {
             Console.WriteLine("FAIL");
+        }
+
+        if (z.IsSuccessStatusCode)
+        {
+            var e = await z.Content.ReadFromJsonAsync<ApiEvaluation>();
+            if (e != null)
+            {
+                Evaluation = e;
+            }
+        }
+        if (z.IsSuccessStatusCode)
+        {
+            var r = await v.Content.ReadFromJsonAsync<ApiReview>();
+            if (r != null)
+            {
+                Review = r;
+                reviewExists = true;
+            }
         }
     }
 
