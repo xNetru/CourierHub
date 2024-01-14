@@ -37,6 +37,22 @@
     <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(!Status.IsCancelable || DBsuccess)">Odwołaj zamówienie</button>
 </div>
 
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.CouldNotDeliver)">
+    <hr />
+    <h1 style="padding-top: 25px;">Powód nieudanej dostawy</h1>
+    <br />
+    <textarea rows="10" cols="100" @bind=@Parcel.UndeliveredReason readonly=true />
+    <br />
+</div>
+
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.Denied)">
+    <hr />
+    <h1 style="padding-top: 25px;">Powód odrzucenia</h1>
+    <br />
+    <textarea rows="10" cols="100" @bind=@Evaluation.RejectionReason readonly=true />
+    <br />
+</div>
+
 <div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.CouldNotDeliver && StatusType != StatusType.Delivered)">
     <hr />
     <h1 style="padding-top: 25px;">Ocena serwisu</h1>
@@ -56,14 +72,6 @@
     <button class="btn btn-primary" @onclick="() => Submit()" hidden="@reviewExists">Zatwierdź ocenę</button>
 </div>
 
-<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.Denied)">
-    <hr />
-    <h1 style="padding-top: 25px;">Powód odrzucenia</h1>
-    <br />
-    <textarea rows="10" cols="100" @bind=@Evaluation.RejectionReason readonly=true/>
-    <br />
-</div>
-
 @code {
     [Parameter]
     public string? orderCode { get; set; }
@@ -72,6 +80,7 @@
     private ApiStatus Status = new ApiStatus();
     private ApiReview Review = new ApiReview { Value = -1 };
     private ApiEvaluation Evaluation = new ApiEvaluation();
+    private ApiParcel Parcel = new ApiParcel();
     private StatusType StatusType;
     private bool DBsuccess = false;
     private bool reviewExists = false;
@@ -85,7 +94,9 @@
         var z = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/evaluation");
         Console.WriteLine(z.StatusCode + " GET ORDERS EVALUATION");
         var v = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/review");
-        Console.WriteLine(z.StatusCode + " GET ORDERS REVIEW");
+        Console.WriteLine(v.StatusCode + " GET ORDERS REVIEW");
+        var t = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/parcel");
+        Console.WriteLine(t.StatusCode + " GET ORDERS PARCEL");
         if (x.IsSuccessStatusCode && y.IsSuccessStatusCode)
         {
             var c = await x.Content.ReadFromJsonAsync<ApiStatus>();
@@ -130,6 +141,15 @@
             {
                 Review = r;
                 reviewExists = true;
+            }
+        }
+
+        if (t.IsSuccessStatusCode)
+        {
+            var p = await t.Content.ReadFromJsonAsync<ApiParcel>();
+            if (p != null)
+            {
+                Parcel = p;
             }
         }
     }
