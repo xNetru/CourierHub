@@ -19,7 +19,7 @@ public sealed class OrderWithdrawalStepDefinitions {
     public async Task GivenAUserHavingAnOrderWithCode(string code) {
         string status = JsonSerializer.Serialize(StatusType.NotConfirmed);
         var response = await _httpClient.PatchAsync(
-            $"{_httpClient.BaseAddress}Order/{code}/status", 
+            $"{_httpClient.BaseAddress}Order/{code}/status",
             new StringContent(status, Encoding.UTF8, "application/json")
         );
         if (code != "0") {

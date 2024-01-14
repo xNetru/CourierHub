@@ -1,7 +1,7 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
 using FluentValidation;
 
-namespace CourierHub.Server.Validation; 
+namespace CourierHub.Server.Validation;
 internal class SzymoDimensionsValidator : AbstractValidator<SzymoDimensions> {
     public SzymoDimensionsValidator() {
         RuleFor(x => x.dimensionUnit).Matches("^(Meters|Inches)$");

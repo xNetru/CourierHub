@@ -1,7 +1,7 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
 using FluentValidation;
 
-namespace CourierHub.Server.Validation; 
+namespace CourierHub.Server.Validation;
 internal class SzymoAddressValidator : AbstractValidator<SzymoAddress> {
     public SzymoAddressValidator() {
         RuleFor(x => x.houseNumber).Matches(@"^([0-9]+[A-Za-z]*)$");

@@ -1,7 +1,6 @@
 ﻿namespace CourierHub.IntegrationTest;
 
-public enum StatusType
-{
+public enum StatusType {
     NotConfirmed = 1,
     Confirmed = 2,
     Cancelled = 3,

@@ -1,7 +1,7 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
 using FluentValidation;
 
-namespace CourierHub.Server.Validation; 
+namespace CourierHub.Server.Validation;
 public class SzymoPostOfferRequestValidator : AbstractValidator<SzymoPostOfferRequest> {
     public SzymoPostOfferRequestValidator() {
         var addressValidator = new SzymoAddressValidator();

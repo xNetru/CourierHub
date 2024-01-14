@@ -1,7 +1,7 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
 using FluentValidation;
 
-namespace CourierHub.Server.Validation; 
+namespace CourierHub.Server.Validation;
 public class SzymoInquiryValidator : AbstractValidator<SzymoInquiry> {
     public SzymoInquiryValidator() {
         RuleFor(x => x.weight).GreaterThanOrEqualTo(0.2f).LessThanOrEqualTo(8.0f);

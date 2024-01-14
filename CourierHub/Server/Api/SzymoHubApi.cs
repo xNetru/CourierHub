@@ -1,7 +1,7 @@
 ﻿using CourierHub.Api.Models.SzymoApi;
+using CourierHub.Server.Validation;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
-using CourierHub.Server.Validation;
 using System.Net;
 
 namespace CourierHub.Server.Api;

@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿using CourierHub.IntegrationTest.ApiModels;
+using System.Net.Http.Json;
 using System.Text.Json;
-using CourierHub.IntegrationTest.ApiModels;
 
 namespace CourierHub.IntegrationTest.StepDefinitions;
 
@@ -36,9 +36,9 @@ public sealed class MakeInquireStepDefinitions {
         if (offers == null || offers.Length == 0) {
             throw new Exception("The response of the PostInquireGetOffer contained no offers.");
         }
-        var offer = JsonSerializer.Deserialize<ApiOffer>(offJson) ?? 
+        var offer = JsonSerializer.Deserialize<ApiOffer>(offJson) ??
             throw new Exception("Provided offer was in wrong format.");
-        var aimed = offers.FirstOrDefault(o => o.Price == offer.Price && o.Code == offer.Code) ?? 
+        var aimed = offers.FirstOrDefault(o => o.Price == offer.Price && o.Code == offer.Code) ??
             throw new Exception("User did not receive expected offer.");
     }
 }
