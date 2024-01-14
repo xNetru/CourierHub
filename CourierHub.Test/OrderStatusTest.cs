@@ -31,6 +31,14 @@ namespace CourierHub.Test
                 .When($"http://localhost:7008/Order/{orderCode}/evaluation")
                 .RespondJson(new ApiEvaluation());
 
+            httpClient
+                .When($"http://localhost:7008/Order/{orderCode}/review")
+                .RespondJson(new ApiReview());
+
+            httpClient
+                .When($"http://localhost:7008/Order/{orderCode}/parcel")
+                .RespondJson(new ApiParcel());
+
             // Act
             var component = ctx.RenderComponent<OrderStatus>(
                 parameters => parameters
