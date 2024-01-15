@@ -6,6 +6,7 @@ using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
 using System.Text;
+using OneOf;
 
 namespace CourierHubWebApi.Services {
     public class InquireService : IInquireService {
@@ -17,38 +18,67 @@ namespace CourierHubWebApi.Services {
             _priceCacheService = priceCacheService;
             _apiKeyService = apiKeyService;
         }
-        public async Task<ErrorOr<CreateInquireResponse>> CreateInquire(CreateInquireRequest request, int serviceId) {
+
+        public async Task<OneOf<CreateInquireResponse, int>> CreateInquire(CreateInquireRequest request, int serviceId)
+        {
             Inquire inquire = request.CreateInquire();
+
+            if (!IsValidServiceId(serviceId))
+                return StatusCodes.Status500InternalServerError;
 
             SetOrderCode(inquire);
 
-            if (!_apiKeyService.IsOurServiceRequest(serviceId)) {
-                Error? error = await AddInquireToDataBase(inquire);
-                if (error != null) {
-                    return error.Value;
+            if(!_apiKeyService.IsOurServiceRequest(serviceId))
+            {
+                int statusCode = await AddInquireToDataBase(inquire);
+                if(statusCode != StatusCodes.Status200OK)
+                {
+                    return statusCode;
                 }
             }
 
             return CreateResponse(inquire);
         }
-        public async Task<ErrorOr<CreateInquireResponse>> CreateInquireWithEmail(CreateInquireWithEmailRequest request, int serviceId) {
-            Inquire inquire = request.CreateInquire();
 
-            SetOrderCode(inquire);
+        //public async Task<ErrorOr<CreateInquireResponse>> CreateInquire(CreateInquireRequest request, int serviceId) {
+        //    Inquire inquire = request.CreateInquire();
 
-            if (!TryGetUserId(request.Email, out var userId)) {
-                return Error.NotFound();
-            }
+        //    if(!IsValidServiceId(serviceId))
+        //    {
+        //        return Error.Failure();
+        //    }
 
-            inquire.ClientId = userId;
+        //    SetOrderCode(inquire);
 
-            Error? error = await AddInquireToDataBase(inquire);
-            if (error != null) {
-                return error.Value;
-            }
+        //    if (!_apiKeyService.IsOurServiceRequest(serviceId)) {
+        //        Error? error = await AddInquireToDataBase(inquire);
+        //        if (error != null) {
+        //            return error.Value;
+        //        }
+        //    }
 
-            return CreateResponse(inquire);
-        }
+        //    return CreateResponse(inquire);
+        //}
+
+
+        //public async Task<ErrorOr<CreateInquireResponse>> CreateInquireWithEmail(CreateInquireWithEmailRequest request, int serviceId) {
+        //    Inquire inquire = request.CreateInquire();
+
+        //    SetOrderCode(inquire);
+
+        //    if (!TryGetUserId(request.Email, out var userId)) {
+        //        return Error.NotFound();
+        //    }
+
+        //    inquire.ClientId = userId;
+
+        //    Error? error = await AddInquireToDataBase(inquire);
+        //    if (error != null) {
+        //        return error.Value;
+        //    }
+
+        //    return CreateResponse(inquire);
+        //}
         private void SetOrderCode(Inquire inquire) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(inquire.Datetime.Date.Year);
@@ -93,42 +123,76 @@ namespace CourierHubWebApi.Services {
 
             return price;
         }
-        private async Task<Error?> AddInquireToDataBase(Inquire inquire) {
-            try {
+
+        private async Task<int> AddInquireToDataBase(Inquire inquire)
+        {
+            try
+            {
                 await _dbContext.AddAsync(inquire);
                 _dbContext.SaveChanges();
-            } catch (Exception ex) {
-                return Error.Failure();
             }
-            return default;
+            catch
+            {
+                return StatusCodes.Status500InternalServerError;
+            }
+            return StatusCodes.Status200OK;
         }
-        private ErrorOr<CreateInquireResponse> CreateResponse(Inquire inquire) {
-            decimal calculatedPrice = CalculatePrice(inquire);
-            ErrorOr<DateTime> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
 
-            DateTime? expirationTime = null;
-            cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
-            if (expirationTime != null) {
-                return new CreateInquireResponse(calculatedPrice, inquire.Code, DateTime.Now.AddMinutes(15));
-            } else {
-                return cacheResult.Errors;
-            }
+        //private async Task<Error?> AddInquireToDataBase(Inquire inquire)
+        //{
+        //    try
+        //    {
+        //        await _dbContext.AddAsync(inquire);
+        //        _dbContext.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Error.Failure();
+        //    }
+        //    return default;
+        //}
+
+        private OneOf<CreateInquireResponse, int> CreateResponse(Inquire inquire)
+        {
+            decimal calculatedPrice = CalculatePrice(inquire);
+            OneOf<DateTime, int> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
+
+            return cacheResult.Match(time => (OneOf<CreateInquireResponse,int>)new CreateInquireResponse(calculatedPrice, inquire.Code, time), statusCode => statusCode);
         }
-        private bool TryGetUserId(string email, out int id) {
-            id = 0;
-            IQueryable<int> idQuery = from users
-                                    in _dbContext.Users
-                                      where users.Email == email &&
-                                      users.Type == (int)UserType.Client
-                                      select users.Id;
-            if (!idQuery.Any())
-                return false;
-            try {
-                id = idQuery.First();
-                return true;
-            } catch {
-                return false;
-            }
+        //private ErrorOr<CreateInquireResponse> CreateResponse(Inquire inquire) {
+        //    decimal calculatedPrice = CalculatePrice(inquire);
+        //    ErrorOr<DateTime> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
+
+        //    DateTime? expirationTime = null;
+        //    cacheResult.Match(time => { expirationTime = time; return 0; }, errors => { return 0; });
+        //    if (expirationTime != null) {
+        //        return new CreateInquireResponse(calculatedPrice, inquire.Code, DateTime.Now.AddMinutes(15));
+        //    } else {
+        //        return cacheResult.Errors;
+        //    }
+        //}
+
+        private bool IsValidServiceId(int serviceId)
+        {
+            return _dbContext.Services.Where(x => x.Id == serviceId).Any();
         }
+        //private bool TryGetUserId(string email, out int id) {
+        //    id = 0;
+        //    IQueryable<int> idQuery = from users
+        //                            in _dbContext.Users
+        //                              where users.Email == email &&
+        //                              users.Type == (int)UserType.Client
+        //                              select users.Id;
+        //    if (!idQuery.Any())
+        //        return false;
+        //    try {
+        //        id = idQuery.First();
+        //        return true;
+        //    } catch {
+        //        return false;
+        //    }
+        //}
+
+
     }
 }

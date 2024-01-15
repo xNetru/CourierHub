@@ -54,8 +54,7 @@ namespace CourierHubWebApi.Controllers {
 
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.GetOrderStatus(request, serviceId).Match(
-                    statusCode => Ok(statusCode), errors => Problem(detail: errors.First().Description,
-                    statusCode: errors.First().NumericType)),
+                    orderStatusCode => Ok(orderStatusCode), statusCode => Problem(statusCode: statusCode)),
                 errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
     }

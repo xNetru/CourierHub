@@ -37,7 +37,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public void CreateInquire_ShouldCreateOffer_WhenValidInquiryIsGiven()
+        public void CreateInquire_()
         {
             // Arrange
             
