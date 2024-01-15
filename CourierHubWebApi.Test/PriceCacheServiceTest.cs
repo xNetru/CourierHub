@@ -55,8 +55,7 @@ namespace CourierHubWebApi.Test {
         }
 
         [Fact]
-        public void GetPrice_ShouldReturnError_WhenGivenObtainmentTimeIsAfterExpirationTime()
-        {
+        public void GetPrice_ShouldReturnError_WhenGivenObtainmentTimeIsAfterExpirationTime() {
             // Arrange
             string inquiryCode = "Sixth";
             decimal price = 1256.00m;

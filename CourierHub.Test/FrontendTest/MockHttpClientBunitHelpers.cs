@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace CourierHub.Test {
+namespace CourierHub.Test.FrontendTest {
     public static class MockHttpClientBunitHelpers {
         public static MockHttpMessageHandler AddMockHttpClient(this TestServiceProvider services) {
             var mockHttpHandler = new MockHttpMessageHandler();

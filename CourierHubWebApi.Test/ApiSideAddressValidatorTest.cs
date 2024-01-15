@@ -1,22 +1,12 @@
 ﻿using CourierHubWebApi.Models;
 using CourierHubWebApi.Validations;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace CourierHubWebApi.Test
-{
-    public class ApiSideAddressValidatorTest
-    {
+namespace CourierHubWebApi.Test {
+    public class ApiSideAddressValidatorTest {
         private ApiSideAddressValidator _validator = new();
 
         [Fact]
-        public async Task Validate_ShouldRejectAddress_WhenGivenCityIsNotValid()
-        {
+        public async Task Validate_ShouldRejectAddress_WhenGivenCityIsNotValid() {
             // Arrange
             ApiSideAddress address = new ApiSideAddress(
                 City: "radogoszcz",
@@ -31,8 +21,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public async Task Validate_ShouldRejectAddress_WhenGivenPostalCodeIsNotValid()
-        {
+        public async Task Validate_ShouldRejectAddress_WhenGivenPostalCodeIsNotValid() {
             // Arrange
             ApiSideAddress address = new ApiSideAddress(
                 City: "Radogoszcz",
@@ -48,8 +37,7 @@ namespace CourierHubWebApi.Test
 
 
         [Fact]
-        public async Task Validate_ShouldRejectAddress_WhenGivenStreetIsNotValid()
-        {
+        public async Task Validate_ShouldRejectAddress_WhenGivenStreetIsNotValid() {
             // Arrange
             ApiSideAddress address = new ApiSideAddress(
                 City: "Radogoszcz",
@@ -65,8 +53,7 @@ namespace CourierHubWebApi.Test
 
 
         [Fact]
-        public async Task Validate_ShouldRejectAddress_WhenGivenHouseNumberIsNotValid()
-        {
+        public async Task Validate_ShouldRejectAddress_WhenGivenHouseNumberIsNotValid() {
             // Arrange
             ApiSideAddress address = new ApiSideAddress(
                 City: "Radogoszcz",
@@ -82,8 +69,7 @@ namespace CourierHubWebApi.Test
 
 
         [Fact]
-        public async Task Validate_ShouldRejectAddress_WhenGivenFlatNumberIsNotValid()
-        {
+        public async Task Validate_ShouldRejectAddress_WhenGivenFlatNumberIsNotValid() {
             // Arrange
             ApiSideAddress address = new ApiSideAddress(
                 City: "Radogoszcz",
@@ -98,8 +84,7 @@ namespace CourierHubWebApi.Test
         }
 
         [Fact]
-        public async Task Validate_ShouldAcceptAddress_WhenGivenAddressIsValid()
-        {
+        public async Task Validate_ShouldAcceptAddress_WhenGivenAddressIsValid() {
             // Arrange
             ApiSideAddress address = new ApiSideAddress(
                 City: "Biała-Podlaska",

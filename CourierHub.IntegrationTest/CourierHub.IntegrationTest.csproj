@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Remove="Features\ClientLogin.feature" />
+    <SpecFlowFeatureFiles Remove="Features\CourierViewsOrders.feature" />
+    <SpecFlowFeatureFiles Remove="Features\WorkerChecksInquires.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
     <PackageReference Include="SpecFlow.xUnit" Version="3.9.40" />
