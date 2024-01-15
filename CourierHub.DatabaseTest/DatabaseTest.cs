@@ -3,13 +3,13 @@ using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierHub.DatabaseTest;
-public class DatabaseTest : IClassFixture<CourierHubDbContext> {
+public class DatabaseTest {
 
     private readonly CourierHubDbContext _context;
     private readonly string _serviceName = "CourierHub";
 
-    public DatabaseTest(CourierHubDbContext context) {
-        _context = context;
+    public DatabaseTest() {
+        _context = new CourierHubDbContext();
     }
 
     [Fact]
