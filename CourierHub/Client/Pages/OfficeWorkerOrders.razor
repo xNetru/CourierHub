@@ -2,6 +2,8 @@
 
 @using CourierHub.Shared.ApiModels
 @using CourierHub.Client.Data
+@using Radzen
+@using Radzen.Blazor
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -10,7 +12,7 @@
 
 <h1>Oferty do akceptacji</h1>
 
-<table class="table">
+@* <table class="table">
     <thead>
         <tr>
             <th>Mail</th>
@@ -42,7 +44,33 @@
             </tr>
         }
     </tbody>
-</table>
+</table> *@
+
+<RadzenDataGrid AllowFiltering="true" AllowMultiColumnSorting="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.SimpleWithMenu" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Orders" TItem="ApiOrder" LogicalFilterOperator="LogicalFilterOperator.Or"
+                EmptyText="Brak pasujących rekordów" ContainsText="Zawiera ..." StartsWithText="Zaczyna się od ..." EndsWithText="Kończy się na ..." DoesNotContainText="Nie zawiera ..." IsNullText="Jest NULLem" IsEmptyText="Jest puste" IsNotEmptyText="Nie jest puste"
+                IsNotNullText="Nie jest NULLem" EqualsText="Jest równe ..." NotEqualsText="Nie jest równe ..." GreaterThanOrEqualsText="Większe lub równe ..." GreaterThanText="Większe niż ..."
+                LessThanOrEqualsText="Mniejsze lub równe ..." LessThanText="Mniejsze niż ..." ApplyFilterText="Zastosuj" ClearFilterText="Wyczyść" FilterText="Filtr">
+    <Columns>
+        <RadzenDataGridColumn TItem="ApiOrder" Property="ClientEmail" Filterable="true" Sortable="true" Title="Mail" Width="200px" TextAlign="TextAlign.Center"/>
+        <RadzenDataGridColumn TItem="ApiOrder" Property="ClientCompany" Filterable="true" Sortable="true" Title="Firma" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiOrder" Property="Price" Filterable="true" Sortable="true" Title="Cena" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiOrder" Property="ClientAddress" Filterable="false" Sortable="false" Title="Adres klienta" Width="540px" TextAlign="TextAlign.Center">
+            <Columns>
+                <RadzenDataGridColumn TItem="ApiOrder" Property="ClientAddress.City" Title="Miasto" Width="150px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiOrder" Property="ClientAddress.Street" Title="Ulica" Width="150px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiOrder" Property="ClientAddress.Number" Title="Budynek" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiOrder" Property="ClientAddress.Flat" Title="Lokal" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiOrder" Property="ClientAddress.PostalCode" Title="Kod" Width="80px" TextAlign="TextAlign.Center" />
+            </Columns>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ApiOrder" Context="Order" Filterable="false" Sortable="false" Frozen="true" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="Order">
+                <RadzenButton RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => Choose(Order))" @onclick:stopPropagation="true" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
 
 @code {
     private IEnumerable<ApiOrder> Orders = new List<ApiOrder>();

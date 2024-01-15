@@ -3,7 +3,7 @@ using CourierHub.Client.Pages;
 using CourierHub.Shared.ApiModels;
 using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test {
+namespace CourierHub.Test.FrontendTest {
     public class OrderStatusTest {
         [Fact]
         public void RendersCorrectly() {

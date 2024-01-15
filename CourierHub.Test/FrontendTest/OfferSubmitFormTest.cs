@@ -5,7 +5,7 @@ using CourierHub.Shared.ApiModels;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test {
+namespace CourierHub.Test.FrontendTest {
     public class OfferSubmitFormTest {
         [Fact]
         public void RendersCorrectly() {
@@ -19,15 +19,15 @@ namespace CourierHub.Test {
             RoleContainer role_container = new RoleContainer();
             role_container.Roles["Client"] = true;
             role_container.Roles["NotAuthorized"] = false;
-            ctx.Services.AddSingleton<RoleContainer>(role_container);
+            ctx.Services.AddSingleton(role_container);
 
             OfferContainer offer_container = new OfferContainer();
             offer_container.Offers.Add(new ApiOffer { Code = orderCode, ServiceName = service });
-            ctx.Services.AddSingleton<OfferContainer>(offer_container);
+            ctx.Services.AddSingleton(offer_container);
 
             InquireContainer inquire_container = new InquireContainer();
             inquire_container.Inquires.Add(new ApiInquire { Code = orderCode, Destination = new ApiAddress { Number = "", Flat = "" }, Source = new ApiAddress { Number = "", Flat = "" } });
-            ctx.Services.AddSingleton<InquireContainer>(inquire_container);
+            ctx.Services.AddSingleton(inquire_container);
 
             var httpClient = ctx.Services.AddMockHttpClient();
             httpClient

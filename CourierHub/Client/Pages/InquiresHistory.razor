@@ -1,180 +1,48 @@
 ﻿@page "/history/inquires"
 
 @using CourierHub.Shared.ApiModels
+@using Radzen
+@using Radzen.Blazor
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
 
 <h1>Historia zapytań</h1>
 
-<table class="table">
-        <thead>
-            <tr>
-                <th>Szerokość</th>
-                <th>Długość</th>
-                <th>Głębokość</th>
-                <th>Data zapytania</th>
-                <th>Miasto</th>
-                <th>Ulica</th>
-                <th>Numer</th>
-                <th>Lokal</th>
-                <th>Kod</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Inquires)
-            {
-                <tr>
-                    <td style="white-space:nowrap">@item.Width</td>
-                    <td style="white-space:nowrap">@item.Length</td>
-                    <td style="white-space:nowrap">@item.Depth</td>
-                    <td style="white-space:nowrap">@item.Datetime.ToString("dd-MM-yyyy")</td>
-                    <td>
-                        <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.City</p>
-                        <p style="white-space:nowrap">do: @item.Destination.City</p>
-                    </td>
-                    <td>
-                        <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.Street</p>
-                        <p style="white-space:nowrap">do: @item.Destination.Street</p>
-                    </td>
-                    <td>
-                        <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.Number</p>
-                        <p style="white-space:nowrap">do: @item.Destination.Number</p>
-                    </td>
-                    <td>
-                        <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.Flat</p>
-                        <p style="white-space:nowrap">do: @item.Destination.Flat</p>
-                    </td>
-                    <td>
-                        <p style="white-space:nowrap">z: &nbsp;&nbsp;@item.Source.PostalCode</p>
-                        <p style="white-space:nowrap">do: @item.Destination.PostalCode</p>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
- 
+<RadzenDataGrid AllowFiltering="true" AllowMultiColumnSorting="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.SimpleWithMenu" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Inquires" TItem="ApiInquire" LogicalFilterOperator="LogicalFilterOperator.Or"
+                EmptyText="Brak pasujących rekordów" ContainsText="Zawiera ..." StartsWithText="Zaczyna się od ..." EndsWithText="Kończy się na ..." DoesNotContainText="Nie zawiera ..." IsNullText="Jest NULLem" IsEmptyText="Jest puste" IsNotEmptyText="Nie jest puste"
+                IsNotNullText="Nie jest NULLem" EqualsText="Jest równe ..." NotEqualsText="Nie jest równe ..." GreaterThanOrEqualsText="Większe lub równe ..." GreaterThanText="Większe niż ..."
+                LessThanOrEqualsText="Mniejsze lub równe ..." LessThanText="Mniejsze niż ..." ApplyFilterText="Zastosuj" ClearFilterText="Wyczyść" FilterText="Filtr">
+    <Columns>
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Code" Filterable="true" Sortable="true" Title="Kod" Width="200px" TextAlign="TextAlign.Center"/>
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Width" Filterable="true" Sortable="true" Title="Szerokość" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Length" Filterable="true" Sortable="true" Title="Długość" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Depth" Filterable="true" Sortable="true" Title="Głebokość" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Datetime" FormatString="{0:dd/MM/yyyy}" Filterable="true" Sortable="true" Title="Data zapytania" Width="200px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Source" Filterable="false" Sortable="false" Title="Adres wysyłki" Width="540px" TextAlign="TextAlign.Center">
+            <Columns>
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Source.City" Title="Miasto" Width="150px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Source.Street" Title="Ulica" Width="150px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Source.Number" Title="Budynek" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Source.Flat" Title="Lokal" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Source.PostalCode" Title="Kod" Width="80px" TextAlign="TextAlign.Center" />
+            </Columns>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Destination" Filterable="false" Sortable="false" Title="Adres dostawy" Width="540px" TextAlign="TextAlign.Center">
+            <Columns>
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.City" Title="Miasto" Width="150px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.Street" Title="Ulica" Width="150px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.Number" Title="Budynek" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.Flat" Title="Lokal" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.PostalCode" Title="Kod" Width="80px" TextAlign="TextAlign.Center" />
+            </Columns>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
 
 @code {
     private IEnumerable<ApiInquire> Inquires = new List<ApiInquire>();
-    // {
-    //     new ApiInquire
-    //     {
-    //         Width=10,
-    //         Length=20,
-    //         Depth=30,
-    //         Datetime=DateTime.Today,
-    //         Source = new ApiAddress
-    //         {
-    //             City="abdsguyusuksc",
-    //             Street="abdjgdkc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         },
-    //         Destination = new ApiAddress
-    //         {
-    //             City="abddjkvhkjdhkc",
-    //             Street="abxzhjjvkjfc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         }
-    //     },
-    //             new ApiInquire
-    //     {
-    //         Width=10,
-    //         Length=20,
-    //         Depth=30,
-    //         Datetime=DateTime.Today,
-    //         Source = new ApiAddress
-    //         {
-    //             City="abdsguyusuksc",
-    //             Street="abdjgdkc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         },
-    //         Destination = new ApiAddress
-    //         {
-    //             City="abddjkvhkjdhkc",
-    //             Street="abxzhjjvkjfc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         }
-    //     },
-    //             new ApiInquire
-    //     {
-    //         Width=10,
-    //         Length=20,
-    //         Depth=30,
-    //         Datetime=DateTime.Today,
-    //         Source = new ApiAddress
-    //         {
-    //             City="abdsguyusuksc",
-    //             Street="abdjgdkc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         },
-    //         Destination = new ApiAddress
-    //         {
-    //             City="abddjkvhkjdhkc",
-    //             Street="abxzhjjvkjfc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         }
-    //     },
-    //             new ApiInquire
-    //     {
-    //         Width=10,
-    //         Length=20,
-    //         Depth=30,
-    //         Datetime=DateTime.Today,
-    //         Source = new ApiAddress
-    //         {
-    //             City="abdsguyusuksc",
-    //             Street="abdjgdkc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         },
-    //         Destination = new ApiAddress
-    //         {
-    //             City="abddjkvhkjdhkc",
-    //             Street="abxzhjjvkjfc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         }
-    //     },
-    //             new ApiInquire
-    //     {
-    //         Width=10,
-    //         Length=20,
-    //         Depth=30,
-    //         Datetime=DateTime.Today,
-    //         Source = new ApiAddress
-    //         {
-    //             City="abdsguyusuksc",
-    //             Street="abdjgdkc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         },
-    //         Destination = new ApiAddress
-    //         {
-    //             City="abddjkvhkjdhkc",
-    //             Street="abxzhjjvkjfc",
-    //             Number="1",
-    //             Flat="1",
-    //             PostalCode="00-000"
-    //         }
-    //     }
-    // };
 
     protected async override Task OnInitializedAsync() {
         var context = await Provider.GetAuthenticationStateAsync();

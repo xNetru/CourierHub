@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 using System.Security.Claims;
 
-namespace CourierHub.Test {
+namespace CourierHub.Test.FrontendTest {
     public class OfficeWorkerReviewOrderTest {
         [Fact]
         public void RendersCorrectly() {
@@ -21,7 +21,7 @@ namespace CourierHub.Test {
 
             OrderContainer container = new OrderContainer();
             container.Orders.Add(new ApiOrder { ClientName = name, Code = orderCode, ClientAddress = new ApiAddress { Number = "", Flat = "" }, ClientPhone = "", ClientEmail = mail });
-            ctx.Services.AddSingleton<OrderContainer>(container);
+            ctx.Services.AddSingleton(container);
 
             var httpClient = ctx.Services.AddMockHttpClient();
             httpClient
@@ -51,7 +51,7 @@ namespace CourierHub.Test {
 
             OrderContainer container = new OrderContainer();
             container.Orders.Add(new ApiOrder { ClientName = name, Code = orderCode, ClientAddress = new ApiAddress { Number = "", Flat = "" }, ClientPhone = "", ClientEmail = mail });
-            ctx.Services.AddSingleton<OrderContainer>(container);
+            ctx.Services.AddSingleton(container);
 
             var httpClient = ctx.Services.AddMockHttpClient();
             httpClient
@@ -101,7 +101,7 @@ namespace CourierHub.Test {
 
             OrderContainer container = new OrderContainer();
             container.Orders.Add(new ApiOrder { ClientName = name, Code = orderCode, ClientAddress = new ApiAddress { Number = "", Flat = "" }, ClientPhone = "", ClientEmail = mail });
-            ctx.Services.AddSingleton<OrderContainer>(container);
+            ctx.Services.AddSingleton(container);
 
             var claims = new List<Claim>();
             claims.Add(new Claim("email", worker_mail));

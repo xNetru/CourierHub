@@ -1,6 +1,4 @@
-﻿using CourierHub.Shared.Data;
-using CourierHub.Shared.Enums;
-using CourierHub.Shared.Models;
+﻿using CourierHub.Shared.Enums;
 using CourierHubWebApi.Models;
 using FluentValidation;
 using System.Data.SqlTypes;

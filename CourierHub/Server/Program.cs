@@ -1,11 +1,9 @@
 using CourierHub.Cloud;
 using CourierHub.Server.Containers;
-using CourierHub.Shared.ApiModels;
+using CourierHub.Server.Data;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Static;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace CourierHub;
 public class Program {
@@ -41,6 +39,7 @@ public class Program {
 
         builder.Services.AddSingleton<InquireCodeContainer>();
         builder.Services.AddScoped<WebApiContainer>();
+        builder.Services.AddHostedService<StatusUpdateService>();
 
         var app = builder.Build();
 
@@ -64,15 +63,6 @@ public class Program {
         app.MapRazorPages();
         app.MapControllers();
         app.MapFallbackToFile("index.html");
-
-       var off = new ApiOffer {
-           Price = 20.696256m,
-           Code = "MjAyNWEybzMxNDEyMDIwMA==",
-           ExpirationDate = default
-
-       };
-        string json = JsonSerializer.Serialize(off);
-        Console.WriteLine(json);
 
 
         app.Run();

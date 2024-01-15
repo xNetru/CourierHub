@@ -36,7 +36,7 @@ namespace CourierHubWebApi.Controllers {
             ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
-            
+
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.WithdrawOrder(request, serviceId).Result.Match(
                     statusCode => Ok(statusCode), 

@@ -4,7 +4,7 @@ using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test {
+namespace CourierHub.Test.FrontendTest {
     public class CourierOrderDetailsTest {
         [Fact]
         public void RendersCorrectly() {
