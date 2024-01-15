@@ -73,7 +73,6 @@ namespace CourierHubWebApi.Services {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.ServiceId == serviceId && x.Inquire.Code == request.Code);
             if (orders.Count() != 1)
             {
-                // Spytać Bartka który kod
                 if (orders.Count() == 0)
                     return new ApiError(StatusCodes.Status404NotFound, "No such order exists", "Order not found.");
                 else
