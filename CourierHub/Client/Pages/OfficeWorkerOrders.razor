@@ -12,40 +12,6 @@
 
 <h1>Oferty do akceptacji</h1>
 
-@* <table class="table">
-    <thead>
-        <tr>
-            <th>Mail</th>
-            <th>Firma</th>
-            <th>Cena</th>
-            <th>Miasto</th>
-            <th>Ulica</th>
-            <th>Numer</th>
-            <th>Lokal</th>
-            <th>Kod</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Orders)
-        {
-            <tr>
-                <td style="white-space:nowrap">@item.ClientEmail</td>
-                <td style="white-space:nowrap">@item.ClientCompany</td>
-                <td style="white-space:nowrap">@item.Price</td>
-                <td style="white-space:nowrap">@item.ClientAddress.City</td>
-                <td style="white-space:nowrap">@item.ClientAddress.Street</td>
-                <td style="white-space:nowrap">@item.ClientAddress.Number</td>
-                <td style="white-space:nowrap">@item.ClientAddress.Flat</td>
-                <td style="white-space:nowrap">@item.ClientAddress.PostalCode</td>
-                <td style="white-space:nowrap">
-                    <button class="btn btn-primary" @onclick="() => Choose(item)">Wybierz</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table> *@
-
 <RadzenDataGrid AllowFiltering="true" AllowMultiColumnSorting="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.SimpleWithMenu" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 Data="@Orders" TItem="ApiOrder" LogicalFilterOperator="LogicalFilterOperator.Or"
                 EmptyText="Brak pasujących rekordów" ContainsText="Zawiera ..." StartsWithText="Zaczyna się od ..." EndsWithText="Kończy się na ..." DoesNotContainText="Nie zawiera ..." IsNullText="Jest NULLem" IsEmptyText="Jest puste" IsNotEmptyText="Nie jest puste"
