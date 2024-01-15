@@ -1,6 +1,8 @@
 ﻿@page "/history/orders"
 
 @using CourierHub.Shared.ApiModels
+@using Radzen.Blazor
+@using Radzen
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider Provider
@@ -8,29 +10,16 @@
 
 <h1>Historia zamówień</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Kod</th>
-            <th>Opłata</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Orders)
-        {
-            <tr>
-                <td style="white-space:nowrap">@item.Code</td>
-                <td style="white-space:nowrap">@item.Price</td>
-                <td style="white-space:nowrap">
-                    <button class="btn btn-primary" @onclick="() => Choose(item)">Wybierz</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-
+<RadzenDataGrid style="--rz-grid-header-text-transform: none; --rz-grid-header-font-size: 20px;" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.SimpleWithMenu" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Orders" TItem="ApiOrder" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
+                EmptyText="Brak pasujących rekordów" ContainsText="Zawiera ..." StartsWithText="Zaczyna się od ..." EndsWithText="Kończy się na ..." DoesNotContainText="Nie zawiera ..." IsNullText="Jest NULLem" IsEmptyText="Jest puste" IsNotEmptyText="Nie jest puste"
+                IsNotNullText="Nie jest NULLem" EqualsText="Jest równe ..." NotEqualsText="Nie jest równe ..." GreaterThanOrEqualsText="Większe lub równe ..." GreaterThanText="Większe niż ..."
+                LessThanOrEqualsText="Mniejsze lub równe ..." LessThanText="Mniejsze niż ..." ApplyFilterText="Zastosuj" ClearFilterText="Wyczyść" FilterText="Filtr">
+    <Columns>
+        <RadzenDataGridColumn TItem="ApiOrder" Property="Code" Filterable="true" Sortable="true" Title="Kod" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiOrder" Property="Price" Filterable="true" Sortable="true" Title="Cena" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+    </Columns>
+</RadzenDataGrid>
 
 @code {
     private IEnumerable<ApiOrder> Orders = new List<ApiOrder>();
