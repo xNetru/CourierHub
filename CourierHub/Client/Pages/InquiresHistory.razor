@@ -29,7 +29,7 @@
                 <RadzenDataGridColumn TItem="ApiInquire" Property="Source.PostalCode" Title="Kod" Width="80px" TextAlign="TextAlign.Center" />
             </Columns>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ApiInquire" Property="Source" Filterable="false" Sortable="false" Title="Adres dostawy" Width="540px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="ApiInquire" Property="Destination" Filterable="false" Sortable="false" Title="Adres dostawy" Width="540px" TextAlign="TextAlign.Center">
             <Columns>
                 <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.City" Title="Miasto" Width="150px" TextAlign="TextAlign.Center" />
                 <RadzenDataGridColumn TItem="ApiInquire" Property="Destination.Street" Title="Ulica" Width="150px" TextAlign="TextAlign.Center" />
@@ -40,7 +40,6 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
- 
 
 @code {
     private IEnumerable<ApiInquire> Inquires = new List<ApiInquire>();
