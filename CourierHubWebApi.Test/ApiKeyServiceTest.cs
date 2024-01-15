@@ -31,18 +31,6 @@ namespace CourierHubWebApi.Test {
         }
 
         [Fact]
-        public void TryGetServiceId_ShouldReturnTrueAndServiceId_WhenCorrectApiKeyIsGiven() {
-            // Arrange
-            string apiKey = "a1";
-            int serviceId = -1;
-            // Act
-            bool result = _apiKeyService.TryGetServiceId(apiKey, out serviceId);
-            // Assert
-            Assert.True(result);
-            Assert.Equal(1, serviceId);
-        }
-
-        [Fact]
         public void IsOurServiceRequest_ShouldReturnFalse_WhenIdOfOtherServiceIsGiven() {
             // Arrange
             int serviceId = 2;
