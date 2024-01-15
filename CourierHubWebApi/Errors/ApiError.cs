@@ -11,7 +11,10 @@
 
         private List<Error> _errors = new();
         public ICollection<Error> Errors { get => _errors; }
-        public Error? First { get => _errors.FirstOrDefault(); }
+        public Error First 
+        { 
+            get { Error? first = _errors.FirstOrDefault(); if (first == null) return DefaultInternalServerError.Errors.First(); return (Error)first; }
+        }
         public ApiError(int StatusCode, string? Message = null, string? Title = null) 
         {
             _errors.Add(new Error { StatusCode = StatusCode, Message = Message, Title = Title });
@@ -20,5 +23,6 @@
         {
             _errors.Add(error);
         }
+        public static ApiError DefaultInternalServerError { get => new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error."); }
     }
 }

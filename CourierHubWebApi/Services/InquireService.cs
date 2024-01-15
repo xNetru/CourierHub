@@ -25,7 +25,7 @@ namespace CourierHubWebApi.Services {
             Inquire inquire = request.CreateInquire();
 
             if (!IsValidServiceId(serviceId))
-                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
+                return ApiError.DefaultInternalServerError;
 
             SetOrderCode(inquire);
 

@@ -25,7 +25,7 @@ namespace CourierHubWebApi.Controllers {
                 serviceId => {
                     return _orderService.CreateOrder(request, serviceId).Match(
                     statusCode => Ok(statusCode),
-                    errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
+                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
                 },
                 errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
@@ -39,7 +39,8 @@ namespace CourierHubWebApi.Controllers {
             
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.WithdrawOrder(request, serviceId).Result.Match(
-                    statusCode => Ok(statusCode), errors => Problem(statusCode: StatusCodes.Status400BadRequest)),
+                    statusCode => Ok(statusCode), 
+                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                 errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
 
@@ -54,7 +55,7 @@ namespace CourierHubWebApi.Controllers {
 
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.GetOrderStatus(request, serviceId).Match(
-                    orderStatusCode => Ok(orderStatusCode), statusCode => Problem(statusCode: statusCode)),
+                    orderStatusCode => Ok(orderStatusCode), errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                 errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
         }
     }

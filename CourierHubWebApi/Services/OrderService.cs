@@ -33,7 +33,7 @@ namespace CourierHubWebApi.Services {
             if (price == default)
             {
                 // TODO: return valid error
-                return result.Match(x => new ApiError(StatusCodes.Status500InternalServerError), x => x);
+                return result.Match(x => ApiError.DefaultInternalServerError, x => x);
             }
 
             order.Price = (decimal)price;
@@ -46,7 +46,7 @@ namespace CourierHubWebApi.Services {
 
             if (inquiryIdQuery.Count() != 1)
             {
-                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
+                return ApiError.DefaultInternalServerError;
             }
 
             Inquire inquiry = inquiryIdQuery.First();
@@ -64,7 +64,7 @@ namespace CourierHubWebApi.Services {
             }
             catch
             {
-                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
+                return ApiError.DefaultInternalServerError;
             }
             return StatusCodes.Status200OK;
         }
@@ -123,7 +123,7 @@ namespace CourierHubWebApi.Services {
                 if (orders.Count() == 0)
                     return new ApiError(StatusCodes.Status404NotFound, "No such order exists", "Order not found.");
                 else
-                    return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
+                    return ApiError.DefaultInternalServerError;
             }
             Order order = orders.First();
             Status? status = _dbContext.Statuses.Where(x => x.Id == order.StatusId).FirstOrDefault();
@@ -137,7 +137,7 @@ namespace CourierHubWebApi.Services {
                 }
                 catch
                 {
-                    return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
+                    return ApiError.DefaultInternalServerError;
                 }
             }
             else
@@ -176,7 +176,9 @@ namespace CourierHubWebApi.Services {
             Order? order = orders.FirstOrDefault();
             if (orders.Count() != 1 || order == null)
             {
-                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
+                if (order == null)
+                    return new ApiError(StatusCodes.Status404NotFound, "No such order exists.", "Order not found.");
+                return ApiError.DefaultInternalServerError;
             }
             return (StatusType)order.StatusId;
         }

@@ -12,7 +12,7 @@ namespace CourierHubWebApi.Services {
             if (!_registeredOffers.TryAdd(InquireCode,
                                 new OfferData(Price, timeStamp)))
             {
-                return new ApiError(StatusCodes.Status500InternalServerError, "Cannot prepare offer", "Internal server error");
+                return ApiError.DefaultInternalServerError;
             }
             return timeStamp;
         }
@@ -42,7 +42,7 @@ namespace CourierHubWebApi.Services {
             }
             catch
             {
-                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.";
+                return ApiError.DefaultInternalServerError;
             }
         }
 
