@@ -18,6 +18,11 @@
     <Columns>
         <RadzenDataGridColumn TItem="ApiOrder" Property="Code" Filterable="true" Sortable="true" Title="Kod" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="ApiOrder" Property="Price" Filterable="true" Sortable="true" Title="Cena" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiOrder" Context="Order" Filterable="false" Sortable="false" Frozen="true" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="Order">
+                <RadzenButton RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => Choose(Order))" @onclick:stopPropagation="true" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 

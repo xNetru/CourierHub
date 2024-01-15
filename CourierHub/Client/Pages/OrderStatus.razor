@@ -27,14 +27,20 @@
 </table>
 
 <div class="col" style="text-align: center;">
-    @if (DBsuccess)
+    @if (cancelled)
     {
         <div class="row bg-success text-white" style="margin-top:10px; height:40px">
             <label class="p-2">Status zmieniony </label>
         </div>
     }
+    @if (cantCancel)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Nie da się odwołać tego zamówienia - skontaktuj się z obsługą serwisu: @service</label>
+        </div>
+    }
     <br/>
-    <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(!Status.IsCancelable || DBsuccess)">Odwołaj zamówienie</button>
+    <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(cancelled || cantCancel)">Odwołaj zamówienie</button>
 </div>
 
 <div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.CouldNotDeliver)">
@@ -84,6 +90,8 @@
     private StatusType StatusType;
     private bool DBsuccess = false;
     private bool reviewExists = false;
+    private bool cantCancel = false;
+    private bool cancelled = false;
 
     protected async override Task OnInitializedAsync()
     {
@@ -161,9 +169,14 @@
 
         if (response.IsSuccessStatusCode)
         {
-            DBsuccess = true;
+            cancelled = true;
             StatusType = StatusType.Cancelled;
             StatusName = Enum2String(StatusType);
+            StateHasChanged();
+        }
+        else
+        {
+            cantCancel = true;
             StateHasChanged();
         }
     }
