@@ -7,6 +7,7 @@ using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
 using System.Text;
 using OneOf;
+using CourierHubWebApi.Errors;
 
 namespace CourierHubWebApi.Services {
     public class InquireService : IInquireService {
@@ -19,12 +20,12 @@ namespace CourierHubWebApi.Services {
             _apiKeyService = apiKeyService;
         }
 
-        public async Task<OneOf<CreateInquireResponse, int>> CreateInquire(CreateInquireRequest request, int serviceId)
+        public async Task<OneOf<CreateInquireResponse, ApiError>> CreateInquire(CreateInquireRequest request, int serviceId)
         {
             Inquire inquire = request.CreateInquire();
 
             if (!IsValidServiceId(serviceId))
-                return StatusCodes.Status500InternalServerError;
+                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
 
             SetOrderCode(inquire);
 
@@ -33,7 +34,7 @@ namespace CourierHubWebApi.Services {
                 int statusCode = await AddInquireToDataBase(inquire);
                 if(statusCode != StatusCodes.Status200OK)
                 {
-                    return statusCode;
+                    return new ApiError(statusCode, null, "Internal server error");
                 }
             }
 
@@ -152,12 +153,12 @@ namespace CourierHubWebApi.Services {
         //    return default;
         //}
 
-        private OneOf<CreateInquireResponse, int> CreateResponse(Inquire inquire)
+        private OneOf<CreateInquireResponse, ApiError> CreateResponse(Inquire inquire)
         {
             decimal calculatedPrice = CalculatePrice(inquire);
-            OneOf<DateTime, int> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
+            OneOf<DateTime, ApiError> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
 
-            return cacheResult.Match(time => (OneOf<CreateInquireResponse,int>)new CreateInquireResponse(calculatedPrice, inquire.Code, time), statusCode => statusCode);
+            return cacheResult.Match(time => (OneOf<CreateInquireResponse,ApiError>)new CreateInquireResponse(calculatedPrice, inquire.Code, time), statusCode => statusCode);
         }
         //private ErrorOr<CreateInquireResponse> CreateResponse(Inquire inquire) {
         //    decimal calculatedPrice = CalculatePrice(inquire);

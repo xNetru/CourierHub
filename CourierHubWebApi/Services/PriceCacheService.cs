@@ -1,18 +1,18 @@
 ﻿using CourierHubWebApi.Services.Contracts;
-using ErrorOr;
 using OneOf;
+using CourierHubWebApi.Errors;
 
 namespace CourierHubWebApi.Services {
     public class PriceCacheService : IPriceCacheService {
         private static Dictionary<string, OfferData> _registeredOffers = new Dictionary<string, OfferData>();
 
-        public OneOf<DateTime, int> SavePrice(string InquireCode, decimal Price)
+        public OneOf<DateTime, ApiError> SavePrice(string InquireCode, decimal Price)
         {
             DateTime timeStamp = DateTime.Now.AddMinutes(15);
             if (!_registeredOffers.TryAdd(InquireCode,
                                 new OfferData(Price, timeStamp)))
             {
-                return StatusCodes.Status403Forbidden;
+                return new ApiError(StatusCodes.Status500InternalServerError, "Cannot prepare offer", "Internal server error");
             }
             return timeStamp;
         }
@@ -25,15 +25,15 @@ namespace CourierHubWebApi.Services {
         //    return timeStamp;
         //}
 
-        public OneOf<decimal, int> GetPrice(string InquireCode, DateTime obtainmentTime)
+        public OneOf<decimal, ApiError> GetPrice(string InquireCode, DateTime obtainmentTime)
         {
             if (!_registeredOffers.TryGetValue(InquireCode, out OfferData? offer))
             {
-                return StatusCodes.Status404NotFound;
+                return new ApiError(StatusCodes.Status404NotFound, "Such offer does not exist.", "Offer not found.");
             }
             if (obtainmentTime > offer.TimeStamp)
             {
-                return StatusCodes.Status408RequestTimeout;
+                return new ApiError(StatusCodes.Status408RequestTimeout, "Offer expired.", "Request timeout");
             }
             try
             {
@@ -42,7 +42,7 @@ namespace CourierHubWebApi.Services {
             }
             catch
             {
-                return StatusCodes.Status500InternalServerError;
+                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.";
             }
         }
 

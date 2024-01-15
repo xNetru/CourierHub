@@ -1,6 +1,7 @@
 ﻿using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
+using CourierHubWebApi.Errors;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
@@ -18,7 +19,7 @@ namespace CourierHubWebApi.Services {
             _apiKeyService = apiKeyService;
         }
 
-        public int CreateOrder(CreateOrderRequest request, int serviceId)
+        public OneOf<int, ApiError> CreateOrder(CreateOrderRequest request, int serviceId)
         {
             if (_apiKeyService.IsOurServiceRequest(serviceId))
                 return StatusCodes.Status200OK;
@@ -27,12 +28,12 @@ namespace CourierHubWebApi.Services {
             string inquiryCode = request.InquireCode;
 
             // checking whether offer is not expired
-            OneOf<decimal,int> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
+            OneOf<decimal,ApiError> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
             decimal? price = result.Match(x => x, x => default);
             if (price == default)
             {
                 // TODO: return valid error
-                return result.Match(x => StatusCodes.Status500InternalServerError, x => x);
+                return result.Match(x => new ApiError(StatusCodes.Status500InternalServerError), x => x);
             }
 
             order.Price = (decimal)price;
@@ -45,7 +46,7 @@ namespace CourierHubWebApi.Services {
 
             if (inquiryIdQuery.Count() != 1)
             {
-                return StatusCodes.Status500InternalServerError;
+                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
             }
 
             Inquire inquiry = inquiryIdQuery.First();
@@ -63,7 +64,7 @@ namespace CourierHubWebApi.Services {
             }
             catch
             {
-                return StatusCodes.Status500InternalServerError;
+                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
             }
             return StatusCodes.Status200OK;
         }
@@ -113,13 +114,16 @@ namespace CourierHubWebApi.Services {
         //    }
         //    return StatusCodes.Status200OK;
         //}
-        public async Task<int> WithdrawOrder(WithdrawOrderRequest request, int serviceId)
+        public async Task<OneOf<int, ApiError>> WithdrawOrder(WithdrawOrderRequest request, int serviceId)
         {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.ServiceId == serviceId && x.Inquire.Code == request.Code);
             if (orders.Count() != 1)
             {
                 // Spytać Bartka który kod
-                return StatusCodes.Status404NotFound; 
+                if (orders.Count() == 0)
+                    return new ApiError(StatusCodes.Status404NotFound, "No such order exists", "Order not found.");
+                else
+                    return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
             }
             Order order = orders.First();
             Status? status = _dbContext.Statuses.Where(x => x.Id == order.StatusId).FirstOrDefault();
@@ -133,12 +137,12 @@ namespace CourierHubWebApi.Services {
                 }
                 catch
                 {
-                    return StatusCodes.Status500InternalServerError;
+                    return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
                 }
             }
             else
             {
-                return StatusCodes.Status408RequestTimeout;
+                return new ApiError(StatusCodes.Status408RequestTimeout, "Withdrawal period elapsed.", "Order cannot be cancelled.");
             }
 
         }
@@ -166,13 +170,13 @@ namespace CourierHubWebApi.Services {
 
         //}
 
-        public OneOf<StatusType,int> GetOrderStatus(GetOrderStatusRequest request, int serviceId)
+        public OneOf<StatusType, ApiError> GetOrderStatus(GetOrderStatusRequest request, int serviceId)
         {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.Inquire.Code == request.Code && x.ServiceId == serviceId);
             Order? order = orders.FirstOrDefault();
             if (orders.Count() != 1 || order == null)
             {
-                return StatusCodes.Status500InternalServerError;
+                return new ApiError(StatusCodes.Status500InternalServerError, null, "Internal server error.");
             }
             return (StatusType)order.StatusId;
         }
