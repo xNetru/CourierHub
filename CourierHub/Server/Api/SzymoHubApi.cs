@@ -34,7 +34,9 @@ public class SzymoHubApi : IWebApi {
                 return (StatusType.Cancelled, StatusCodes.Status200OK, null);
             }
         } catch (TaskCanceledException e) {
-            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+            Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[SzymoHubApi]: Error has occured: " + e.Message);
         }
 
         if (response == null) {
@@ -92,44 +94,6 @@ public class SzymoHubApi : IWebApi {
             true,
             inquire.IsCompany);
 
-
-        //var source = new SzymoAddress(
-        //    "12",
-        //    "31",
-        //    "Bydgoska",
-        //    "Warszawa",
-        //    "02-102",
-        //    "Poland");
-
-        //var destination = new SzymoAddress(
-        //    "12",
-        //    "12",
-        //    "Warszawska",
-        //    "Bydgoszcz",
-        //    "90-930",
-        //    "Poland");
-
-        //var dimensions = new SzymoDimensions(
-        //    1.0f,
-        //    1.0f,
-        //    1.0f,
-        //    "Meters");
-
-        //var szymoInquiry = new SzymoInquiry(
-        //    dimensions,
-        //    "Pln",
-        //    2.0f,
-        //    "Kilograms",
-        //    source,
-        //    destination,
-        //    DateTime.Now.AddDays(1),
-        //    DateTime.Now.AddDays(16),
-        //    true,
-        //    "High",
-        //    true,
-        //    false);
-
-
         if (!inquiryValidator.Validate(szymoInquiry).IsValid)
             return (null, StatusCodes.Status400BadRequest);
 
@@ -140,7 +104,9 @@ public class SzymoHubApi : IWebApi {
         try {
             response = await _httpClient.PostAsJsonAsync("/Inquires", szymoInquiry, cancelToken.Token);
         } catch (TaskCanceledException e) {
-            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+            Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[SzymoHubApi]: Error has occured: " + e.Message);
         }
 
         if (response.IsSuccessStatusCode) {
@@ -188,7 +154,9 @@ public class SzymoHubApi : IWebApi {
         try {
             response = await _httpClient.PostAsJsonAsync("/Offers", szymoOffer, cancelToken.Token);
         } catch (TaskCanceledException e) {
-            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+            Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[SzymoHubApi]: Error has occured: " + e.Message);
         }
 
         if (response.IsSuccessStatusCode) {
@@ -212,7 +180,9 @@ public class SzymoHubApi : IWebApi {
         try {
             response = await _httpClient.DeleteAsync($"/offer/{code}/cancel", cancelToken.Token);
         } catch (TaskCanceledException e) {
-            Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+            Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[SzymoHubApi]: Error has occured: " + e.Message);
         }
         return (int)response.StatusCode;
     }

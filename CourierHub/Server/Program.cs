@@ -1,5 +1,6 @@
 using CourierHub.Cloud;
 using CourierHub.Server.Containers;
+using CourierHub.Server.Data;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ public class Program {
 
         builder.Services.AddSingleton<InquireCodeContainer>();
         builder.Services.AddScoped<WebApiContainer>();
+        builder.Services.AddHostedService<StatusUpdateService>();
 
         var app = builder.Build();
 
