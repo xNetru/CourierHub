@@ -75,20 +75,29 @@ namespace CourierHub.IntegrationTest.Features
             testRunner.CollectScenarioErrors();
         }
         
+        public virtual void FeatureBackground()
+        {
+#line 3
+#line hidden
+#line 4
+    testRunner.Given("the base address for OrderWithdrawal is https://localhost:7008", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+        }
+        
         void System.IDisposable.Dispose()
         {
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="User wants to withdraw an order")]
+        [Xunit.SkippableFactAttribute(DisplayName="User wants to withdraw an existing order")]
         [Xunit.TraitAttribute("FeatureTitle", "OrderWithdrawal")]
-        [Xunit.TraitAttribute("Description", "User wants to withdraw an order")]
-        public virtual void UserWantsToWithdrawAnOrder()
+        [Xunit.TraitAttribute("Description", "User wants to withdraw an existing order")]
+        public virtual void UserWantsToWithdrawAnExistingOrder()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User wants to withdraw an order", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 3
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User wants to withdraw an existing order", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 6
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -108,14 +117,61 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 4
+#line 3
+this.FeatureBackground();
+#line hidden
+#line 7
 testRunner.Given("a user having an order with code MjAyNDExNDE4MjAxNjM=", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 5
-testRunner.When("he requests withdrawal at Api/CourierHub/cancel/MjAyNDExNDE4MjAxNjM=", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 8
+testRunner.When("he requests withdrawal at Api/CourierHub/cancel/", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 6
-testRunner.Then("he receives an anwser 201", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 9
+testRunner.Then("he receives an anwser 200", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="User wants to withdraw non-existing order")]
+        [Xunit.TraitAttribute("FeatureTitle", "OrderWithdrawal")]
+        [Xunit.TraitAttribute("Description", "User wants to withdraw non-existing order")]
+        public virtual void UserWantsToWithdrawNon_ExistingOrder()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User wants to withdraw non-existing order", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 11
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 3
+this.FeatureBackground();
+#line hidden
+#line 12
+testRunner.Given("a user having an order with code 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 13
+testRunner.When("he requests withdrawal at Api/CourierHub/cancel/", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 14
+testRunner.Then("he receives an anwser 400", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

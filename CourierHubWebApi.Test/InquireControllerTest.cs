@@ -12,7 +12,7 @@
 //            IList<Inquire> inquires = new List<Inquire>();
 //            _mockContext.Setup(x => x.Inquires).ReturnsDbSet(inquires);
 
-            
+
 //        }
 //    }
 //}
