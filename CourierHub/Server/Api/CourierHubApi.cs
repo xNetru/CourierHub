@@ -25,6 +25,8 @@ public class CourierHubApi : IWebApi {
             status = await _httpClient.GetFromJsonAsync<StatusType?>($"/api/Order/Status/{code}/", cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[CourierHubApi]: Error has occured: " + e.Message);
         }
 
         if (status == null) {
@@ -71,6 +73,8 @@ public class CourierHubApi : IWebApi {
             response = await _httpClient.PostAsJsonAsync("/api/Inquire", apiInquire, cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[CourierHubApi]: Error has occured: " + e.Message);
         }
 
         if (response.IsSuccessStatusCode) {
@@ -135,6 +139,8 @@ public class CourierHubApi : IWebApi {
             response = await _httpClient.PutAsJsonAsync("/api/Order/Withdraw", new WithdrawOrderRequest(code), cancelToken.Token);
         } catch (TaskCanceledException e) {
             Console.WriteLine("CourierHubApi have not responded within 30 seconds: " + e.Message);
+        } catch (Exception e) {
+            Console.WriteLine("[CourierHubApi]: Error has occured: " + e.Message);
         }
         return (int)response.StatusCode;
     }
