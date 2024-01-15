@@ -3,10 +3,13 @@ using CourierHub.Client.Pages;
 using CourierHub.Shared.ApiModels;
 using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test {
-    public class OrderStatusTest {
+namespace CourierHub.Test.FrontendTest
+{
+    public class OrderStatusTest
+    {
         [Fact]
-        public void RendersCorrectly() {
+        public void RendersCorrectly()
+        {
             // Arrange
             var orderCode = "123";
             var service = "CourierHub";
