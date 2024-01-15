@@ -1,10 +1,12 @@
 ﻿using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
+using CourierHubWebApi.Errors;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using ErrorOr;
+using OneOf;
 
 namespace CourierHubWebApi.Services {
     public class OrderService : IOrderService {
@@ -16,7 +18,9 @@ namespace CourierHubWebApi.Services {
             _priceCacheService = priceCacheService;
             _apiKeyService = apiKeyService;
         }
-        public ErrorOr<int> CreateOrder(CreateOrderRequest request, int serviceId) {
+
+        public OneOf<int, ApiError> CreateOrder(CreateOrderRequest request, int serviceId)
+        {
             if (_apiKeyService.IsOurServiceRequest(serviceId))
                 return StatusCodes.Status200OK;
             Order order = request.CreateOrder();
@@ -24,24 +28,25 @@ namespace CourierHubWebApi.Services {
             string inquiryCode = request.InquireCode;
 
             // checking whether offer is not expired
-            ErrorOr<decimal> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
+            OneOf<decimal,ApiError> result = _priceCacheService.GetPrice(inquiryCode, DateTime.Now);
             decimal? price = result.Match(x => x, x => default);
-            if (price == default) {
+            if (price == default)
+            {
                 // TODO: return valid error
-                return Error.Failure();
+                return result.Match(x => ApiError.DefaultInternalServerError, x => x);
             }
 
             order.Price = (decimal)price;
 
             // taking matching inquiry from database 
             IQueryable<Inquire> inquiryIdQuery = from inquires
-                             in _dbContext.Inquires
+                                                 in _dbContext.Inquires
                                                  where inquires.Code == inquiryCode
                                                  select inquires;
 
-            if (inquiryIdQuery.Count() != 1) {
-                // TODO: return valid error
-                return Error.Failure();
+            if (inquiryIdQuery.Count() != 1)
+            {
+                return ApiError.DefaultInternalServerError;
             }
 
             Inquire inquiry = inquiryIdQuery.First();
@@ -52,45 +57,57 @@ namespace CourierHubWebApi.Services {
 
             order.ClientAddress = clientAddress;
 
-            try {
+            try
+            {
                 _dbContext.Add(order);
                 _dbContext.SaveChanges();
-            } catch {
-                // TODO: rollback changes
-                return Error.Failure();
+            }
+            catch
+            {
+                return ApiError.DefaultInternalServerError;
             }
             return StatusCodes.Status200OK;
         }
-
-        public async Task<ErrorOr<int>> WithdrawOrder(WithdrawOrderRequest request, int serviceId) {
+        public async Task<OneOf<int, ApiError>> WithdrawOrder(WithdrawOrderRequest request, int serviceId)
+        {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.ServiceId == serviceId && x.Inquire.Code == request.Code);
-            if (orders.Count() != 1) {
-                // TODO: pass valid error
-                return Error.Failure();
+            if (orders.Count() != 1)
+            {
+                if (orders.Count() == 0)
+                    return new ApiError(StatusCodes.Status404NotFound, "No such order exists", "Order not found.");
+                else
+                    return ApiError.DefaultInternalServerError;
             }
             Order order = orders.First();
             Status? status = _dbContext.Statuses.Where(x => x.Id == order.StatusId).FirstOrDefault();
-            if (status != null && status.IsCancelable) {
-                try {
+            if (status != null && status.IsCancelable)
+            {
+                try
+                {
                     order.StatusId = (int)StatusType.Cancelled;
                     await _dbContext.SaveChangesAsync();
                     return StatusCodes.Status200OK;
-                } catch (Exception ex) {
-                    // TODO: pass valid error
-                    return Error.Failure();
                 }
-            } else {
-                // TODO: pass valid error
-                return Error.Failure();
+                catch
+                {
+                    return ApiError.DefaultInternalServerError;
+                }
+            }
+            else
+            {
+                return new ApiError(StatusCodes.Status408RequestTimeout, "Withdrawal period elapsed.", "Order cannot be cancelled.");
             }
 
         }
-
-        public ErrorOr<StatusType> GetOrderStatus(GetOrderStatusRequest request, int serviceId) {
+        public OneOf<StatusType, ApiError> GetOrderStatus(GetOrderStatusRequest request, int serviceId)
+        {
             IQueryable<Order> orders = _dbContext.Orders.Where(x => x.Inquire.Code == request.Code && x.ServiceId == serviceId);
             Order? order = orders.FirstOrDefault();
-            if (orders.Count() != 1 || order == null) {
-                return Error.Conflict();
+            if (orders.Count() != 1 || order == null)
+            {
+                if (order == null)
+                    return new ApiError(StatusCodes.Status404NotFound, "No such order exists.", "Order not found.");
+                return ApiError.DefaultInternalServerError;
             }
             return (StatusType)order.StatusId;
         }
