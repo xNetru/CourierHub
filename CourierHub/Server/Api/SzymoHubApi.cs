@@ -168,8 +168,8 @@ public class SzymoHubApi : IWebApi {
             order.ClientAddress.Number,
             order.ClientAddress.Flat,
             order.ClientAddress.Street,
-            order.ClientAddress.PostalCode,
             order.ClientAddress.City,
+            order.ClientAddress.PostalCode,
             "Poland");
 
         var szymoOffer = new SzymoPostOfferRequest(

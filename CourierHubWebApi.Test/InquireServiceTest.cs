@@ -36,13 +36,13 @@ namespace CourierHubWebApi.Test
 
         }
 
-        [Fact]
-        public void CreateInquire_()
-        {
-            // Arrange
+        //[Fact]
+        //public void CreateInquire_()
+        //{
+        //    // Arrange
             
-            // Act
-            // Assert
-        }
+        //    // Act
+        //    // Assert
+        //}
     }
 }
