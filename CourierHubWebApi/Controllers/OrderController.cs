@@ -27,7 +27,7 @@ namespace CourierHubWebApi.Controllers {
                     statusCode => Ok(statusCode),
                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
                 },
-                errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
+                errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
         [HttpPut("Withdraw")]
         public IActionResult WithdrawOrder(WithdrawOrderRequest request,
@@ -41,7 +41,7 @@ namespace CourierHubWebApi.Controllers {
                 serviceId => _orderService.WithdrawOrder(request, serviceId).Result.Match(
                     statusCode => Ok(statusCode), 
                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
-                errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
+                errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
 
         [HttpGet("Status/{code}")]
@@ -55,8 +55,9 @@ namespace CourierHubWebApi.Controllers {
 
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.GetOrderStatus(request, serviceId).Match(
-                    orderStatusCode => Ok(orderStatusCode), errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
-                errors => Problem(detail: errors.First().Description, statusCode: errors.First().NumericType));
+                    orderStatusCode => Ok(orderStatusCode), 
+                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
+                errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
     }
 }
