@@ -8,13 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 using System.Security.Claims;
 
-namespace CourierHub.Test.FrontendTest
-{
-    public class OfficeWorkerReviewOrderTest
-    {
+namespace CourierHub.Test.FrontendTest {
+    public class OfficeWorkerReviewOrderTest {
         [Fact]
-        public void RendersCorrectly()
-        {
+        public void RendersCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -44,8 +41,7 @@ namespace CourierHub.Test.FrontendTest
         }
 
         [Fact]
-        public void AcceptCorrectly()
-        {
+        public void AcceptCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -94,8 +90,7 @@ namespace CourierHub.Test.FrontendTest
         }
 
         [Fact]
-        public void DenyCorrectly()
-        {
+        public void DenyCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";

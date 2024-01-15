@@ -2,7 +2,7 @@
 using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CourierHub.DatabaseTest; 
+namespace CourierHub.DatabaseTest;
 public class DatabaseTest : IClassFixture<CourierHubDbContext> {
 
     private readonly CourierHubDbContext _context;

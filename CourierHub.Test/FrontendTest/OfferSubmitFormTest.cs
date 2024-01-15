@@ -5,13 +5,10 @@ using CourierHub.Shared.ApiModels;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test.FrontendTest
-{
-    public class OfferSubmitFormTest
-    {
+namespace CourierHub.Test.FrontendTest {
+    public class OfferSubmitFormTest {
         [Fact]
-        public void RendersCorrectly()
-        {
+        public void RendersCorrectly() {
             // Arrange
             var mail = "test@mail.com";
             var orderCode = "123";

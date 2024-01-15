@@ -4,13 +4,10 @@ using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
 using RichardSzalay.MockHttp;
 
-namespace CourierHub.Test.FrontendTest
-{
-    public class CourierOrderDetailsTest
-    {
+namespace CourierHub.Test.FrontendTest {
+    public class CourierOrderDetailsTest {
         [Fact]
-        public void RendersCorrectly()
-        {
+        public void RendersCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -43,8 +40,7 @@ namespace CourierHub.Test.FrontendTest
         }
 
         [Fact]
-        public void PickUpCorrectly()
-        {
+        public void PickUpCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -87,8 +83,7 @@ namespace CourierHub.Test.FrontendTest
         }
 
         [Fact]
-        public void DeliverCorrectly()
-        {
+        public void DeliverCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
@@ -130,8 +125,7 @@ namespace CourierHub.Test.FrontendTest
         }
 
         [Fact]
-        public void NotDeliveredCorrectly()
-        {
+        public void NotDeliveredCorrectly() {
             // Arrange
             var orderCode = "123";
             var mail = "test@mail.com";
