@@ -1,9 +1,11 @@
-﻿using CourierHubWebApi.Extensions;
+﻿using CourierHub.Shared.Logging.Contracts;
+using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Diagnostics;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,6 +24,7 @@ namespace CourierHubWebApi.Controllers {
         /// <param name="request">Inquiry</param>
         /// <param name="validator">Validator</param>
         /// <param name="apiKeyService">ApiKeyService</param>
+        /// <param name="logger">Logger</param>
         /// <returns>Newly created offer</returns>
         /// <response code="200">Offer created</response>
         /// <response code="401">Unauthorized request</response>
@@ -31,18 +34,38 @@ namespace CourierHubWebApi.Controllers {
         [ProducesResponseType(typeof(CreateInquireResponse), 200)]
         public IActionResult CreateInquire([FromBody] CreateInquireRequest request,
             [FromServices] IValidator<CreateInquireRequest> validator,
-            [FromServices] IApiKeyService apiKeyService) {
+            [FromServices] IApiKeyService apiKeyService,
+            [FromServices] IMyLogger logger) {
+            // time measurement start
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            logger.blobData.BlobBuilder.AddRequest(request);
+
             ModelStateDictionary? errors = this.Validate<CreateInquireRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
 
-            return this.GetServiceIdFromHttpContext(apiKeyService).Match(serviceId => _inquireService.CreateInquire(request, serviceId).Result.Match(
+
+            var result = this.GetServiceIdFromHttpContext(apiKeyService).Match(serviceId => _inquireService.CreateInquire(request, serviceId).Result.Match(
                                 response => CreatedAtAction(
                                     actionName: nameof(CreateInquire),
                                     routeValues: new { id = response.Code },
                                     value: response),
                                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
                                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
+
+            return result;
+        }
+        private void PrepareBlobPathAndContainer(IMyLogger logger) 
+        {
+            DateTime now = DateTime.Now;
+            logger.blobData.PathBuilder.AddApplication(Applications.API);
+            logger.blobData.PathBuilder.AddDate(DateOnly.FromDateTime(now));
+            logger.blobData.PathBuilder.AddController("InquireController");
+            logger.blobData.PathBuilder.AddMethod("POST");
+            logger.blobData.PathBuilder.AddTime(TimeOnly.FromDateTime(now));
+
+            logger.blobData.ContainerBuilder.AddLogs();
         }
     }
+
 }

@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CourierHub.Cloud\CourierHub.Cloud.csproj" />
     <ProjectReference Include="..\CourierHub\Shared\CourierHub.Shared.csproj" />
   </ItemGroup>
 	
