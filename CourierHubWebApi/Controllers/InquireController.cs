@@ -39,14 +39,19 @@ namespace CourierHubWebApi.Controllers {
             // time measurement start
             Stopwatch stopwatch = Stopwatch.StartNew();
 
+            PrepareBlobPathAndContainer(logger);
             logger.blobData.BlobBuilder.AddRequest(request);
 
             ModelStateDictionary? errors = this.Validate<CreateInquireRequest>(validator, request);
             if (errors != null)
+            {
+                logger.blobData.BlobBuilder.AddError(errors);
+                logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
+                logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
                 return ValidationProblem(errors);
+            }
 
-
-            var result = this.GetServiceIdFromHttpContext(apiKeyService).Match(serviceId => _inquireService.CreateInquire(request, serviceId).Result.Match(
+            ObjectResult result = this.GetServiceIdFromHttpContext(apiKeyService).Match(serviceId => _inquireService.CreateInquire(request, serviceId).Result.Match(
                                 response => CreatedAtAction(
                                     actionName: nameof(CreateInquire),
                                     routeValues: new { id = response.Code },
@@ -54,8 +59,13 @@ namespace CourierHubWebApi.Controllers {
                                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
                                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
 
-            //logger.blobData.BlobBuilder.
-
+            int? statusCode = result.StatusCode;
+            if(statusCode != null)
+                logger.blobData.BlobBuilder.AddStatusCode((int)statusCode);
+            logger.blobData.BlobBuilder.AddResponse(result);
+            logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
+            if (!logger.SaveLog().Result)
+                Console.WriteLine("Could not save log");
             return result;
         }
         private void PrepareBlobPathAndContainer(IMyLogger logger) 
@@ -65,7 +75,7 @@ namespace CourierHubWebApi.Controllers {
             logger.blobData.PathBuilder.AddDate(DateOnly.FromDateTime(now));
             logger.blobData.PathBuilder.AddController("InquireController");
             logger.blobData.PathBuilder.AddMethod("POST");
-            logger.blobData.PathBuilder.AddTime(TimeOnly.FromDateTime(now));
+            logger.blobData.PathBuilder.AddTime(now.TimeOfDay);
 
             logger.blobData.ContainerBuilder.AddLogs();
         }

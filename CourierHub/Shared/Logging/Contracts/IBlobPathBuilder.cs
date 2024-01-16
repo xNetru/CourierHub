@@ -17,7 +17,7 @@ namespace CourierHub.Shared.Logging.Contracts
         void AddDate(DateOnly date);
         void AddController(string controllerName);
         void AddMethod(string methodName);
-        void AddTime(TimeOnly time);
+        void AddTime(TimeSpan time);
         void Reset();
         string? Build();
     }

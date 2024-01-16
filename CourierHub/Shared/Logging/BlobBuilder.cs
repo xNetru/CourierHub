@@ -25,7 +25,7 @@ namespace CourierHub.Shared.Logging
             _errorsBuilder.AppendLine(JsonSerializer.Serialize(error));
         }
 
-        public void AddOperationTime(TimeOnly time)
+        public void AddOperationTime(TimeSpan time)
         {
             _time = time.ToString();
         }

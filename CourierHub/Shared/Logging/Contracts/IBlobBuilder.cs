@@ -12,7 +12,7 @@ namespace CourierHub.Shared.Logging.Contracts
         void AddRequest(object request);
         void AddResponse(object response);
         void AddError(object error);
-        void AddOperationTime(TimeOnly time);
+        void AddOperationTime(TimeSpan time);
         string Build();
         void Reset();
     }

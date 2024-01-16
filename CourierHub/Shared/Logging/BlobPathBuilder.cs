@@ -40,9 +40,9 @@ namespace CourierHub.Shared.Logging
             _method = methodName;
         }
 
-        public void AddTime(TimeOnly time)
+        public void AddTime(TimeSpan time)
         {
-            _time = time.ToString("hh:mm:ss");
+            _time = time.ToString("hh\\:mm\\:ss");
         }
 
         public string? Build()
