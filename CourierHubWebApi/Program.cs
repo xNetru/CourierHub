@@ -7,7 +7,10 @@ using CourierHubWebApi.Services.Contracts;
 using CourierHubWebApi.Validations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace CourierHubWebApi {
     public class Program {
@@ -19,7 +22,8 @@ namespace CourierHubWebApi {
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
             builder.Services.AddScoped<IInquireService, InquireService>();
             builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
             builder.Services.AddScoped<IPriceCacheService, PriceCacheService>();
@@ -47,6 +51,9 @@ namespace CourierHubWebApi {
                     { scheme, new List<string>() }
                 };
                 x.AddSecurityRequirement(requirement);
+
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                x.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
 
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
@@ -60,12 +67,8 @@ namespace CourierHubWebApi {
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment()) {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            //app.UseExceptionHandler("/error");
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 

@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>a06d1420-84a0-4f34-9f0c-cddc34db794e</UserSecretsId>
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,5 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CourierHub\Shared\CourierHub.Shared.csproj" />
   </ItemGroup>
+	
+	
 
 </Project>

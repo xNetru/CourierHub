@@ -1,4 +1,5 @@
-﻿using CourierHubWebApi.Extensions;
+﻿using CourierHub.Shared.Enums;
+using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
@@ -13,6 +14,18 @@ namespace CourierHubWebApi.Controllers {
         public OrderController(IOrderService orderService) {
             _orderService = orderService;
         }
+        /// <summary>
+        /// Creates order based on passed offer
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="validator"></param>
+        /// <param name="apiKeyService"></param>
+        /// <returns>Returns status code indicating whether the order creation succeded</returns>
+        /// <response code="200">Order created successfully</response>
+        /// <response code="401">Unauthorized request</response>
+        /// <response code="404">No such offer exists</response>
+        /// <response code="408">Offer expired</response>
+        /// <response code="500">Internal server error</response>
         [HttpPost]
         public IActionResult CreateOrder(CreateOrderRequest request,
             [FromServices] IValidator<CreateOrderRequest> validator,
@@ -29,6 +42,18 @@ namespace CourierHubWebApi.Controllers {
                 },
                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
+        /// <summary>
+        /// Withdraws order
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="validator"></param>
+        /// <param name="apiKeyService"></param>
+        /// <returns>Returns status code indicating whether the order creation succeded</returns>
+        /// <response code="200">Order withdrawn successfully</response>
+        /// <response code="401">Unauthorized request</response>
+        /// <response code="404">No such order exists</response>
+        /// <response code="408">Order cancellation time elapsed</response>
+        /// <response code="500">Internal server error</response>
         [HttpPut("Withdraw")]
         public IActionResult WithdrawOrder(WithdrawOrderRequest request,
             [FromServices] IValidator<WithdrawOrderRequest> validator,
@@ -43,8 +68,20 @@ namespace CourierHubWebApi.Controllers {
                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
-
+        /// <summary>
+        /// Returns order status code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="validator"></param>
+        /// <param name="apiKeyService"></param>
+        /// <returns>Returns order status as integer</returns>
+        /// <response code="200">Order status successfully</response>
+        /// <response code="401">Unauthorized request</response>
+        /// <response code="404">No such order exists</response>
+        /// <response code="408">Order cancellation time elapsed</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet("Status/{code}")]
+        [ProducesResponseType(typeof(StatusType), StatusCodes.Status200OK)]
         public IActionResult GetOrderStatus(string code,
             [FromServices] IValidator<GetOrderStatusRequest> validator,
             [FromServices] IApiKeyService apiKeyService) {
