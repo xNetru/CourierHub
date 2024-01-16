@@ -10,7 +10,6 @@ using OneOf;
 namespace CourierHubWebApi.Extensions {
 
     public static class ApiControllerExtensions {
-        private static readonly string _serviceIdItemsIndex = "ServiceIdIndex";
         public static ModelStateDictionary? Validate<T>(this ControllerBase controller, IValidator<T> validator, T validatee) {
             ValidationResult validationResult = validator.Validate(validatee);
             if (!validationResult.IsValid) {

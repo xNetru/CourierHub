@@ -32,7 +32,6 @@ namespace CourierHubWebApi.Services {
             decimal? price = result.Match(x => x, x => default);
             if (price == default)
             {
-                // TODO: return valid error
                 return result.Match(x => ApiError.DefaultInternalServerError, x => x);
             }
 

@@ -36,10 +36,10 @@ namespace CourierHubWebApi.Validations {
             return time >= (DateTime)SqlDateTime.MinValue &&
                    time <= (DateTime)SqlDateTime.MaxValue;
         }
-        private bool BeValidPriorityType(int Priority) {
-            return Priority == (int)PriorityType.Low ||
-                   Priority == (int)PriorityType.Medium ||
-                   Priority == (int)PriorityType.High;
+        private bool BeValidPriorityType(PriorityType Priority) {
+            return Priority == PriorityType.Low ||
+                   Priority == PriorityType.Medium ||
+                   Priority == PriorityType.High;
         }
     }
 }

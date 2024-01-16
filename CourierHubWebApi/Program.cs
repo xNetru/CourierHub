@@ -1,5 +1,7 @@
 
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Models;
+using CourierHubWebApi.Examples;
 using CourierHubWebApi.Middleware;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
@@ -7,7 +9,11 @@ using CourierHubWebApi.Services.Contracts;
 using CourierHubWebApi.Validations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace CourierHubWebApi {
     public class Program {
@@ -19,6 +25,8 @@ namespace CourierHubWebApi {
 
             // Add services to the container.
 
+            //    builder.Services.AddControllers().AddJsonOptions(options =>
+            //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
             builder.Services.AddControllers();
             builder.Services.AddScoped<IInquireService, InquireService>();
             builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
@@ -47,7 +55,17 @@ namespace CourierHubWebApi {
                     { scheme, new List<string>() }
                 };
                 x.AddSecurityRequirement(requirement);
+
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                x.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                x.ExampleFilters();
             });
+
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateInquireRequestExample>();
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateInquireResponseExample>();
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateOrderRequestExample>();
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<GetOrderStatusRequestExample>();
 
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
 
@@ -60,12 +78,8 @@ namespace CourierHubWebApi {
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment()) {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            //app.UseExceptionHandler("/error");
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
