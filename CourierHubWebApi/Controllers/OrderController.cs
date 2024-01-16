@@ -1,10 +1,12 @@
 ﻿using CourierHub.Shared.Enums;
+using CourierHubWebApi.Examples;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace CourierHubWebApi.Controllers {
     [Route("api/[controller]")]
@@ -17,7 +19,7 @@ namespace CourierHubWebApi.Controllers {
         /// <summary>
         /// Creates order based on passed offer
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">Order data</param>
         /// <param name="validator"></param>
         /// <param name="apiKeyService"></param>
         /// <returns>Returns status code indicating whether the order creation succeded</returns>
@@ -27,7 +29,7 @@ namespace CourierHubWebApi.Controllers {
         /// <response code="408">Offer expired</response>
         /// <response code="500">Internal server error</response>
         [HttpPost]
-        public IActionResult CreateOrder(CreateOrderRequest request,
+        public IActionResult CreateOrder([FromBody] CreateOrderRequest request,
             [FromServices] IValidator<CreateOrderRequest> validator,
             [FromServices] IApiKeyService apiKeyService) {
             ModelStateDictionary? errors = this.Validate<CreateOrderRequest>(validator, request);
@@ -45,7 +47,7 @@ namespace CourierHubWebApi.Controllers {
         /// <summary>
         /// Withdraws order
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">Order code</param>
         /// <param name="validator"></param>
         /// <param name="apiKeyService"></param>
         /// <returns>Returns status code indicating whether the order creation succeded</returns>
@@ -55,7 +57,7 @@ namespace CourierHubWebApi.Controllers {
         /// <response code="408">Order cancellation time elapsed</response>
         /// <response code="500">Internal server error</response>
         [HttpPut("Withdraw")]
-        public IActionResult WithdrawOrder(WithdrawOrderRequest request,
+        public IActionResult WithdrawOrder([FromBody] WithdrawOrderRequest request,
             [FromServices] IValidator<WithdrawOrderRequest> validator,
             [FromServices] IApiKeyService apiKeyService) {
             ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
@@ -71,7 +73,7 @@ namespace CourierHubWebApi.Controllers {
         /// <summary>
         /// Returns order status code
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="code">Order code</param>
         /// <param name="validator"></param>
         /// <param name="apiKeyService"></param>
         /// <returns>Returns order status as integer</returns>

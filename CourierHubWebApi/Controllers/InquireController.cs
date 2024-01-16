@@ -20,8 +20,8 @@ namespace CourierHubWebApi.Controllers {
         /// Creates offer
         /// </summary>
         /// <param name="request">Inquiry</param>
-        /// <param name="validator">Inquiry</param>
-        /// <param name="apiKeyService">Inquiry</param>
+        /// <param name="validator">Validator</param>
+        /// <param name="apiKeyService">ApiKeyService</param>
         /// <returns>Newly created offer</returns>
         /// <response code="200">Offer created</response>
         /// <response code="401">Unauthorized request</response>

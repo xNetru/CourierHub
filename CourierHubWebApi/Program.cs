@@ -1,5 +1,7 @@
 
 using CourierHub.Shared.Data;
+using CourierHub.Shared.Models;
+using CourierHubWebApi.Examples;
 using CourierHubWebApi.Middleware;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
@@ -9,6 +11,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -55,7 +58,14 @@ namespace CourierHubWebApi {
 
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 x.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                x.ExampleFilters();
             });
+
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateInquireRequestExample>();
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateInquireResponseExample>();
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateOrderRequestExample>();
+            builder.Services.AddSwaggerExamplesFromAssemblyOf<GetOrderStatusRequestExample>();
 
             builder.Services.AddDbContext<CourierHubDbContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionStrings")["DefaultConnection"]));
 
