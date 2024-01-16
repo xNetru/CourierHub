@@ -15,7 +15,20 @@ namespace CourierHubWebApi.Controllers {
         public InquireController(IInquireService inquireService) {
             _inquireService = inquireService;
         }
+
+        /// <summary>
+        /// Returns offer
+        /// </summary>
+        /// <param name="request">Inquiry</param>
+        /// <param name="validator">Inquiry</param>
+        /// <param name="apiKeyService">Inquiry</param>
+        /// <response code="200">Offer created</response>
+        /// <response code="401">Unauthorized request</response>
+        /// <response code="500">Internal server error</response>
         [HttpPost]
+        [ProducesResponseType(typeof(CreateInquireResponse), 200)]
+        [ProducesResponseType(typeof(ProblemDetails), 401)]
+        [ProducesResponseType(typeof(ProblemDetails), 500)]
         public IActionResult CreateInquire(CreateInquireRequest request,
             [FromServices] IValidator<CreateInquireRequest> validator,
             [FromServices] IApiKeyService apiKeyService) {
@@ -30,7 +43,8 @@ namespace CourierHubWebApi.Controllers {
                                     actionName: nameof(CreateInquire),
                                     routeValues: new { id = response.Code },
                                     value: response),
-                                errors => Problem()), errors => Problem());
+                                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
+                                errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
 
         }
     }

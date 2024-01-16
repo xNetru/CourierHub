@@ -134,8 +134,8 @@ public class SzymoHubApi : IWebApi {
             order.ClientAddress.Number,
             order.ClientAddress.Flat,
             order.ClientAddress.Street,
-            order.ClientAddress.PostalCode,
             order.ClientAddress.City,
+            order.ClientAddress.PostalCode,
             "Poland");
 
         var szymoOffer = new SzymoPostOfferRequest(
@@ -188,7 +188,6 @@ public class SzymoHubApi : IWebApi {
     }
 
     private bool AddTokenToClient(HttpClient client) {
-        if (!_accessTokenContainer.IsServiceTokenCachedAndNotExpired(_service)) {
             string[] userCredentials = _service.ApiKey.Split(';');
             if (userCredentials.Length < 2)
                 return false;
@@ -201,7 +200,6 @@ public class SzymoHubApi : IWebApi {
                 return false;
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-        }
         return true;
     }
 }
