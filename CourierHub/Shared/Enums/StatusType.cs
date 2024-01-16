@@ -1,5 +1,8 @@
-﻿namespace CourierHub.Shared.Enums;
+﻿using System.Text.Json.Serialization;
 
+namespace CourierHub.Shared.Enums;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum StatusType {
     NotConfirmed = 1,
     Confirmed = 2,

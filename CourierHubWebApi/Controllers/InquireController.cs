@@ -17,23 +17,21 @@ namespace CourierHubWebApi.Controllers {
         }
 
         /// <summary>
-        /// Returns offer
+        /// Creates offer
         /// </summary>
         /// <param name="request">Inquiry</param>
-        /// <param name="validator">Inquiry</param>
-        /// <param name="apiKeyService">Inquiry</param>
+        /// <param name="validator">Validator</param>
+        /// <param name="apiKeyService">ApiKeyService</param>
+        /// <returns>Newly created offer</returns>
         /// <response code="200">Offer created</response>
         /// <response code="401">Unauthorized request</response>
         /// <response code="500">Internal server error</response>
         [HttpPost]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(CreateInquireResponse), 200)]
-        [ProducesResponseType(typeof(ProblemDetails), 401)]
-        [ProducesResponseType(typeof(ProblemDetails), 500)]
-        public IActionResult CreateInquire(CreateInquireRequest request,
+        public IActionResult CreateInquire([FromBody] CreateInquireRequest request,
             [FromServices] IValidator<CreateInquireRequest> validator,
             [FromServices] IApiKeyService apiKeyService) {
-
-
             ModelStateDictionary? errors = this.Validate<CreateInquireRequest>(validator, request);
             if (errors != null)
                 return ValidationProblem(errors);
@@ -45,7 +43,6 @@ namespace CourierHubWebApi.Controllers {
                                     value: response),
                                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
                                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
-
         }
     }
 }

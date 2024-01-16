@@ -65,7 +65,7 @@ public class CourierHubApi : IWebApi {
             inquire.Datetime,
             inquire.IsCompany,
             inquire.IsWeekend,
-            inquire.Priority);
+            (PriorityType)inquire.Priority);
 
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
