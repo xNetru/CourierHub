@@ -38,6 +38,7 @@ namespace CourierHubWebApi.Controllers {
             [FromServices] IMyLogger logger) {
             // time measurement start
             Stopwatch stopwatch = Stopwatch.StartNew();
+
             logger.blobData.BlobBuilder.AddRequest(request);
 
             ModelStateDictionary? errors = this.Validate<CreateInquireRequest>(validator, request);
@@ -52,6 +53,8 @@ namespace CourierHubWebApi.Controllers {
                                     value: response),
                                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
                                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
+
+            //logger.blobData.BlobBuilder.
 
             return result;
         }
