@@ -3,6 +3,11 @@ using CourierHub.Shared.Models;
 using CourierHubWebApi.Services;
 using Moq;
 using Moq.EntityFrameworkCore;
+using CourierHubWebApi.Models;
+using MaxMind.GeoIP2.Model;
+using CourierHub.Shared.Enums;
+using OneOf;
+using CourierHubWebApi.Errors;
 
 namespace CourierHubWebApi.Test {
     public class InquireServiceTest {
@@ -31,9 +36,42 @@ namespace CourierHubWebApi.Test {
         [Fact]
         public void CreateInquire_ShouldCreateOffer_WhenValidInquiryIsGiven() {
             // Arrange
+            ApiSideAddress source = new ApiSideAddress(
+                City: "New York",
+                PostalCode: "67-298",
+                Street: "Forster Avenue",
+                Number: "23",
+                Flat: null);
 
+            ApiSideAddress destination = new ApiSideAddress(
+                City: "Trenton",
+                PostalCode: "56-298",
+                Street: "Edgewood Road",
+                Number: "4",
+                Flat: "12");
+
+            DateTime requestTime = DateTime.Now;
+            DateTime sourceTime = requestTime.AddMonths(1).AddDays(10);
+            DateTime destincationTime = requestTime.AddMonths(1).AddDays(20);
+
+            CreateInquireRequest inquiry = new CreateInquireRequest(
+                Depth: 890,
+                Width: 989,
+                Length: 193,
+                Mass: 1000,
+                SourceAddress: source,
+                DestinationAddress: destination,
+                SourceDate: sourceTime,
+                DestinationDate: destincationTime,
+                Datetime: requestTime,
+                IsCompany: true,
+                IsWeekend: destincationTime.DayOfWeek == DayOfWeek.Saturday || destincationTime.DayOfWeek == DayOfWeek.Sunday,
+                PriorityType.Low);
             // Act
+            OneOf<CreateInquireResponse, ApiError> result = _inquireService.CreateInquire(inquiry, 1).Result;
+            CreateInquireResponse? response = result.Match(x => x, x => null);
             // Assert
+            Assert.NotNull(response);
         }
     }
 }

@@ -19,6 +19,7 @@ namespace CourierHubWebApi.Controllers {
         public OrderController(IOrderService orderService) {
             _orderService = orderService;
         }
+
         /// <summary>
         /// Creates order based on passed offer
         /// </summary>
@@ -62,46 +63,7 @@ namespace CourierHubWebApi.Controllers {
 
             return result;
         }
-        /// <summary>
-        /// Withdraws order
-        /// </summary>
-        /// <param name="request">Order code</param>
-        /// <param name="validator">Validator</param>
-        /// <param name="apiKeyService">ApiKeyService</param>
-        /// <param name="logger">Logger</param>
-        /// <returns>Returns status code indicating whether the order creation succeded</returns>
-        /// <response code="200">Order withdrawn successfully</response>
-        /// <response code="401">Unauthorized request</response>
-        /// <response code="404">No such order exists</response>
-        /// <response code="408">Order cancellation time elapsed</response>
-        /// <response code="500">Internal server error</response>
-        [HttpPut("Withdraw")]
-        public IActionResult WithdrawOrder([FromBody] WithdrawOrderRequest request,
-            [FromServices] IValidator<WithdrawOrderRequest> validator,
-            [FromServices] IApiKeyService apiKeyService,
-            [FromServices] IMyLogger logger) {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            PrepareBlobPathAndContainerForPutWithdraw(logger);
-
-            ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
-            if (errors != null)
-            {
-                logger.blobData.BlobBuilder.AddError(errors);
-                logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
-                logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
-                return ValidationProblem(errors);
-            }
-
-            ObjectResult result = this.GetServiceIdFromHttpContext(apiKeyService).Match(
-                serviceId => _orderService.WithdrawOrder(request, serviceId).Result.Match(
-                    statusCode => Ok(statusCode), 
-                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
-                errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
-            
-            AddResultToBlob(logger, result, stopwatch);
-
-            return result;
-        }
+        
         /// <summary>
         /// Returns order status code
         /// </summary>
@@ -146,6 +108,47 @@ namespace CourierHubWebApi.Controllers {
             return result;
         }
 
+        /// <summary>
+        /// Withdraws order
+        /// </summary>
+        /// <param name="request">Order code</param>
+        /// <param name="validator">Validator</param>
+        /// <param name="apiKeyService">ApiKeyService</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>Returns status code indicating whether the order creation succeded</returns>
+        /// <response code="200">Order withdrawn successfully</response>
+        /// <response code="401">Unauthorized request</response>
+        /// <response code="404">No such order exists</response>
+        /// <response code="408">Order cancellation time elapsed</response>
+        /// <response code="500">Internal server error</response>
+        [HttpPut("Withdraw")]
+        public IActionResult WithdrawOrder([FromBody] WithdrawOrderRequest request,
+            [FromServices] IValidator<WithdrawOrderRequest> validator,
+            [FromServices] IApiKeyService apiKeyService,
+            [FromServices] IMyLogger logger)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            PrepareBlobPathAndContainerForPutWithdraw(logger);
+
+            ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
+            if (errors != null)
+            {
+                logger.blobData.BlobBuilder.AddError(errors);
+                logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
+                logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
+                return ValidationProblem(errors);
+            }
+
+            ObjectResult result = this.GetServiceIdFromHttpContext(apiKeyService).Match(
+                serviceId => _orderService.WithdrawOrder(request, serviceId).Result.Match(
+                    statusCode => Ok(statusCode),
+                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
+                errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
+
+            AddResultToBlob(logger, result, stopwatch);
+
+            return result;
+        }
         private void PrepareBlobPathAndContainerForPostOffer(IMyLogger logger)
         {
             DateTime now = DateTime.Now;
