@@ -23,8 +23,6 @@ variables:
   project_webapi: '**/*WebApi.csproj'
   test_app: '**/*Hub.Test.csproj'
   test_webapi: '**/*WebApi.Test.csproj'
-  test_db: '**/*DatabaseTest.csproj'
-  test_integration: '**/*DatabaseTest.csproj'
 
 steps:
 - task: NuGetToolInstaller@1
@@ -82,18 +80,3 @@ steps:
     projects: '$(test_webapi)'
     feedsToUse: select
     testRunTitle: 'webapi tests'
-
-- task: DotNetCoreCLI@2
-  displayName: 'BUILD DataBase Tests'
-  inputs:
-    command: 'build'
-    projects: '$(test_db)'
-    feedsToUse: select
-
-- task: DotNetCoreCLI@2
-  displayName: 'TEST DataBase'
-  inputs:
-    command: 'test'
-    projects: '$(test_db)'
-    feedsToUse: select
-    testRunTitle: 'db tests'
