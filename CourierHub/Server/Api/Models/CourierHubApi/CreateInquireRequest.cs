@@ -1,4 +1,6 @@
-﻿namespace CourierHub.Api.Models.CourierHubApi;
+﻿using CourierHub.Shared.Enums;
+
+namespace CourierHub.Api.Models.CourierHubApi;
 
 public record CreateInquireRequest(
     int Depth,
@@ -12,4 +14,4 @@ public record CreateInquireRequest(
     DateTime Datetime,
     bool IsCompany,
     bool IsWeekend,
-    int Priority);
+    PriorityType Priority);

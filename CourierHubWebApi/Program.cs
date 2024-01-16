@@ -22,8 +22,9 @@ namespace CourierHubWebApi {
 
             // Add services to the container.
 
-            builder.Services.AddControllers().AddJsonOptions(options =>
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            //    builder.Services.AddControllers().AddJsonOptions(options =>
+            //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            builder.Services.AddControllers();
             builder.Services.AddScoped<IInquireService, InquireService>();
             builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
             builder.Services.AddScoped<IPriceCacheService, PriceCacheService>();

@@ -36,7 +36,7 @@ namespace CourierHubWebApi.Test {
                 Datetime: new DateTime(2025, 9, 10),
                 IsCompany: true,
                 IsWeekend: false,
-                Priority: 2);
+                Priority: PriorityType.High);
             // Act
             var result = await _validator.ValidateAsync(request);
             // Assert
@@ -73,7 +73,7 @@ namespace CourierHubWebApi.Test {
                 Datetime: new DateTime(2025, 9, 10),
                 IsCompany: true,
                 IsWeekend: false,
-                Priority: 2);
+                Priority: PriorityType.High);
             // Act
             var result = await _validator.ValidateAsync(request);
             // Assert
@@ -111,7 +111,7 @@ namespace CourierHubWebApi.Test {
                 Datetime: new DateTime(2025, 9, 10),
                 IsCompany: true,
                 IsWeekend: false,
-                Priority: 2);
+                Priority: PriorityType.High);
             // Act
             var result = await _validator.ValidateAsync(request);
             // Assert
@@ -148,7 +148,7 @@ namespace CourierHubWebApi.Test {
                 Datetime: new DateTime(2025, 9, 10),
                 IsCompany: true,
                 IsWeekend: false,
-                Priority: 10);
+                Priority: (PriorityType)10);
             // Act
             var result = await _validator.ValidateAsync(request);
             // Assert
@@ -185,7 +185,7 @@ namespace CourierHubWebApi.Test {
                 Datetime: new DateTime(2025, 9, 10),
                 IsCompany: true,
                 IsWeekend: false,
-                Priority: 2);
+                Priority: PriorityType.High);
             // Act
             var result = await _validator.ValidateAsync(request);
             // Assert
