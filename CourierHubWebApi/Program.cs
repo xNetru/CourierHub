@@ -88,7 +88,9 @@ namespace CourierHubWebApi {
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CourierHub-BCK API v1");
+            });
 
             app.UseHttpsRedirection();
 
