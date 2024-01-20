@@ -80,7 +80,8 @@ namespace CourierHub.IntegrationTest.Features
 #line 3
 #line hidden
 #line 4
-    testRunner.Given("the base address for OrderWithdrawal is https://localhost:7008", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+    testRunner.Given("the base address for OrderWithdrawal is https://courierhub-bck.azurewebsites.net/" +
+                    "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
         
