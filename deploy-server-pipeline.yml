@@ -10,9 +10,7 @@ trigger:
 
 pool:
   vmImage: 'windows-latest'
-  name: Default
-  demands:
-  - Agent.Name -equals SKAM
+  name: 'Azure Pipelines'
 
 variables:
   solution: '**/*.sln'
