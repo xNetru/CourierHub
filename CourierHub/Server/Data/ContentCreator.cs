@@ -16,9 +16,41 @@ public class ContentCreator {
     }
 
     public EmailContent CreateMailContent(ApiMailContent content) {
-        // tu trzeba stworzyć zawartość maila z linkiem
-        // coś dla ciebie Maks
-        throw new NotImplementedException();
+        int index = content.Link.LastIndexOf('/');
+        string code = content.Link.Substring(index + 1);
+        string htmlContent =
+        $@"
+            <!DOCTYPE html>
+            <html lang=""pl"">
+            <head>
+                <meta charset=""UTF-8"">
+                <meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
+                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                <title>Status paczki</title>
+            </head>
+            <body style=""font-family: Arial, sans-serif;"">
+            
+                <h2>Szanowny/a {content.Client.Name} {content.Client.Surname},</h2>
+            
+                <p>Mamy nadzieję, że niniejsza wiadomość znajdzie Cię w dobrym zdrowiu. Chcielibyśmy poinformować Cię o aktualnym statusie Twojego zamówienia o kodzie {code}.</p>
+            
+                <p>Możesz sprawdzić aktualny status swojego zamówienia, klikając na poniższy link:</p>
+            
+                <p><a href=""{content.Link}"">Sprawdź Status Zamówienia</a></p>
+            
+                <p>Jeśli masz jakiekolwiek pytania lub obawy, prosimy o kontakt z naszym działem obsługi klienta.</p>
+            
+                <p>Dziękujemy za wybór naszych usług!</p>
+            
+                <p>Z poważaniem,<br>
+                CourierHub</p>
+            
+            </body>
+            </html>
+        ";
+        EmailContent email = new EmailContent($"Status zamówienia {code}");
+        email.Html = htmlContent;
+        return email;
     }
 
     public string CreateContract(ApiContract contract) {
@@ -27,7 +59,7 @@ public class ContentCreator {
             "                                                        CONTRACT\r\n" +
            $"                                       {contract.Code}\r\n" +
             "\r\n" +
-           $"This Agreement is entered into on {contract.DateTime:dd.MM.YYYY}, between:\r\n" +
+           $"This Agreement is entered into on {contract.DateTime:dd.MM.yyyy}, between:\r\n" +
             "\r\n" +
            $"{(contract.Client.Company ?? contract.Client.Name + " " + contract.Client.Surname)}, hereinafter referred to as the \"Client,\" located at {contract.Client.Address.Street} {contract.Client.Address.Number} {contract.Client.Address.City}\r\n" +
             "" +
@@ -71,15 +103,15 @@ public class ContentCreator {
     public string CreateReceipt(ApiReceipt receipt) {
         string text =
            $"Order code: {receipt.Code}\r\n" +
-           $"Date: {receipt.DateTime:dd.MM.YYYY}\r\n" +
+           $"Date: {receipt.DateTime:dd.MM.yyyy}\r\n" +
             "\r\n" +
             "Order details:\r\n" +
            $"  Depth: {receipt.Inquire.Depth}\r\n" +
            $"  Width: {receipt.Inquire.Width}\r\n" +
            $"  Length: {receipt.Inquire.Length}\r\n" +
            $"  Mass: {receipt.Inquire.Mass}\r\n" +
-           $"  Source Date: {receipt.Inquire.SourceDate:dd.MM.YYYY}\r\n" +
-           $"  Destination Date: {receipt.Inquire.DestinationDate:dd.MM.YYYY}\r\n" +
+           $"  Source Date: {receipt.Inquire.SourceDate:dd.MM.yyyy}\r\n" +
+           $"  Destination Date: {receipt.Inquire.DestinationDate:dd.MM.yyyy}\r\n" +
            $"  Is Company: {receipt.Inquire.IsCompany}\r\n" +
            $"  Is Weekend: {receipt.Inquire.IsWeekend}\r\n" +
            $"  Priority: {receipt.Inquire.Priority}\r\n" +

@@ -1,31 +1,25 @@
 ﻿using CourierHubWebApi.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 
 namespace CourierHubWebApi.Middleware {
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class ApiKeyMiddleware {
         private readonly RequestDelegate _next;
-        private static readonly string _apiKeyName = "X-Api-Key";
-        private static readonly string _serviceId = "ServiceIdIndex";
+        //private static readonly string _serviceId = "ServiceIdIndex";
         public ApiKeyMiddleware(RequestDelegate next) {
             _next = next;
         }
 
         public Task Invoke(HttpContext context, [FromServices] IApiKeyService apiKeyService) {
-            if (!context.Request.Headers.TryGetValue(_apiKeyName, out StringValues extractedApiKey)) {
-                context.Response.StatusCode = 401;
+            if (!apiKeyService.TryExtractApiKey(context, out string apiKey)) {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return context.Response.WriteAsync("Api Key was not provided");
             }
-            string? serviceIdIndex = context.RequestServices.GetRequiredService<IConfiguration>().GetValue<string>(_serviceId);
-            string? key = extractedApiKey.First();
-            if (key == null || !apiKeyService.TryGetServiceId(key, out int serviceId)) {
-                context.Response.StatusCode = 401;
+
+            if (!apiKeyService.TryGetServiceId(apiKey, out int serviceId)) {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return context.Response.WriteAsync("Unauthorized client");
             }
-
-            if (serviceIdIndex != null)
-                context.Items[serviceIdIndex] = serviceId.ToString();
 
             return _next(context);
 

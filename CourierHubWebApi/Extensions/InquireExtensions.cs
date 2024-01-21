@@ -15,7 +15,7 @@ namespace CourierHubWebApi.Extensions {
             inquire.Datetime = request.Datetime;
             inquire.IsCompany = request.IsCompany;
             inquire.IsWeekend = request.IsWeekend;
-            inquire.Priority = request.Priority;
+            inquire.Priority = (int)request.Priority;
             inquire.Source = request.CreateSourceAddress();
             inquire.Destination = request.CreateDestinationAddress();
 

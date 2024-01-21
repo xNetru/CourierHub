@@ -1,5 +1,6 @@
+using CourierHub.Cloud;
+using CourierHub.Server.Containers;
 using CourierHub.Server.Data;
-using CourierHub.Shared.Abstractions;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Static;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +37,9 @@ public class Program {
             return new AzureCommunicationService(connection, sender);
         });
 
-        builder.Services.AddSingleton(provider => {
-            return new InquireCodeContainer();
-        });
+        builder.Services.AddSingleton<InquireCodeContainer>();
+        builder.Services.AddScoped<WebApiContainer>();
+        builder.Services.AddHostedService<StatusUpdateService>();
 
         var app = builder.Build();
 
@@ -62,6 +63,7 @@ public class Program {
         app.MapRazorPages();
         app.MapControllers();
         app.MapFallbackToFile("index.html");
+
 
         app.Run();
     }

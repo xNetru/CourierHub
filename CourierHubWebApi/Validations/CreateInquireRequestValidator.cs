@@ -1,21 +1,13 @@
-﻿using CourierHub.Shared.Data;
-using CourierHub.Shared.Enums;
-using CourierHub.Shared.Models;
+﻿using CourierHub.Shared.Enums;
 using CourierHubWebApi.Models;
 using FluentValidation;
 using System.Data.SqlTypes;
 
 namespace CourierHubWebApi.Validations {
     public class CreateInquireRequestValidator : AbstractValidator<CreateInquireRequest> {
-        private CourierHubDbContext _dbContext;
         private static ApiSideAddressValidator _apiSideAddressValidator = new ApiSideAddressValidator();
 
-        public CreateInquireRequestValidator(CourierHubDbContext CourierHubDbContext) {
-            _dbContext = CourierHubDbContext;
-
-            // Client Id Validation
-            // RuleFor(x => x.ClientId).Must(ClientId => BeNullOrExistInDatabaseAsync(ClientId).Result);
-
+        public CreateInquireRequestValidator() {
             // Dimensions
             RuleFor(x => x.Depth).GreaterThan(0);
             RuleFor(x => x.Width).GreaterThan(0);
@@ -44,20 +36,10 @@ namespace CourierHubWebApi.Validations {
             return time >= (DateTime)SqlDateTime.MinValue &&
                    time <= (DateTime)SqlDateTime.MaxValue;
         }
-        private async Task<bool> BeNullOrExistInDatabaseAsync(int? ClientId) {
-            if (ClientId == null)
-                return true;
-            User? result = await _dbContext.Users.FindAsync(ClientId);
-            if (result == null)
-                return false;
-            if (result.Type == (int)UserType.Client)
-                return true;
-            return false;
-        }
-        private bool BeValidPriorityType(int Priority) {
-            return Priority == (int)PriorityType.Low ||
-                   Priority == (int)PriorityType.Medium ||
-                   Priority == (int)PriorityType.High;
+        private bool BeValidPriorityType(PriorityType Priority) {
+            return Priority == PriorityType.Low ||
+                   Priority == PriorityType.Medium ||
+                   Priority == PriorityType.High;
         }
     }
 }

@@ -1,0 +1,205 @@
+﻿@page "/order/Status/{orderCode}"
+
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
+@using Radzen.Blazor
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+
+<h1 style="text-align: center;">Status zamówienia</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Serwis</th>
+            <th>Kod</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="white-space:nowrap">@service</td>
+            <td style="white-space:nowrap">@orderCode</td>
+            <td style="white-space:nowrap">@StatusName</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="col" style="text-align: center;">
+    @if (cancelled)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Status zmieniony </label>
+        </div>
+    }
+    @if (cantCancel)
+    {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Nie da się odwołać tego zamówienia - skontaktuj się z obsługą serwisu: @service</label>
+        </div>
+    }
+    <br/>
+    <button class="btn btn-primary" @onclick="() => Cancel()" hidden="@(cancelled || cantCancel)">Odwołaj zamówienie</button>
+</div>
+
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.CouldNotDeliver)">
+    <hr />
+    <h1 style="padding-top: 25px;">Powód nieudanej dostawy</h1>
+    <br />
+    <textarea rows="10" cols="100" @bind=@Parcel.UndeliveredReason readonly=true />
+    <br />
+</div>
+
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.Denied)">
+    <hr />
+    <h1 style="padding-top: 25px;">Powód odrzucenia</h1>
+    <br />
+    <textarea rows="10" cols="100" @bind=@Evaluation.RejectionReason readonly=true />
+    <br />
+</div>
+
+<div style="text-align: center; padding-top: 25px; padding-bottom: 10px" hidden="@(StatusType != StatusType.CouldNotDeliver && StatusType != StatusType.Delivered)">
+    <hr />
+    <h1 style="padding-top: 25px;">Ocena serwisu</h1>
+    <br/>
+    <div class="rz-p-6 rz-text-align-center" disabled="@reviewExists">
+        <RadzenRating @bind-Value=@Review.Value ReadOnly="@reviewExists"/>
+    </div>
+    <br/>
+    <textarea id="ReviewTextArea" rows="10" cols="100" @bind=@Review.Description placeholder="@(reviewExists ? "" : "Napisz swoją recenzję...")" disabled="@reviewExists" />
+    <br/>
+    @if (DBsuccess) {
+        <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+            <label class="p-2">Ocena zapisana </label>
+        </div>
+    }
+    <br/>
+    <button class="btn btn-primary" @onclick="() => Submit()" hidden="@reviewExists">Zatwierdź ocenę</button>
+</div>
+
+@code {
+    [Parameter]
+    public string? orderCode { get; set; }
+    private string? StatusName;
+    private string? service;
+    private ApiStatus Status = new ApiStatus();
+    private ApiReview Review = new ApiReview { Value = -1 };
+    private ApiEvaluation Evaluation = new ApiEvaluation();
+    private ApiParcel Parcel = new ApiParcel();
+    private StatusType StatusType;
+    private bool DBsuccess = false;
+    private bool reviewExists = false;
+    private bool cantCancel = false;
+    private bool cancelled = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var x = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/status");
+        Console.WriteLine(x.StatusCode + " GET ORDERS STATUS");
+        var y = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/service");
+        Console.WriteLine(y.StatusCode + " GET ORDERS SERVICE");
+        var z = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/evaluation");
+        Console.WriteLine(z.StatusCode + " GET ORDERS EVALUATION");
+        var v = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/review");
+        Console.WriteLine(v.StatusCode + " GET ORDERS REVIEW");
+        var t = await Http.GetAsync($"{Http.BaseAddress}Order/{orderCode}/parcel");
+        Console.WriteLine(t.StatusCode + " GET ORDERS PARCEL");
+        if (x.IsSuccessStatusCode && y.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<ApiStatus>();
+            var s = await y.Content.ReadAsStringAsync();
+            if (c != null && s != null)
+            {
+                int startIndex = s.IndexOf("<title>") + "<title>".Length;
+                int endIndex = s.IndexOf("</title>", startIndex);
+                if (startIndex >= 0 && endIndex > startIndex)
+                {
+                    s = s.Substring(startIndex, endIndex - startIndex);
+                }
+
+                service = s;
+                Status = c;
+                Enum.TryParse(Status.Name, out StatusType);
+                StatusName = Enum2String(StatusType);
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+
+        if (z.IsSuccessStatusCode)
+        {
+            var e = await z.Content.ReadFromJsonAsync<ApiEvaluation>();
+            if (e != null)
+            {
+                Evaluation = e;
+            }
+        }
+
+        if (v.IsSuccessStatusCode)
+        {
+            var r = await v.Content.ReadFromJsonAsync<ApiReview>();
+            if (r != null)
+            {
+                Review = r;
+                reviewExists = true;
+            }
+        }
+
+        if (t.IsSuccessStatusCode)
+        {
+            var p = await t.Content.ReadFromJsonAsync<ApiParcel>();
+            if (p != null)
+            {
+                Parcel = p;
+            }
+        }
+    }
+
+    private async void Cancel()
+    {
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Api/{service}/cancel/{orderCode}", service); // fake content for PATCH
+        Console.WriteLine("PATCH REVIEW STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            cancelled = true;
+            StatusType = StatusType.Cancelled;
+            StatusName = Enum2String(StatusType);
+            StateHasChanged();
+        }
+        else
+        {
+            cantCancel = true;
+            StateHasChanged();
+        }
+    }
+
+    private async void Submit()
+    {
+        Review.Datetime = DateTime.Today;
+
+        var response = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/Review", Review);
+        Console.WriteLine("PATCH REVIEW STATUS : " + response.StatusCode);
+
+        if (response.IsSuccessStatusCode) {
+            DBsuccess = true;
+            reviewExists = true;
+            StateHasChanged();
+        }
+    }
+
+    private string? Enum2String(StatusType StatusType)
+    {
+        int type = (int)StatusType;
+        StatusTypePL StatusTypePL = (StatusTypePL)Enum.ToObject(typeof(StatusTypePL), type);
+        string? res = Enum.GetName(typeof(StatusTypePL), StatusTypePL);
+        return res?.Replace('_', ' ');
+    }
+}

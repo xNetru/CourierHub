@@ -1,13 +1,15 @@
-﻿using ErrorOr;
+﻿using CourierHubWebApi.Errors;
+using CourierHubWebApi.Services.Contracts;
+using ErrorOr;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using OneOf;
 
 namespace CourierHubWebApi.Extensions {
 
     public static class ApiControllerExtensions {
-        private static readonly string _serviceIdItemsIndex = "ServiceIdIndex";
         public static ModelStateDictionary? Validate<T>(this ControllerBase controller, IValidator<T> validator, T validatee) {
             ValidationResult validationResult = validator.Validate(validatee);
             if (!validationResult.IsValid) {
@@ -23,20 +25,15 @@ namespace CourierHubWebApi.Extensions {
             }
             return null;
         }
-        public static ErrorOr<int> ExtractServiceIdFromContext(this ControllerBase controller) {
-            string? serviceIdItemsIndex = controller.HttpContext.RequestServices.GetRequiredService<IConfiguration>().GetValue<string>(_serviceIdItemsIndex);
-            if (serviceIdItemsIndex != null) {
-                if (controller.HttpContext.Items.TryGetValue(serviceIdItemsIndex, out object? stringServiceId)) {
-                    if (stringServiceId is string s) {
-                        if (int.TryParse(s, out int serviceId)) {
-                            // In case of errors inside _inquireService the information about them is not passed
-                            // TODO: passing errors
-                            return serviceId;
-                        }
-                    }
+        public static OneOf<int, ApiError> GetServiceIdFromHttpContext(this ControllerBase controller,
+            IApiKeyService apiKeyService) {
+            if (apiKeyService.TryExtractApiKey(controller.HttpContext, out string apiKey)) {
+                if (apiKeyService.TryGetServiceId(apiKey, out int serviceId)) {
+                    return serviceId;
                 }
+                return new ApiError(StatusCodes.Status401Unauthorized, "Invalid API key.", "Unauthorized.");
             }
-            return Error.Custom(description: "Middleware error", type: (int)ErrorType.Unexpected, code: "500");
+            return new ApiError(StatusCodes.Status401Unauthorized, "Api key was not provided.", "Unauthorized.");
         }
     }
 }

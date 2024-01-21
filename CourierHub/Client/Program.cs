@@ -1,4 +1,4 @@
-using CourierHub.Shared.Data;
+using CourierHub.Client.Data;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 

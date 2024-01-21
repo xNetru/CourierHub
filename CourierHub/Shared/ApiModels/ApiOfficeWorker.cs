@@ -7,10 +7,12 @@ public class ApiOfficeWorker {
     public string Email { get; set; } = null!;
 
     [Required(ErrorMessage = "Imię jest wymagane")]
+    [MaxLength(50)]
     [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Imię musi się zaczynać od duzej litery")]
     public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "Nazwisko jest wymagane")]
+    [MaxLength(50)]
     [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "Nazwisko musi się zaczynać od duzej litery")]
     public string Surname { get; set; } = null!;
 

@@ -1,0 +1,80 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+  branches:
+    include:
+      - dev
+
+pool:
+  vmImage: 'windows-latest'
+  name: 'Azure Pipelines'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  project_cloud: '**/*Cloud.csproj'
+  project_server: '**/*Server.csproj'
+  project_webapi: '**/*WebApi.csproj'
+  test_app: '**/*Hub.Test.csproj'
+  test_webapi: '**/*WebApi.Test.csproj'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'BUILD Cloud'
+  inputs:
+    command: 'build'
+    projects: '$(project_cloud)'
+    feedsToUse: select
+
+- task: DotNetCoreCLI@2
+  displayName: 'BUILD Server'
+  inputs:
+    command: 'build'
+    projects: '$(project_server)'
+    feedsToUse: select
+
+- task: DotNetCoreCLI@2
+  displayName: 'BUILD App Test'
+  inputs:
+    command: 'build'
+    projects: '$(test_app)'
+    feedsToUse: select
+
+- task: DotNetCoreCLI@2
+  displayName: 'TEST App'
+  inputs:
+    command: 'test'
+    projects: '$(test_app)'
+    feedsToUse: select
+
+- task: DotNetCoreCLI@2
+  displayName: 'BUILD WebApi'
+  inputs:
+    command: 'build'
+    projects: '$(project_webapi)'
+    feedsToUse: select
+
+- task: DotNetCoreCLI@2
+  displayName: 'BUILD WebApi Tests'
+  inputs:
+    command: 'build'
+    projects: '$(test_webapi)'
+    feedsToUse: select
+
+- task: DotNetCoreCLI@2
+  displayName: 'TEST WebApi'
+  inputs:
+    command: 'test'
+    projects: '$(test_webapi)'
+    feedsToUse: select
+    testRunTitle: 'webapi tests'

@@ -4,6 +4,7 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CourierHub.Shared.Controllers;
 [ApiController]
@@ -31,9 +32,30 @@ public class CourierController : ControllerBase {
         return Ok((ApiCourier)user);
     }
 
-    // PATCH: <CourierController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/parcel/{...}
-    [HttpPatch("{email}/order/{code}/parcel")]
-    public async Task<ActionResult> PatchParcel(string email, string code, [FromBody] ApiParcel? parcel) {
+    // GET: <CourierController>/email@gmail.com/order
+    [HttpGet("{mail}/order")]
+    public async Task<ActionResult<IEnumerable<ApiOrder>>> GetOrders(string mail) {
+        if (mail == null) { return BadRequest(); }
+        var orders = await _context.Orders.Where(e =>
+            e.StatusId == (int)StatusType.PickedUp &&
+            e.Parcel != null &&
+            e.Parcel.Courier != null &&
+            e.Parcel.Courier.Email == mail
+        ).ToListAsync();
+        if (orders.IsNullOrEmpty()) { return NotFound(Array.Empty<Order>()); }
+
+        var apiOrders = new List<ApiOrder>();
+        foreach (var order in orders) {
+            order.ClientAddress = (await _context.Addresses.FirstOrDefaultAsync(e => e.Id == order.ClientAddressId))!;
+            order.Inquire = (await _context.Inquires.FirstOrDefaultAsync(e => e.Id == order.InquireId))!;
+            apiOrders.Add((ApiOrder)order);
+        }
+        return Ok(apiOrders);
+    }
+
+    // PATCH: <CourierController>/email@gmail.com/order/q1w2-e3r4-t5y6-u7i8-o9p0/parcel/1/{...}
+    [HttpPatch("{email}/order/{code}/parcel/{status}")]
+    public async Task<ActionResult> PatchParcel(string email, string code, int status, [FromBody] ApiParcel? parcel) {
         if (parcel == null) { return BadRequest(); }
 
         var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email && e.Type == (int)UserType.Courier);
@@ -44,11 +66,16 @@ public class CourierController : ControllerBase {
 
         var parcelDB = (Parcel)parcel;
         parcelDB.CourierId = user.Id;
-        await _context.Parcels.AddAsync(parcelDB);
+        if (order.ParcelId != null) {
+            order.Parcel = parcelDB;
+            order.Parcel.Id = order.ParcelId.Value;
+        } else {
+            await _context.Parcels.AddAsync(parcelDB);
+        }
         await _context.SaveChangesAsync();
 
         order.ParcelId = parcelDB.Id;
-        order.StatusId = (int)StatusType.PickedUp;
+        order.StatusId = status;
         await _context.SaveChangesAsync();
         return Ok();
     }

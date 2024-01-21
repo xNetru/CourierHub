@@ -1,7 +1,7 @@
 ﻿@page "/offerSubmitForm/{mail}"
 
 @using CourierHub.Shared.Models
-@using CourierHub.Shared.Data
+@using CourierHub.Client.Data
 @using System.Text.Json;
 @using System.Text;
 @using CourierHub.Shared.ApiModels
@@ -118,7 +118,7 @@
                 <div class="form-group row" style="margin-top:10px">
                     <div class="col-md-6">
                         <label for="OfferProvider" class="col-form-label">Serwis kurierski</label>
-                        <input type="text" class="form-control" id="OfferProvider" @bind-value="@Service" disabled="true" />
+                        <input type="text" class="form-control" id="OfferProvider" @bind-value="@Offer.ServiceName" disabled="true" />
                     </div>
 
                     <div class="col-md-6">
@@ -274,7 +274,14 @@
         @if (displayOfferConfirmed)
         {
             <div class="row bg-success text-white" style="margin-top:10px; height:40px">
-                <label class="p-2">Oferta przesłana do akceptacji :) </label>
+                <label class="p-2">Oferta przesłana do akceptacji</label>
+            </div>
+        }
+
+        @if (displayOfferExpired)
+        {
+            <div class="row bg-success text-white" style="margin-top:10px; height:40px">
+                <label class="p-2">Oferta jest już nieaktualna</label>
             </div>
         }
 
@@ -289,31 +296,37 @@
 
     private ApiOrder NewOrder = new ApiOrder {
             ClientAddress = new ApiAddress(),
-            Code = "", // from Offer
+            Code = "",
             ClientCompany = ""
     };
-    private ApiOffer Offer = new ApiOffer { // from inquireForm
+    private ApiOffer Offer = new ApiOffer {
         ExpirationDate = new DateTime()
     };
-    private ApiInquire Inquire = new ApiInquire { // from inquireForm
+    private ApiInquire Inquire = new ApiInquire {
         Source = new ApiAddress(),
         Destination = new ApiAddress(),
         Priority = 0
     };
-    private string Service = "Kurieroinator";
 
     private bool displayOfferConfirmed = false;
+    private bool displayOfferExpired = false;
     private bool isButtonDisabled = false;
 
     private async void HandleValidSubmit(EditContext context)
     {
-        const string SERVICENAME = "CourierHub"; // needs to be readen from form, service chosen by client
+        if (Offer.ExpirationDate < DateTime.Now)
+        {
+            displayOfferExpired = true;
+            isButtonDisabled = true;
+            return;
+        }
 
-        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/{SERVICENAME}/order/", NewOrder);
+        var response = await Http.PostAsJsonAsync($"{Http.BaseAddress}Api/{Offer.ServiceName}/order/", NewOrder);
         Console.WriteLine("POST ORDER STATUS : " + response.StatusCode);
         if (response.IsSuccessStatusCode) {
             displayOfferConfirmed = true;
             isButtonDisabled = true;
+            StateHasChanged();
         } else {
             Console.WriteLine("POST ORDER FAILED");
         }
@@ -327,9 +340,10 @@
     protected async override Task OnInitializedAsync()
     {
         Inquire = UserInquires.Inquires.Last();
-        Offer = UserOffers.Offers.First(); // for now as we have only our API
+        Offer = UserOffers.Offers.First();
         NewOrder.Code = Offer.Code;
         NewOrder.Price = Offer.Price;
+        Inquire.Code = Offer.Code;
 
         if (Role.Roles["Client"])
         {
@@ -341,9 +355,11 @@
                 var c = await x.Content.ReadFromJsonAsync<ApiClient>();
                 if (c != null)
                 {
+                    c.Address.Flat = c.Address.Flat.TrimEnd();
+                    c.Address.Number = c.Address.Number.TrimEnd();
                     NewOrder.ClientName = c.Name;
                     NewOrder.ClientSurname = c.Surname;
-                    NewOrder.ClientPhone = c.Phone;
+                    NewOrder.ClientPhone = c.Phone.TrimEnd();
                     NewOrder.ClientAddress = c.Address;
                     NewOrder.ClientCompany = c.Company;
                     NewOrder.ClientEmail = mail;

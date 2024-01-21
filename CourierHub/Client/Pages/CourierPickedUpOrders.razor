@@ -1,0 +1,74 @@
+﻿@page "/Courier/orders/pickedup"
+
+@using CourierHub.Shared.ApiModels
+@using CourierHub.Shared.Enums
+@using Radzen
+@using Radzen.Blazor
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider Provider
+@inject NavigationManager NavigationManager
+
+<h1>Dostępne paczki</h1>
+
+<RadzenDataGrid style="--rz-grid-header-text-transform: none; --rz-grid-header-font-size: 20px;" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.SimpleWithMenu" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@Orders" TItem="ApiOrder" LogicalFilterOperator="LogicalFilterOperator.Or"
+                EmptyText="Brak pasujących rekordów" ContainsText="Zawiera ..." StartsWithText="Zaczyna się od ..." EndsWithText="Kończy się na ..." DoesNotContainText="Nie zawiera ..." IsNullText="Jest NULLem" IsEmptyText="Jest puste" IsNotEmptyText="Nie jest puste"
+                IsNotNullText="Nie jest NULLem" EqualsText="Jest równe ..." NotEqualsText="Nie jest równe ..." GreaterThanOrEqualsText="Większe lub równe ..." GreaterThanText="Większe niż ..."
+                LessThanOrEqualsText="Mniejsze lub równe ..." LessThanText="Mniejsze niż ..." ApplyFilterText="Zastosuj" ClearFilterText="Wyczyść" FilterText="Filtr">
+    <Columns>
+        <RadzenDataGridColumn TItem="ApiOrder" Property="Code" Filterable="true" Sortable="true" Title="Kod" Frozen="true" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="ApiOrder" Context="Order" Filterable="false" Sortable="false" Frozen="true" Width="80px" TextAlign="TextAlign.Center" >
+            <Template Context="Order">
+                <RadzenButton RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => Choose(Order))" @onclick:stopPropagation="true" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private IEnumerable<ApiOrder> Orders = new List<ApiOrder>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var state = await Provider.GetAuthenticationStateAsync();
+        var email = state.User.Claims.FirstOrDefault(c => c.Type == "email");
+
+        var x = await Http.GetAsync($"{Http.BaseAddress}Courier/{email?.Value}/order");
+        Console.WriteLine(x.StatusCode + " GET COURIER ORDERS");
+
+        if (x.IsSuccessStatusCode)
+        {
+            var c = await x.Content.ReadFromJsonAsync<ApiOrder[]>();
+            if (c != null)
+            {
+                Orders = c;
+            }
+            else
+            {
+                Console.WriteLine("BAD DESERIALIZATION");
+            }
+        }
+        else
+        {
+            Console.WriteLine("FAIL");
+        }
+    }
+
+    private async void Choose(ApiOrder item)
+    {
+        var context = await Provider.GetAuthenticationStateAsync();
+        var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
+        string mail = "";
+        if (email != null)
+        {
+            mail = email.Value;
+        }
+        else
+        {
+            Console.WriteLine("BAD MAIL");
+            return;
+        }
+        NavigationManager.NavigateTo($"/Courier/order/details/{item.Code}/{mail}");
+    }
+}
