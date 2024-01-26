@@ -43,8 +43,7 @@ namespace CourierHubWebApi.Controllers {
             logger.blobData.BlobBuilder.AddRequest(request);
 
             ModelStateDictionary? errors = this.Validate<CreateInquireRequest>(validator, request);
-            if (errors != null)
-            {
+            if (errors != null) {
                 logger.blobData.BlobBuilder.AddError(errors);
                 logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
                 logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
@@ -56,11 +55,11 @@ namespace CourierHubWebApi.Controllers {
                                     actionName: nameof(CreateInquire),
                                     routeValues: new { id = response.Code },
                                     value: response),
-                                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
+                                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
 
             int? statusCode = result.StatusCode;
-            if(statusCode != null)
+            if (statusCode != null)
                 logger.blobData.BlobBuilder.AddStatusCode((int)statusCode);
             logger.blobData.BlobBuilder.AddResponse(result);
             logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
@@ -68,8 +67,7 @@ namespace CourierHubWebApi.Controllers {
                 Console.WriteLine("Could not save log");
             return result;
         }
-        private void PrepareBlobPathAndContainer(IMyLogger logger) 
-        {
+        private void PrepareBlobPathAndContainer(IMyLogger logger) {
             DateTime now = DateTime.Now;
             logger.blobData.PathBuilder.AddApplication(Applications.API);
             logger.blobData.PathBuilder.AddDate(DateOnly.FromDateTime(now));

@@ -1,9 +1,9 @@
-﻿using CourierHubWebApi.Models;
+﻿using CourierHubWebApi.Errors;
+using CourierHubWebApi.Models;
 using OneOf;
-using CourierHubWebApi.Errors;
 
 namespace CourierHubWebApi.Services.Contracts {
     public interface IInquireService {
-        Task<OneOf<CreateInquireResponse,ApiError>> CreateInquire(CreateInquireRequest inquire, int serviceId);
+        Task<OneOf<CreateInquireResponse, ApiError>> CreateInquire(CreateInquireRequest inquire, int serviceId);
     }
 }

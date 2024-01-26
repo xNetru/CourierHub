@@ -1,7 +1,6 @@
 
 using CourierHub.Cloud;
 using CourierHub.Shared.Data;
-using CourierHub.Shared.Models;
 using CourierHubWebApi.Examples;
 using CourierHubWebApi.Middleware;
 using CourierHubWebApi.Models;
@@ -14,9 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
-using System.Text.Json.Serialization;
-using CourierHub.Shared.Logging;
-using CourierHub.Shared.Logging.Contracts;
 
 
 namespace CourierHubWebApi {

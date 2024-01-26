@@ -30,7 +30,7 @@ public class StatusUpdateService : BackgroundService {
     }
     private async Task UpdateOrderStatus() {
         // orders that were not fulfilled by service name
-        var orders = await _context.Orders.Where(e => e.Service.IsIntegrated && 
+        var orders = await _context.Orders.Where(e => e.Service.IsIntegrated &&
             (e.Status.Id == 1 || e.Status.Id == 2 || e.Status.Id == 5)
         ).GroupBy(e => e.Service.Name).ToListAsync();
 
