@@ -50,7 +50,7 @@ public class ApiController : ControllerBase {
             var codeList = offers.Select(e => e.Code).ToList();
             _inquireCodes.Add((codeList, inquireDB.Id));
 
-            return Ok(offers);
+            return Ok(offers.ToList());
         } else {
             return NotFound(Array.Empty<ApiOffer>());
         }
