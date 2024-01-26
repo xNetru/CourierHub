@@ -1,12 +1,9 @@
 ﻿using CourierHubWebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace CourierHubWebApi.Examples
-{
-    public class CreateInquireResponseExample : IExamplesProvider<CreateInquireResponse>
-    {
-        public CreateInquireResponse GetExamples()
-        {
+namespace CourierHubWebApi.Examples {
+    public class CreateInquireResponseExample : IExamplesProvider<CreateInquireResponse> {
+        public CreateInquireResponse GetExamples() {
             return new CreateInquireResponse(
                 Price: 19.99m,
                 Code: "MjAyNG0xbTExNjAwMDAw",

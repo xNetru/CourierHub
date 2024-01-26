@@ -1,14 +1,11 @@
-﻿using CourierHub.Cloud;
-using CourierHub.Shared.Enums;
+﻿using CourierHub.Shared.Enums;
 using CourierHub.Shared.Logging.Contracts;
-using CourierHubWebApi.Examples;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics;
 
 namespace CourierHubWebApi.Controllers {
@@ -43,8 +40,7 @@ namespace CourierHubWebApi.Controllers {
             PrepareBlobPathAndContainerForPostOffer(logger);
 
             ModelStateDictionary? errors = this.Validate<CreateOrderRequest>(validator, request);
-            if (errors != null)
-            {
+            if (errors != null) {
                 logger.blobData.BlobBuilder.AddError(errors);
                 logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
                 logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
@@ -63,7 +59,7 @@ namespace CourierHubWebApi.Controllers {
 
             return result;
         }
-        
+
         /// <summary>
         /// Returns order status code
         /// </summary>
@@ -82,15 +78,13 @@ namespace CourierHubWebApi.Controllers {
         public IActionResult GetOrderStatus(string code,
             [FromServices] IValidator<GetOrderStatusRequest> validator,
             [FromServices] IApiKeyService apiKeyService,
-            [FromServices] IMyLogger logger)
-        {
+            [FromServices] IMyLogger logger) {
             Stopwatch stopwatch = Stopwatch.StartNew();
             PrepareBlobPathAndContainerForGetStatus(logger);
 
             GetOrderStatusRequest request = new(code);
             ModelStateDictionary? errors = this.Validate<GetOrderStatusRequest>(validator, request);
-            if (errors != null)
-            {
+            if (errors != null) {
                 logger.blobData.BlobBuilder.AddError(errors);
                 logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
                 logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
@@ -99,12 +93,12 @@ namespace CourierHubWebApi.Controllers {
 
             ObjectResult result = this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.GetOrderStatus(request, serviceId).Match(
-                    orderStatusCode => Ok(orderStatusCode), 
+                    orderStatusCode => Ok(orderStatusCode),
                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
 
             AddResultToBlob(logger, result, stopwatch);
-            
+
             return result;
         }
 
@@ -125,14 +119,12 @@ namespace CourierHubWebApi.Controllers {
         public IActionResult WithdrawOrder([FromBody] WithdrawOrderRequest request,
             [FromServices] IValidator<WithdrawOrderRequest> validator,
             [FromServices] IApiKeyService apiKeyService,
-            [FromServices] IMyLogger logger)
-        {
+            [FromServices] IMyLogger logger) {
             Stopwatch stopwatch = Stopwatch.StartNew();
             PrepareBlobPathAndContainerForPutWithdraw(logger);
 
             ModelStateDictionary? errors = this.Validate<WithdrawOrderRequest>(validator, request);
-            if (errors != null)
-            {
+            if (errors != null) {
                 logger.blobData.BlobBuilder.AddError(errors);
                 logger.blobData.BlobBuilder.AddStatusCode(StatusCodes.Status400BadRequest);
                 logger.blobData.BlobBuilder.AddOperationTime(stopwatch.Elapsed);
@@ -149,8 +141,7 @@ namespace CourierHubWebApi.Controllers {
 
             return result;
         }
-        private void PrepareBlobPathAndContainerForPostOffer(IMyLogger logger)
-        {
+        private void PrepareBlobPathAndContainerForPostOffer(IMyLogger logger) {
             DateTime now = DateTime.Now;
             logger.blobData.PathBuilder.AddApplication(Applications.API);
             logger.blobData.PathBuilder.AddDate(DateOnly.FromDateTime(now));
@@ -161,8 +152,7 @@ namespace CourierHubWebApi.Controllers {
             logger.blobData.ContainerBuilder.AddLogs();
         }
 
-        private void PrepareBlobPathAndContainerForPutWithdraw(IMyLogger logger)
-        {
+        private void PrepareBlobPathAndContainerForPutWithdraw(IMyLogger logger) {
             DateTime now = DateTime.Now;
             logger.blobData.PathBuilder.AddApplication(Applications.API);
             logger.blobData.PathBuilder.AddDate(DateOnly.FromDateTime(now));
@@ -173,8 +163,7 @@ namespace CourierHubWebApi.Controllers {
             logger.blobData.ContainerBuilder.AddLogs();
         }
 
-        private void PrepareBlobPathAndContainerForGetStatus(IMyLogger logger)
-        {
+        private void PrepareBlobPathAndContainerForGetStatus(IMyLogger logger) {
             DateTime now = DateTime.Now;
             logger.blobData.PathBuilder.AddApplication(Applications.API);
             logger.blobData.PathBuilder.AddDate(DateOnly.FromDateTime(now));
@@ -186,8 +175,7 @@ namespace CourierHubWebApi.Controllers {
         }
 
         // need to be moved into extensions
-        private void AddResultToBlob(IMyLogger logger, ObjectResult result, Stopwatch stopwatch) 
-        {
+        private void AddResultToBlob(IMyLogger logger, ObjectResult result, Stopwatch stopwatch) {
             int? statusCode = result.StatusCode;
             if (statusCode != null)
                 logger.blobData.BlobBuilder.AddStatusCode((int)statusCode);

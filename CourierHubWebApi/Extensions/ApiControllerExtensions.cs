@@ -1,6 +1,5 @@
 ﻿using CourierHubWebApi.Errors;
 using CourierHubWebApi.Services.Contracts;
-using ErrorOr;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
