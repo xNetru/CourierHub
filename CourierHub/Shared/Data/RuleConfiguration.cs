@@ -14,6 +14,14 @@ public class RuleConfiguration : IEntityTypeConfiguration<Rule> {
         builder.Property(e => e.VelocityMax).HasColumnName("Velocity_max");
         builder.Property(e => e.WidthMax).HasColumnName("Width_max");
 
-        // TODO: add rule
+        builder.HasData(
+            new Rule {
+                Id = 1,
+                DepthMax = 8000,
+                WidthMax = 8000,
+                LengthMax = 8000,
+                MassMax = 20000,
+                VelocityMax = 20
+            });
     }
 }

@@ -20,6 +20,21 @@ public class ScalerConfiguration : IEntityTypeConfiguration<Scaler> {
         builder.Property(e => e.Weekend).HasColumnType("money");
         builder.Property(e => e.Width).HasColumnType("money");
 
-        // TODO: add scaler
+        builder.HasData(
+            new Scaler {
+                Id = 1,
+                Name = "SusScaler",
+                Depth = 1.2m,
+                Width = 1.2m,
+                Length = 1.2m,
+                Mass = 2m,
+                Distance = 3m,
+                Time = 1.3m,
+                Company = 2.3m,
+                Weekend = 1.2m,
+                Priority = 1.2m,
+                Fee = 1.2m,
+                Tax = 1.18f
+            });
     }
 }
