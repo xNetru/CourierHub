@@ -1,13 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourierHub.Shared.Models;
-using System.Reflection.Emit;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CourierHub.Shared.Data;
 public class ServiceConfiguration : IEntityTypeConfiguration<Service> {
@@ -28,18 +21,32 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service> {
                 Name = "CourierHub",
                 BaseAddress = "https://courierhub-bck-api.azurewebsites.net/",
                 Statute = "TBD",
-                ApiKey = "?",
+                ApiKey = "?", // TODO: fill API KEY for us
                 IsIntegrated = true
             },
             new Service {
                 Id = 2,
                 Name = "MiNI.Courier.API",
-                BaseAddress = "?",
+                BaseAddress = "https://mini.currier.api.snet.com.pl/",
                 Statute = "TBD",
                 ApiKey = "team2d;EAAA50B8-90CB-436E-9864-4BC75B56F3BE",
                 IsIntegrated = true
+            },
+            new Service {
+                Id = 3,
+                Name = "WeraHubApi",
+                BaseAddress = "https://couriercompanyapi.azurewebsites.net/",
+                Statute = "TBD",
+                ApiKey = "ApiKey.1",
+                IsIntegrated = false
+            },
+            new Service {
+                Id = 4,
+                Name = "CourierHub-Kacper",
+                BaseAddress = "https://courierhub-bck-api.azurewebsites.net/",
+                Statute = "TBD",
+                ApiKey = "79a31940-2209-4422-93bd-f0ce9067a3c8",
+                IsIntegrated = false
             });
-
-        // TODO: add missing values and services
     }
 }

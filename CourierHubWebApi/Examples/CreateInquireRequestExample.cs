@@ -1,13 +1,10 @@
-﻿using CourierHubWebApi.Models;
+﻿using CourierHub.Shared.Enums;
+using CourierHubWebApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using CourierHub.Shared.Enums;
 
-namespace CourierHubWebApi.Examples
-{
-    public class CreateInquireRequestExample : IExamplesProvider<CreateInquireRequest>
-    {
-        CreateInquireRequest IExamplesProvider<CreateInquireRequest>.GetExamples()
-        {
+namespace CourierHubWebApi.Examples {
+    public class CreateInquireRequestExample : IExamplesProvider<CreateInquireRequest> {
+        CreateInquireRequest IExamplesProvider<CreateInquireRequest>.GetExamples() {
             ApiSideAddress source = new ApiSideAddress(
                 City: "Lipinki Łużyckie",
                 PostalCode: "01-912",

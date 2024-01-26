@@ -1,13 +1,12 @@
 ﻿using CourierHub.Shared.Data;
+using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
+using CourierHubWebApi.Errors;
+using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
 using Moq;
 using Moq.EntityFrameworkCore;
-using CourierHubWebApi.Models;
-using MaxMind.GeoIP2.Model;
-using CourierHub.Shared.Enums;
 using OneOf;
-using CourierHubWebApi.Errors;
 
 namespace CourierHubWebApi.Test {
     public class InquireServiceTest {

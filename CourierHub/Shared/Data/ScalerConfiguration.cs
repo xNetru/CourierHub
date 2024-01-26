@@ -1,13 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using CourierHub.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourierHub.Shared.Models;
-using System.Reflection.Emit;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CourierHub.Shared.Data;
 public class ScalerConfiguration : IEntityTypeConfiguration<Scaler> {

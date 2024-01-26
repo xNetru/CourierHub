@@ -7,8 +7,7 @@ namespace CourierHubWebApi.Test {
         private CreateInquireRequestValidator _validator = new();
 
         [Fact]
-        public async Task Validate_ShouldRejectRequest_WhenWrongAddressIsGiven()
-        {
+        public async Task Validate_ShouldRejectRequest_WhenWrongAddressIsGiven() {
             // Arrange
             ApiSideAddress source = new ApiSideAddress(
                 City: "Lipinki Łużyckie",
@@ -44,8 +43,7 @@ namespace CourierHubWebApi.Test {
         }
 
         [Fact]
-        public async Task Validate_ShouldRejectRequest_WhenWrongDimensionsAreGiven()
-        {
+        public async Task Validate_ShouldRejectRequest_WhenWrongDimensionsAreGiven() {
             // Arrange
             ApiSideAddress source = new ApiSideAddress(
                 City: "Lipinki Łużyckie",
@@ -82,8 +80,7 @@ namespace CourierHubWebApi.Test {
 
 
         [Fact]
-        public async Task Validate_ShouldRejectRequest_WhenWrongTimeIsGiven()
-        {
+        public async Task Validate_ShouldRejectRequest_WhenWrongTimeIsGiven() {
             // Arrange
             ApiSideAddress source = new ApiSideAddress(
                 City: "Lipinki Łużyckie",
@@ -119,8 +116,7 @@ namespace CourierHubWebApi.Test {
         }
 
         [Fact]
-        public async Task Validate_ShouldRejectRequest_WhenWrongPriorityIsGiven()
-        {
+        public async Task Validate_ShouldRejectRequest_WhenWrongPriorityIsGiven() {
             // Arrange
             ApiSideAddress source = new ApiSideAddress(
                 City: "Lipinki Łużyckie",
@@ -156,8 +152,7 @@ namespace CourierHubWebApi.Test {
         }
 
         [Fact]
-        public async Task Validate_ShouldAcceptRequest_WhenValidInquiryIsGiven()
-        {
+        public async Task Validate_ShouldAcceptRequest_WhenValidInquiryIsGiven() {
             // Arrange
             ApiSideAddress source = new ApiSideAddress(
                 City: "Ligota Łabęcka",

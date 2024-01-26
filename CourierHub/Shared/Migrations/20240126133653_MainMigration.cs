@@ -1,20 +1,15 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CourierHub.Shared.Migrations
-{
+namespace CourierHub.Shared.Migrations {
     /// <inheritdoc />
-    public partial class MainMigration : Migration
-    {
+    public partial class MainMigration : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.CreateTable(
                 name: "Address",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Street = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -23,30 +18,26 @@ namespace CourierHub.Shared.Migrations
                     Postal_code = table.Column<string>(type: "char(6)", unicode: false, fixedLength: true, maxLength: 6, nullable: false),
                     City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Address", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Review",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "ntext", nullable: true),
                     Datetime = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Review", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Rule",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false),
                     Depth_max = table.Column<int>(type: "int", nullable: true),
                     Width_max = table.Column<int>(type: "int", nullable: true),
@@ -54,15 +45,13 @@ namespace CourierHub.Shared.Migrations
                     Mass_max = table.Column<int>(type: "int", nullable: true),
                     Velocity_max = table.Column<float>(type: "real", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Rule", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Scaler",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Depth = table.Column<decimal>(type: "money", nullable: true),
@@ -77,15 +66,13 @@ namespace CourierHub.Shared.Migrations
                     Fee = table.Column<decimal>(type: "money", nullable: true),
                     Tax = table.Column<float>(type: "real", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Scaler", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Service",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Api_key = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -93,28 +80,24 @@ namespace CourierHub.Shared.Migrations
                     BaseAddress = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     IsIntegrated = table.Column<bool>(type: "bit", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Service", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Status",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     IsCancelable = table.Column<bool>(type: "bit", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Status", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "User",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -122,15 +105,13 @@ namespace CourierHub.Shared.Migrations
                     Surname = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Client_data",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Photo = table.Column<byte[]>(type: "image", nullable: true),
@@ -140,8 +121,7 @@ namespace CourierHub.Shared.Migrations
                     Source_address_Id = table.Column<int>(type: "int", nullable: false),
                     Client_Id = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Client_data", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Client_data_Address1",
@@ -163,16 +143,14 @@ namespace CourierHub.Shared.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Evaluation",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Datetime = table.Column<DateTime>(type: "datetime", nullable: false),
                     Rejection_reason = table.Column<string>(type: "ntext", nullable: true),
                     Worker_Id = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Evaluation", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Evaluation_User",
@@ -183,8 +161,7 @@ namespace CourierHub.Shared.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Inquire",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Client_Id = table.Column<int>(type: "int", nullable: true),
@@ -202,8 +179,7 @@ namespace CourierHub.Shared.Migrations
                     Priority = table.Column<int>(type: "int", nullable: false),
                     Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Inquire", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Inquire_Address",
@@ -224,8 +200,7 @@ namespace CourierHub.Shared.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Parcel",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Pickup_datetime = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -233,8 +208,7 @@ namespace CourierHub.Shared.Migrations
                     Undelivered_reason = table.Column<string>(type: "ntext", nullable: true),
                     Courier_Id = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Parcel", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Parcel_User",
@@ -245,8 +219,7 @@ namespace CourierHub.Shared.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Order",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Inquire_Id = table.Column<int>(type: "int", nullable: false),
@@ -263,8 +236,7 @@ namespace CourierHub.Shared.Migrations
                     Client_Company = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Client_Address_Id = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Order", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Order_Address",
@@ -380,8 +352,7 @@ namespace CourierHub.Shared.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "Client_data");
 
