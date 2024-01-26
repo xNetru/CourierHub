@@ -19,7 +19,7 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service> {
             new Service {
                 Id = 1,
                 Name = "CourierHub",
-                BaseAddress = "https://courierhub-bck-api.azurewebsites.net/",
+                BaseAddress = "https://courierhub-bck-api-new.azurewebsites.net/",
                 Statute = "TBD",
                 ApiKey = "a2cf116b-854a-4b96-99f0-c88fdadb6de6",
                 IsIntegrated = true
@@ -43,7 +43,7 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service> {
             new Service {
                 Id = 4,
                 Name = "CourierHub-Wera",
-                BaseAddress = "https://courierhub-bck-api.azurewebsites.net/",
+                BaseAddress = "https://courierhub-bck-api-new.azurewebsites.net/",
                 Statute = "TBD",
                 ApiKey = "79a31940-2209-4422-93bd-f0ce9067a3c8",
                 IsIntegrated = false
