@@ -40,7 +40,7 @@
     {
         var context = await Provider.GetAuthenticationStateAsync();
         var email = context.User.Claims.FirstOrDefault(c => c.Type == "email");
-        string mail = "";
+        string mail = "NotAMail";
         if (email != null)
         {
             mail = email.Value;
