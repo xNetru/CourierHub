@@ -1,7 +1,7 @@
 Feature: OrderWithdrawal
 
 Background:
-    Given the base address for OrderWithdrawal is https://courierhub-bck.azurewebsites.net/
+    Given the base address for OrderWithdrawal is https://courierhub-bck-new.azurewebsites.net/
 
 Scenario: User wants to withdraw an existing order
 Given a user having an order with code MjAyNDExNDE4MjAxNjM=

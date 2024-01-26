@@ -1,13 +1,11 @@
 ﻿using CourierHub.Shared.Data;
-using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
+using CourierHubWebApi.Errors;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services.Contracts;
-using ErrorOr;
-using System.Text;
 using OneOf;
-using CourierHubWebApi.Errors;
+using System.Text;
 
 namespace CourierHubWebApi.Services {
     public class InquireService : IInquireService {
@@ -20,8 +18,7 @@ namespace CourierHubWebApi.Services {
             _apiKeyService = apiKeyService;
         }
 
-        public async Task<OneOf<CreateInquireResponse, ApiError>> CreateInquire(CreateInquireRequest request, int serviceId)
-        {
+        public async Task<OneOf<CreateInquireResponse, ApiError>> CreateInquire(CreateInquireRequest request, int serviceId) {
             Inquire inquire = request.CreateInquire();
 
             if (!IsValidServiceId(serviceId))
@@ -29,11 +26,9 @@ namespace CourierHubWebApi.Services {
 
             SetOrderCode(inquire);
 
-            if(!_apiKeyService.IsOurServiceRequest(serviceId))
-            {
+            if (!_apiKeyService.IsOurServiceRequest(serviceId)) {
                 int statusCode = await AddInquireToDataBase(inquire);
-                if(statusCode != StatusCodes.Status200OK)
-                {
+                if (statusCode != StatusCodes.Status200OK) {
                     return new ApiError(statusCode, null, "Internal server error");
                 }
             }
@@ -85,28 +80,22 @@ namespace CourierHubWebApi.Services {
             return price;
         }
 
-        private async Task<int> AddInquireToDataBase(Inquire inquire)
-        {
-            try
-            {
+        private async Task<int> AddInquireToDataBase(Inquire inquire) {
+            try {
                 await _dbContext.AddAsync(inquire);
                 _dbContext.SaveChanges();
-            }
-            catch
-            {
+            } catch {
                 return StatusCodes.Status500InternalServerError;
             }
             return StatusCodes.Status200OK;
         }
-        private OneOf<CreateInquireResponse, ApiError> CreateResponse(Inquire inquire)
-        {
+        private OneOf<CreateInquireResponse, ApiError> CreateResponse(Inquire inquire) {
             decimal calculatedPrice = CalculatePrice(inquire);
             OneOf<DateTime, ApiError> cacheResult = _priceCacheService.SavePrice(inquire.Code, calculatedPrice);
 
-            return cacheResult.Match(time => (OneOf<CreateInquireResponse,ApiError>)new CreateInquireResponse(calculatedPrice, inquire.Code, time), statusCode => statusCode);
+            return cacheResult.Match(time => (OneOf<CreateInquireResponse, ApiError>)new CreateInquireResponse(calculatedPrice, inquire.Code, time), statusCode => statusCode);
         }
-        private bool IsValidServiceId(int serviceId)
-        {
+        private bool IsValidServiceId(int serviceId) {
             return _dbContext.Services.Where(x => x.Id == serviceId).Any();
         }
     }

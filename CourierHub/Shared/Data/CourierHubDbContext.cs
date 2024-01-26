@@ -232,53 +232,6 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Description).HasColumnType("ntext");
         });
 
-        modelBuilder.Entity<Rule>(entity => {
-            entity.ToTable("Rule");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.DepthMax).HasColumnName("Depth_max");
-            entity.Property(e => e.LengthMax).HasColumnName("Length_max");
-            entity.Property(e => e.MassMax).HasColumnName("Mass_max");
-            entity.Property(e => e.VelocityMax).HasColumnName("Velocity_max");
-            entity.Property(e => e.WidthMax).HasColumnName("Width_max");
-        });
-
-        modelBuilder.Entity<Scaler>(entity => {
-            entity.ToTable("Scaler");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Company).HasColumnType("money");
-            entity.Property(e => e.Depth).HasColumnType("money");
-            entity.Property(e => e.Distance).HasColumnType("money");
-            entity.Property(e => e.Fee).HasColumnType("money");
-            entity.Property(e => e.Length).HasColumnType("money");
-            entity.Property(e => e.Mass).HasColumnType("money");
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.Priority).HasColumnType("money");
-            entity.Property(e => e.Time).HasColumnType("money");
-            entity.Property(e => e.Weekend).HasColumnType("money");
-            entity.Property(e => e.Width).HasColumnType("money");
-        });
-
-        modelBuilder.Entity<Service>(entity => {
-            entity.ToTable("Service");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.ApiKey)
-                .HasMaxLength(100)
-                .HasColumnName("Api_key");
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.Statute).HasMaxLength(100);
-            entity.Property(e => e.BaseAddress).HasMaxLength(50);
-        });
-
-        modelBuilder.Entity<Status>(entity => {
-            entity.ToTable("Status");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Name).HasMaxLength(50);
-        });
-
         modelBuilder.Entity<User>(entity => {
             entity.HasKey(e => e.Id).HasName("PK_User");
 
@@ -290,6 +243,12 @@ public partial class CourierHubDbContext : DbContext {
             entity.Property(e => e.Surname).HasMaxLength(50);
 
         });
+
+        modelBuilder.ApplyConfiguration(new StatusConfiguration());
+        modelBuilder.ApplyConfiguration(new ServiceConfiguration());
+        modelBuilder.ApplyConfiguration(new ScalerConfiguration());
+        modelBuilder.ApplyConfiguration(new RuleConfiguration());
+
         OnModelCreatingPartial(modelBuilder);
     }
 

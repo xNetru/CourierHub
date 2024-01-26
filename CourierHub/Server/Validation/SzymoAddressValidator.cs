@@ -1,4 +1,4 @@
-﻿using CourierHub.Api.Models.SzymoApi;
+﻿using CourierHub.Api.Models.SzymoHubApi;
 using FluentValidation;
 
 namespace CourierHub.Server.Validation;
