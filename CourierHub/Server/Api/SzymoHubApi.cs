@@ -1,4 +1,4 @@
-﻿using CourierHub.Api.Models.SzymoApi;
+﻿using CourierHub.Api.Models.SzymoHubApi;
 using CourierHub.Server.Validation;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
