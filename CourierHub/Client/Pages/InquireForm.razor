@@ -209,7 +209,7 @@
     {
         var state = await Provider.GetAuthenticationStateAsync();
 
-        NewInquire.Datetime = DateTime.Today;
+        NewInquire.Datetime = DateTime.Now;
 
         UserInquires.Inquires.Clear();
         UserInquires.Inquires.Add(NewInquire);
