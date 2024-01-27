@@ -26,8 +26,8 @@ namespace CourierHubWebApi.Validations {
             RuleFor(x => x.Datetime).Must(BeInSqlDateTimeRange);
             RuleFor(x => x.SourceDate).Must(BeInSqlDateTimeRange);
             RuleFor(x => x.DestinationDate).Must(BeInSqlDateTimeRange);
-            RuleFor(x => x.Datetime).Must((x, DateTime) => DateTime <= x.SourceDate);
-            RuleFor(x => x.SourceDate).Must((x, SourceDate) => SourceDate <= x.DestinationDate);
+            RuleFor(x => x.Datetime).Must((x, DateTime) => DateTime.Date <= x.SourceDate.Date);
+            RuleFor(x => x.SourceDate).Must((x, SourceDate) => SourceDate.Date <= x.DestinationDate.Date);
 
             // Priority Validation
             RuleFor(x => x.Priority).Must(BeValidPriorityType);

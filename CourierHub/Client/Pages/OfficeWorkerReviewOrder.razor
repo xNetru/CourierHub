@@ -306,7 +306,7 @@
         Order = Container.Orders.Last();
         Order.ClientPhone = Order.ClientPhone.TrimEnd();
         Order.ClientAddress.Number = Order.ClientAddress.Number.TrimEnd();
-        Order.ClientAddress.Flat = Order.ClientAddress.Flat.TrimEnd();
+        Order.ClientAddress.Flat = Order.ClientAddress.Flat?.TrimEnd();
         var response = await Http.GetAsync($"{Http.BaseAddress}Inquire/{Order.Code}/code");
         Console.WriteLine("GET INQUIRE: " + response.StatusCode);
         if (response.IsSuccessStatusCode)
@@ -315,9 +315,9 @@
             if (inq != null)
             {
                 Inquire = inq;
-                Inquire.Source.Flat = Inquire.Source.Flat.TrimEnd();
+                Inquire.Source.Flat = Inquire.Source.Flat?.TrimEnd();
                 Inquire.Source.Number = Inquire.Source.Number.TrimEnd();
-                Inquire.Destination.Flat = Inquire.Destination.Flat.TrimEnd();
+                Inquire.Destination.Flat = Inquire.Destination.Flat?.TrimEnd();
                 Inquire.Destination.Number = Inquire.Destination.Number.TrimEnd();
             }
             else
@@ -337,11 +337,11 @@
             if(cli != null)
             {
                 Client = cli;
-                Client.Phone = Client.Phone.TrimEnd();
+                Client.Phone = Client.Phone?.TrimEnd();
                 Client.Address.Number = Client.Address.Number.TrimEnd();
-                Client.Address.Flat = Client.Address.Flat.TrimEnd();
+                Client.Address.Flat = Client.Address.Flat?.TrimEnd();
                 Client.SourceAddress.Number = Client.Address.Number.TrimEnd();
-                Client.SourceAddress.Flat = Client.Address.Flat.TrimEnd();
+                Client.SourceAddress.Flat = Client.Address.Flat?.TrimEnd();
             }
         }
     }

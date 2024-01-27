@@ -28,7 +28,8 @@ public class ApiController : ControllerBase {
         if (inquire == null) { return BadRequest(Array.Empty<ApiOffer>()); }
 
         var offers = new ConcurrentBag<ApiOffer>();
-        Parallel.ForEach(_webApis, async webapi => {
+        var options = new ParallelOptions { MaxDegreeOfParallelism = 3 };
+        await Parallel.ForEachAsync(_webApis, options, async (webapi, token) => {
             (ApiOffer? offer, int status) = await webapi.PostInquireGetOffer(inquire);
             if (offer != null && status >= 200 && status < 300) {
                 offers.Add(offer);
