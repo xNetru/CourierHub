@@ -2,7 +2,7 @@
 using CourierHub.Cloud;
 using CourierHub.Shared.Data;
 using CourierHubWebApi.Examples;
-using CourierHubWebApi.Middleware;
+using CourierHubWebApi.Middlewares;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
 using CourierHubWebApi.Services.Contracts;
@@ -89,6 +89,8 @@ namespace CourierHubWebApi {
             });
 
             app.UseHttpsRedirection();
+
+            app.UseLoggingMiddleware();
 
             app.UseApiKeyMiddleware();
 

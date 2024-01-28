@@ -9,6 +9,9 @@
         void AddController(string controllerName);
         void AddMethod(string methodName);
         void AddTime(TimeSpan time);
+        void AddDefaultMethod();
+        void AddDefaultController();
+        void AddDateAndTime(DateTime datetime);
         void Reset();
         string? Build();
     }

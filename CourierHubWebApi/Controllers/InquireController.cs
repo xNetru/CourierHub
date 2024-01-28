@@ -30,7 +30,7 @@ namespace CourierHubWebApi.Controllers {
         /// <response code="500">Internal server error</response>
         [HttpPost]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(CreateInquireResponse), 200)]
+        [ProducesResponseType(typeof(CreateInquireResponse), 201)]
         public IActionResult CreateInquire([FromBody] CreateInquireRequest request,
             [FromServices] IValidator<CreateInquireRequest> validator,
             [FromServices] IApiKeyService apiKeyService) {

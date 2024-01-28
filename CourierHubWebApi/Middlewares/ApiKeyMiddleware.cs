@@ -1,7 +1,7 @@
 ﻿using CourierHubWebApi.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CourierHubWebApi.Middleware {
+namespace CourierHubWebApi.Middlewares {
     // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class ApiKeyMiddleware {
         private readonly RequestDelegate _next;
@@ -22,7 +22,6 @@ namespace CourierHubWebApi.Middleware {
             }
 
             return _next(context);
-
         }
         public static async Task<string> GetRequestBody(HttpContext context) {
             var bodyStream = new StreamReader(context.Request.Body);

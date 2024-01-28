@@ -4,7 +4,7 @@
         void AddRequest(object request);
         void AddResponse(object response);
         void AddError(object error);
-        void AddOperationTime(TimeSpan time);
+        void AddOperationTime(ulong time);
         string Build();
         void Reset();
     }

@@ -53,9 +53,9 @@ namespace CourierHubWebApi.Services {
         }
         private decimal CalculatePrice(Inquire inquire) {
 
-            Scaler? scaler = _dbContext.Scalers.Where(x => x.Id == 0).FirstOrDefault();
+            Scaler? scaler = _dbContext.Scalers.FirstOrDefault();
             if (scaler == null)
-                return 0m;
+                return decimal.Round(0m, 2);
 
             decimal price = (scaler.Width == null ? 1m : (decimal)scaler.Width) * inquire.Width +
                 (scaler.Depth == null ? 1m : (decimal)scaler.Depth) * inquire.Depth +
@@ -77,7 +77,8 @@ namespace CourierHubWebApi.Services {
             if (scaler.Tax != null)
                 price *= (decimal)scaler.Tax;
 
-            return price;
+            
+            return decimal.Round(price, 2);
         }
 
         private async Task<int> AddInquireToDataBase(Inquire inquire) {
