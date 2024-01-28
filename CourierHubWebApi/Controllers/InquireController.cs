@@ -46,7 +46,7 @@ namespace CourierHubWebApi.Controllers {
                                     actionName: nameof(CreateInquire),
                                     routeValues: new { id = response.Code },
                                     value: response),
-                                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)), 
+                                    errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace CourierHub.Api.Models.SzymoApi;
+﻿namespace CourierHub.Api.Models.SzymoHubApi;
 
 public record SzymoPostOfferRequest(
     string inquiryId,

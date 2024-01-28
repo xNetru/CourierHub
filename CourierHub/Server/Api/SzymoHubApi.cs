@@ -1,4 +1,4 @@
-﻿using CourierHub.Api.Models.SzymoApi;
+﻿using CourierHub.Api.Models.SzymoHubApi;
 using CourierHub.Server.Validation;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
@@ -188,18 +188,18 @@ public class SzymoHubApi : IWebApi {
     }
 
     private bool AddTokenToClient(HttpClient client) {
-            string[] userCredentials = _service.ApiKey.Split(';');
-            if (userCredentials.Length < 2)
-                return false;
+        string[] userCredentials = _service.ApiKey.Split(';');
+        if (userCredentials.Length < 2)
+            return false;
 
-            string clientId = userCredentials[0];
-            string clientSecret = userCredentials[1];
+        string clientId = userCredentials[0];
+        string clientSecret = userCredentials[1];
 
-            string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenBase, _tokenEndPoint);
-            if (accessToken == null)
-                return false;
+        string? accessToken = _accessTokenContainer.GetToken(_service, clientId, clientSecret, _tokenBase, _tokenEndPoint);
+        if (accessToken == null)
+            return false;
 
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
         return true;
     }
 }

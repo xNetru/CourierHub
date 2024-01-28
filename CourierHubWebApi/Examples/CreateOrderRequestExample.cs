@@ -1,13 +1,9 @@
 ﻿using CourierHubWebApi.Models;
-using MaxMind.GeoIP2.Model;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace CourierHubWebApi.Examples
-{
-    public class CreateOrderRequestExample : IExamplesProvider<CreateOrderRequest>
-    {
-        CreateOrderRequest IExamplesProvider<CreateOrderRequest>.GetExamples()
-        {
+namespace CourierHubWebApi.Examples {
+    public class CreateOrderRequestExample : IExamplesProvider<CreateOrderRequest> {
+        CreateOrderRequest IExamplesProvider<CreateOrderRequest>.GetExamples() {
             ApiSideAddress clientAddress = new ApiSideAddress(
                 City: "Bielsko-Biała",
                 PostalCode: "29-102",

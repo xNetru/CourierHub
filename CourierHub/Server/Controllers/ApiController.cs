@@ -6,6 +6,7 @@ using CourierHub.Shared.Enums;
 using CourierHub.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace CourierHub.Shared.Controllers;
 [ApiController]
@@ -26,13 +27,14 @@ public class ApiController : ControllerBase {
     public async Task<ActionResult<IEnumerable<ApiOffer>>> PostInquireGetOffers([FromBody] ApiInquire? inquire) {
         if (inquire == null) { return BadRequest(Array.Empty<ApiOffer>()); }
 
-        var offers = new List<ApiOffer>();
-        foreach (var webapi in _webApis) {
+        var offers = new ConcurrentBag<ApiOffer>();
+        var options = new ParallelOptions { MaxDegreeOfParallelism = 3 };
+        await Parallel.ForEachAsync(_webApis, options, async (webapi, token) => {
             (ApiOffer? offer, int status) = await webapi.PostInquireGetOffer(inquire);
             if (offer != null && status >= 200 && status < 300) {
                 offers.Add(offer);
             }
-        }
+        });
 
         if (offers.Any()) {
             Inquire inquireDB = (Inquire)inquire;
@@ -49,7 +51,7 @@ public class ApiController : ControllerBase {
             var codeList = offers.Select(e => e.Code).ToList();
             _inquireCodes.Add((codeList, inquireDB.Id));
 
-            return Ok(offers);
+            return Ok(offers.ToList());
         } else {
             return NotFound(Array.Empty<ApiOffer>());
         }

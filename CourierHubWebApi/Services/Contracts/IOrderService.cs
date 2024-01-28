@@ -1,9 +1,7 @@
 ﻿using CourierHub.Shared.Enums;
-using CourierHubWebApi.Models;
-using ErrorOr;
-using OneOf;
-using Microsoft.AspNetCore.Http;
 using CourierHubWebApi.Errors;
+using CourierHubWebApi.Models;
+using OneOf;
 
 namespace CourierHubWebApi.Services.Contracts {
     public interface IOrderService {

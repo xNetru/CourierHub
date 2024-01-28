@@ -1,5 +1,4 @@
-﻿using CourierHub.Cloud;
-using CourierHub.Shared.Enums;
+﻿using CourierHub.Shared.Enums;
 using CourierHubWebApi.Examples;
 using CourierHubWebApi.Extensions;
 using CourierHubWebApi.Models;
@@ -7,7 +6,6 @@ using CourierHubWebApi.Services.Contracts;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Swashbuckle.AspNetCore.Filters;
 using System.Diagnostics;
 
 namespace CourierHubWebApi.Controllers {
@@ -51,7 +49,7 @@ namespace CourierHubWebApi.Controllers {
                 },
                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
-        
+
         /// <summary>
         /// Returns order status code
         /// </summary>
@@ -81,7 +79,7 @@ namespace CourierHubWebApi.Controllers {
 
             return this.GetServiceIdFromHttpContext(apiKeyService).Match(
                 serviceId => _orderService.GetOrderStatus(request, serviceId).Match(
-                    orderStatusCode => Ok(orderStatusCode), 
+                    orderStatusCode => Ok(orderStatusCode),
                     errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title)),
                 errors => Problem(statusCode: errors.First.StatusCode, detail: errors.First.Message, title: errors.First.Title));
         }
