@@ -15,7 +15,7 @@ public class ApiController : ControllerBase {
     private readonly CourierHubDbContext _context;
     private readonly IList<(List<string>, int)> _inquireCodes;
     private readonly IList<IWebApi> _webApis;
-
+    private readonly string path = "C:\\Users\\kamil\\Desktop\\logi.txt";
     public ApiController(CourierHubDbContext context, WebApiContainer apiContainer, InquireCodeContainer inquireContainer) {
         _context = context;
         _inquireCodes = inquireContainer.InquireCodes;
@@ -29,8 +29,10 @@ public class ApiController : ControllerBase {
 
         var offers = new ConcurrentBag<ApiOffer>();
         var options = new ParallelOptions { MaxDegreeOfParallelism = 3 };
+        System.IO.File.AppendAllText(path, $"Post Inquire in {_webApis.Count} apis");
         await Parallel.ForEachAsync(_webApis, options, async (webapi, token) => {
             (ApiOffer? offer, int status) = await webapi.PostInquireGetOffer(inquire);
+            System.IO.File.AppendAllText(path, $"[{webapi.ServiceName}] Status code: {status}");
             if (offer != null && status >= 200 && status < 300) {
                 offers.Add(offer);
             }

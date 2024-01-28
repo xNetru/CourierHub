@@ -21,81 +21,34 @@ public class WeraHubApi : IWebApi {
     public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in WeronikaHubApi.");
 
-        if(_context.Orders.Where(o => o.Inquire.Code == code && o.StatusId == (int)StatusType.NotConfirmed).FirstOrDefault() != default)
+        try
         {
-            WeraRequestStatusResponse? response = null;
-            var cancelToken = new CancellationTokenSource(30 * 1000);
-            try
+            var response = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
+
+            if(response != null)
             {
-                response = await _httpClient.GetFromJsonAsync<WeraRequestStatusResponse?>($"/api/Request/GetRequestStatus/{code}", cancelToken.Token);
-            }
-            catch (HttpRequestException ex)
-            {
-                if (ex.Message.Contains(HttpStatusCode.NotFound.ToString()))
+                switch (response.StatusCode)
                 {
-                    return (StatusType.Cancelled, StatusCodes.Status200OK, null);
-                }
-            }
-            catch (TaskCanceledException e)
-            {
-                Console.WriteLine("WeraHubApi have not responded within 30 seconds: " + e.Message);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
-            }
+                    case HttpStatusCode.BadRequest:
+                        return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
 
-            if (response == null)
-            {
-                return (null, (int)HttpStatusCode.GatewayTimeout, null);
-            }
-            else
-            {
-                if (response.result.isReady)
-                {
-                    try
-                    {
-                        var deliveryResult = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
-                        if (deliveryResult == null)
-                        {
-                            return (null, (int)HttpStatusCode.GatewayTimeout, null);
-                        }
-                        if (deliveryResult.IsSuccessStatusCode)
-                        {
-                            var delivery = await deliveryResult.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
-                            if(delivery == null)
-                            {
-                                return (null, StatusCodes.Status503ServiceUnavailable, null);
-                            }
-                            else
-                            {
-                                if (delivery.result.requestStatus == Enums.WeraApi.WeraRequestStatus.Rejected)
-                                {
+                    case HttpStatusCode.Created:
+                        var deliverResponse = await response.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
+                        if(deliverResponse != null)
+                            return (StatusType.Confirmed, StatusCodes.Status200OK, deliverResponse.result.companyDeliveryId);
+                        return (null, StatusCodes.Status417ExpectationFailed, null);
 
-                                }
-                                else
-                                {
-
-                                }
-                            }
-                        }
-                    }
-                    catch
-                    {
-
-                    }
-
-                    return (StatusType.Confirmed, StatusCodes.Status200OK, null);
-                }
-                else
-                {
-                    return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
+                    case HttpStatusCode.UnprocessableEntity:
+                        return(StatusType.Denied, StatusCodes.Status200OK, null);
                 }
             }
         }
+        catch(Exception e)
+        {
+            Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
+        }
 
-
-
+        return (null, StatusCodes.Status503ServiceUnavailable, null);
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
@@ -104,6 +57,8 @@ public class WeraHubApi : IWebApi {
         WeraAddressDto destinationAddress;
         WeraPackageDto package;
         WeraInquiryDto weraInquiry;
+
+        Console.WriteLine("[WeraHubApi] Starting creating classes");
 
         try
         {
@@ -137,11 +92,12 @@ public class WeraHubApi : IWebApi {
                 destinationAddress: destinationAddress,
                 package: package);
         } 
-        catch 
+        catch (Exception e)
         {
+            Console.WriteLine($"[WeraHubApi] Error occurred during classes initialization: {e.Message}");
             return (null, 400);
         }
-
+        Console.WriteLine("[WeraGubApi] Sending request");
         var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try
@@ -156,6 +112,8 @@ public class WeraHubApi : IWebApi {
         {
             Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
         }
+
+        Console.WriteLine("[WeraHubApi] Response received");
 
         if (response.IsSuccessStatusCode)
         {

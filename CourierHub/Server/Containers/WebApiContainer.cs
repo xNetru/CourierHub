@@ -25,7 +25,7 @@ public class WebApiContainer {
                 //    break;
                 //}
                 case "WeraHubApi": {
-                    WebApis.Add(new WeraHubApi((ApiService)service));
+                    WebApis.Add(new WeraHubApi((ApiService)service, new CourierHubDbContext()));
                     break;
                 }
             }
