@@ -68,7 +68,7 @@ public class WeraHubApi : IWebApi {
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try
         {
-            response = await _httpClient.PostAsJsonAsync("/Inquires", weraInquiry, cancelToken.Token);
+            response = await _httpClient.PostAsJsonAsync("/api/Offer/PostOffer", weraInquiry, cancelToken.Token);
         }
         catch (TaskCanceledException e)
         {
@@ -102,7 +102,6 @@ public class WeraHubApi : IWebApi {
         {
             return (null, (int)response.StatusCode);
         }
-        return (null, 400);
     }
 
     public async Task<(int, string?)> PostOrder(ApiOrder order) {

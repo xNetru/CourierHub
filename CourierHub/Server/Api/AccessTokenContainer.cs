@@ -30,7 +30,7 @@ namespace CourierHub.Server.Api {
             } else {
                 var tokenResponse = GetAccessToken(clientId, clientSecret, baseAddress, tokenEndPoint).Result;
                 if (tokenResponse != null && tokenResponse.access_token != null) {
-                    tokens.Add(service.Name, (tokenResponse.access_token, DateTime.Now.AddMinutes(tokenResponse.expires_in)));
+                    tokens.TryAdd(service.Name, (tokenResponse.access_token, DateTime.Now.AddMinutes(tokenResponse.expires_in)));
                     return tokenResponse.access_token;
                 }
             }
