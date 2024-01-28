@@ -2,7 +2,7 @@
 
 namespace CourierHub.Server.Api.Models.WeraApi
 {
-    public record OfferDto(
+    public record WeraOfferDto(
         string? companyOfferId,
         WeraInquiryDto inquiry,
         DateTime creationDate,
