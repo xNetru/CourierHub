@@ -53,12 +53,37 @@ public class WeraHubApi : IWebApi {
             {
                 if (response.result.isReady)
                 {
-                    var deliveryResult = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
-                    if(deliveryResult == null)
+                    try
                     {
-                        return (null, (int)HttpStatusCode.GatewayTimeout, null);
+                        var deliveryResult = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
+                        if (deliveryResult == null)
+                        {
+                            return (null, (int)HttpStatusCode.GatewayTimeout, null);
+                        }
+                        if (deliveryResult.IsSuccessStatusCode)
+                        {
+                            var delivery = await deliveryResult.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
+                            if(delivery == null)
+                            {
+                                return (null, StatusCodes.Status503ServiceUnavailable, null);
+                            }
+                            else
+                            {
+                                if (delivery.result.requestStatus == Enums.WeraApi.WeraRequestStatus.Rejected)
+                                {
+
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                        }
                     }
-                    
+                    catch
+                    {
+
+                    }
 
                     return (StatusType.Confirmed, StatusCodes.Status200OK, null);
                 }
