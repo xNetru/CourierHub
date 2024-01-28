@@ -19,7 +19,7 @@ public class WeraHubApi : IWebApi {
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     }
     public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
-        Console.WriteLine("GetOrderStatus was invoked in WeronikaHubApi.");
+        Console.WriteLine("GetOrderStatus was invoked in WeraHubApi.");
 
         try
         {
@@ -33,9 +33,22 @@ public class WeraHubApi : IWebApi {
                         return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
 
                     case HttpStatusCode.Created:
-                        var deliverResponse = await response.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
-                        if(deliverResponse != null)
-                            return (StatusType.Confirmed, StatusCodes.Status200OK, deliverResponse.result.companyDeliveryId);
+                        var deliveryResponse = await response.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
+                        if(deliveryResponse != null)
+                        {
+                            var getDeliveryResponse = await _httpClient.GetFromJsonAsync<WeraDeliveryResponse>($"/api/Delivery/GetDelivery/{deliveryResponse.result.companyDeliveryId}");
+                            if(getDeliveryResponse != null)
+                            {
+                                switch(getDeliveryResponse.result.deliveryStatus)
+                                {
+                                    case Enums.WeraApi.DeliveryStatus.Proccessing: return (StatusType.Confirmed, StatusCodes.Status200OK, null);
+                                    case Enums.WeraApi.DeliveryStatus.Delivered: return (StatusType.Delivered, StatusCodes.Status200OK, null);
+                                    case Enums.WeraApi.DeliveryStatus.Canceled: return (StatusType.Cancelled, StatusCodes.Status200OK, null);
+                                    case Enums.WeraApi.DeliveryStatus.CannotDeliver: return (StatusType.CouldNotDeliver, StatusCodes.Status200OK, null);
+                                    case Enums.WeraApi.DeliveryStatus.PickedUp: return (StatusType.PickedUp, StatusCodes.Status200OK, null);
+                                }
+                            }
+                        }
                         return (null, StatusCodes.Status417ExpectationFailed, null);
 
                     case HttpStatusCode.UnprocessableEntity:
@@ -208,7 +221,21 @@ public class WeraHubApi : IWebApi {
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try
         {
-            response = await _httpClient.DeleteAsync($"/api/Delivery/CancelDelivery/{code}", cancelToken.Token);
+            response = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
+            if(response != null)
+            {
+                if(response.IsSuccessStatusCode)
+                {
+                    var deliveryResponse = await response.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
+                    if(deliveryResponse != null)
+                    {
+                        response = await _httpClient.DeleteAsync($"/api/Delivery/CancelDelivery/{deliveryResponse.result.companyDeliveryId}", cancelToken.Token);
+                        if (response == null)
+                            return StatusCodes.Status503ServiceUnavailable;
+                    }
+                }
+                return (int)response.StatusCode;
+            }
         }
         catch (TaskCanceledException e)
         {
@@ -218,6 +245,6 @@ public class WeraHubApi : IWebApi {
         {
             Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
         }
-        return (int)response.StatusCode;
+        return StatusCodes.Status503ServiceUnavailable;
     }
 }
