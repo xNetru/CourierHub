@@ -1,15 +1,18 @@
 ﻿using CourierHub.Api.Models.SzymoHubApi;
 using CourierHub.Server.Api.Models.WeraApi;
 using CourierHub.Shared.ApiModels;
+using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
 using System.Net;
 
 namespace CourierHub.Server.Api;
 public class WeraHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
+    private readonly CourierHubDbContext _context;
     public string ServiceName { get; set; }
 
-    public WeraHubApi(ApiService service) {
+    public WeraHubApi(ApiService service, CourierHubDbContext context) {
+        _context = context;
         ServiceName = service.Name;
         _httpClient.BaseAddress = new Uri(service.BaseAddress);
         _httpClient.DefaultRequestHeaders.Add("x-api-key", service.ApiKey);
@@ -17,7 +20,57 @@ public class WeraHubApi : IWebApi {
     }
     public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in WeronikaHubApi.");
-        return (null, 400, null);
+
+        if(_context.Orders.Where(o => o.Inquire.Code == code && o.StatusId == (int)StatusType.NotConfirmed).FirstOrDefault() != default)
+        {
+            WeraRequestStatusResponse? response = null;
+            var cancelToken = new CancellationTokenSource(30 * 1000);
+            try
+            {
+                response = await _httpClient.GetFromJsonAsync<WeraRequestStatusResponse?>($"/api/Request/GetRequestStatus/{code}", cancelToken.Token);
+            }
+            catch (HttpRequestException ex)
+            {
+                if (ex.Message.Contains(HttpStatusCode.NotFound.ToString()))
+                {
+                    return (StatusType.Cancelled, StatusCodes.Status200OK, null);
+                }
+            }
+            catch (TaskCanceledException e)
+            {
+                Console.WriteLine("WeraHubApi have not responded within 30 seconds: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
+            }
+
+            if (response == null)
+            {
+                return (null, (int)HttpStatusCode.GatewayTimeout, null);
+            }
+            else
+            {
+                if (response.result.isReady)
+                {
+                    var deliveryResult = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
+                    if(deliveryResult == null)
+                    {
+                        return (null, (int)HttpStatusCode.GatewayTimeout, null);
+                    }
+                    
+
+                    return (StatusType.Confirmed, StatusCodes.Status200OK, null);
+                }
+                else
+                {
+                    return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
+                }
+            }
+        }
+
+
+
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
@@ -106,11 +159,82 @@ public class WeraHubApi : IWebApi {
 
     public async Task<(int, string?)> PostOrder(ApiOrder order) {
         Console.WriteLine("PostOrder was invoked in WeronikaHubApi.");
-        return (400, null);
+        try
+        {
+            WeraAddressDto address = new(
+            streetName: order.ClientAddress.Street,
+            houseNumber: int.Parse(order.ClientAddress.Number),
+            flatNumber: order.ClientAddress.Flat == null ? 0 : int.Parse(order.ClientAddress.Flat),
+            postcode: order.ClientAddress.PostalCode,
+            city: order.ClientAddress.City);
+
+            WeraPersonalDataDto personalData = new(
+                name: order.ClientName,
+                surname: order.ClientSurname,
+                companyName: order.ClientCompany,
+                address: address,
+                email: order.ClientEmail);
+
+            WeraRequestSendDto request = new(
+                companyOfferId: order.Code,
+                personalData: personalData);
+
+            var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+            var cancelToken = new CancellationTokenSource(30 * 1000);
+            try
+            {
+                response = await _httpClient.PostAsJsonAsync("/api/Request/PostRequest", request, cancelToken.Token);
+            }
+            catch (TaskCanceledException e)
+            {
+                Console.WriteLine("WeraHubApi have not responded within 30 seconds: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                var orderResponse = await response.Content.ReadFromJsonAsync<WeraRequestResponseResponse>();
+                if (orderResponse != null)
+                {
+                    return ((int)response.StatusCode, orderResponse.result.companyRequestId);
+                }
+                else
+                {
+                    return (StatusCodes.Status503ServiceUnavailable, null);
+                }
+            }
+            return ((int)response.StatusCode, null);
+        }
+        catch
+        {
+            return (400, null);
+
+        }
+
+
+
     }
 
     public async Task<int> PutOrderWithrawal(string code) {
-        Console.WriteLine("PutOrderWithrawal was invoked in WeronikaHubApi.");
-        return 400;
+        Console.WriteLine("PutOrderWithdrawal was invoked in WeraHubApi.");
+
+        var response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+        var cancelToken = new CancellationTokenSource(30 * 1000);
+        try
+        {
+            response = await _httpClient.DeleteAsync($"/api/Delivery/CancelDelivery/{code}", cancelToken.Token);
+        }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine("WeraHubApi have not responded within 30 seconds: " + e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("[WeraHubApi]: Error has occurred: " + e.Message);
+        }
+        return (int)response.StatusCode;
     }
 }
