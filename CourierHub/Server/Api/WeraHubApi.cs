@@ -21,6 +21,7 @@ public class WeraHubApi : IWebApi {
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {
+        Console.WriteLine("PostInquireGetOffer was invoked in WeronikaHubApi.");
         WeraAddressDto sourceAddress;
         WeraAddressDto destinationAddress;
         WeraPackageDto package;
@@ -101,6 +102,7 @@ public class WeraHubApi : IWebApi {
         {
             return (null, (int)response.StatusCode);
         }
+        return (null, 400);
     }
 
     public async Task<(int, string?)> PostOrder(ApiOrder order) {
