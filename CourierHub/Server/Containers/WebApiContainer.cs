@@ -19,13 +19,8 @@ public class WebApiContainer {
                     WebApis.Add(new SzymoHubApi((ApiService)service, new AccessTokenContainer()));
                     break;
                 }
-                //TODO
-                //case "WeraHubApiIn": {
-                //    WebApis.Add(new WeraHubApi((ApiService)service);
-                //    break;
-                //}
                 case "WeraHubApi": {
-                    WebApis.Add(new WeraHubApi((ApiService)service, new CourierHubDbContext()));
+                    WebApis.Add(new WeraHubApi((ApiService)service));
                     break;
                 }
             }

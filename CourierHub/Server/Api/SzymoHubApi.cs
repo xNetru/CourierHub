@@ -1,4 +1,5 @@
 ﻿using CourierHub.Api.Models.SzymoHubApi;
+using CourierHub.Server.Api.Models.SzymoHubApi;
 using CourierHub.Server.Validation;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
@@ -25,13 +26,44 @@ public class SzymoHubApi : IWebApi {
     public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in SzymoHubApi.");
 
+        AddTokenToClient(_httpClient);
+
         SzymoGetOfferStatusResponse? response = null;
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
             response = await _httpClient.GetFromJsonAsync<SzymoGetOfferStatusResponse?>($"/offer/request/{code}/status", cancelToken.Token);
         } catch (HttpRequestException ex) {
             if (ex.Message.Contains(HttpStatusCode.NotFound.ToString())) {
-                return (StatusType.Cancelled, StatusCodes.Status200OK, null);
+                SzymoGetOfferResponse? offerResponse = null;
+                cancelToken = new CancellationTokenSource(30 * 1000);
+                try
+                {
+                    offerResponse = await _httpClient.GetFromJsonAsync<SzymoGetOfferResponse?>($"/offer/{code}", cancelToken.Token);
+                }
+                catch (TaskCanceledException e)
+                {
+                    Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[SzymoHubApi]: Error has occured: " + e.Message);
+                }
+                if (offerResponse == null)
+                {
+                    return (null, (int)HttpStatusCode.GatewayTimeout, null);
+                }
+                else
+                {
+                    switch(offerResponse.offerStatus)
+                    {
+                        case Enums.SzymoHubApi.OfferStatus.Accepted:
+                            return (StatusType.Confirmed, StatusCodes.Status200OK, null);
+                        case Enums.SzymoHubApi.OfferStatus.Canceled:
+                            return (StatusType.Cancelled, StatusCodes.Status200OK, null);
+                        default:
+                            return (null, StatusCodes.Status409Conflict, null);
+                    }
+                }
             }
         } catch (TaskCanceledException e) {
             Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);

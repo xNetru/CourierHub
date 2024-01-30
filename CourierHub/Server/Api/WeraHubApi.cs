@@ -8,11 +8,9 @@ using System.Net;
 namespace CourierHub.Server.Api;
 public class WeraHubApi : IWebApi {
     private readonly HttpClient _httpClient = new();
-    private readonly CourierHubDbContext _context;
     public string ServiceName { get; set; }
 
-    public WeraHubApi(ApiService service, CourierHubDbContext context) {
-        _context = context;
+    public WeraHubApi(ApiService service) {
         ServiceName = service.Name;
         _httpClient.BaseAddress = new Uri(service.BaseAddress);
         _httpClient.DefaultRequestHeaders.Add("x-api-key", service.ApiKey);
