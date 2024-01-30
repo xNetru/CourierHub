@@ -1,4 +1,4 @@
-﻿namespace CourierHub.Server.Api.Enums.WeraApi
+﻿namespace CourierHub.Server.Api.Enums.WeraHubApi
 {
     public enum DeliveryStatus
     {

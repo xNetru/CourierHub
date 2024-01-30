@@ -1,5 +1,5 @@
 ﻿using CourierHub.Api.Models.SzymoHubApi;
-using CourierHub.Server.Api.Models.WeraApi;
+using CourierHub.Server.Api.Models.WeraHubApi;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Data;
 using CourierHub.Shared.Enums;
@@ -41,11 +41,11 @@ public class WeraHubApi : IWebApi {
                             {
                                 switch(getDeliveryResponse.result.deliveryStatus)
                                 {
-                                    case Enums.WeraApi.DeliveryStatus.Proccessing: return (StatusType.Confirmed, StatusCodes.Status200OK, null);
-                                    case Enums.WeraApi.DeliveryStatus.Delivered: return (StatusType.Delivered, StatusCodes.Status200OK, null);
-                                    case Enums.WeraApi.DeliveryStatus.Canceled: return (StatusType.Cancelled, StatusCodes.Status200OK, null);
-                                    case Enums.WeraApi.DeliveryStatus.CannotDeliver: return (StatusType.CouldNotDeliver, StatusCodes.Status200OK, null);
-                                    case Enums.WeraApi.DeliveryStatus.PickedUp: return (StatusType.PickedUp, StatusCodes.Status200OK, null);
+                                    case Enums.WeraHubApi.DeliveryStatus.Proccessing: return (StatusType.Confirmed, StatusCodes.Status200OK, null);
+                                    case Enums.WeraHubApi.DeliveryStatus.Delivered: return (StatusType.Delivered, StatusCodes.Status200OK, null);
+                                    case Enums.WeraHubApi.DeliveryStatus.Canceled: return (StatusType.Cancelled, StatusCodes.Status200OK, null);
+                                    case Enums.WeraHubApi.DeliveryStatus.CannotDeliver: return (StatusType.CouldNotDeliver, StatusCodes.Status200OK, null);
+                                    case Enums.WeraHubApi.DeliveryStatus.PickedUp: return (StatusType.PickedUp, StatusCodes.Status200OK, null);
                                 }
                             }
                         }

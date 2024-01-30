@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Css.Dom;
 
-namespace CourierHub.Server.Api.Models.WeraApi
+namespace CourierHub.Server.Api.Models.WeraHubApi
 {
     public record WeraPackageDto(
         double width,

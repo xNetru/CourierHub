@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CourierHub.Server.Api.Enums.WeraApi
+namespace CourierHub.Server.Api.Enums.WeraHubApi
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum WeraRequestStatus
