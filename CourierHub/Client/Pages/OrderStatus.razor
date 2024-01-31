@@ -169,10 +169,15 @@
 
         if (response.IsSuccessStatusCode)
         {
-            cancelled = true;
-            StatusType = StatusType.Cancelled;
-            StatusName = Enum2String(StatusType);
-            StateHasChanged();
+            // patch the status in local database
+            var response2 = await Http.PatchAsJsonAsync($"{Http.BaseAddress}Order/{orderCode}/status", StatusType.Cancelled);
+            if (response2.IsSuccessStatusCode)
+            {
+                cancelled = true;
+                StatusType = StatusType.Cancelled;
+                StatusName = Enum2String(StatusType);
+                StateHasChanged();
+            }
         }
         else
         {
