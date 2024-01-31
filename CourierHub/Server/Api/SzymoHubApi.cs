@@ -1,4 +1,5 @@
 ﻿using CourierHub.Api.Models.SzymoHubApi;
+using CourierHub.Server.Api.Models.SzymoHubApi;
 using CourierHub.Server.Validation;
 using CourierHub.Shared.ApiModels;
 using CourierHub.Shared.Enums;
@@ -25,14 +26,12 @@ public class SzymoHubApi : IWebApi {
     public async Task<(StatusType?, int, string?)> GetOrderStatus(string code) {
         Console.WriteLine("GetOrderStatus was invoked in SzymoHubApi.");
 
+        AddTokenToClient(_httpClient);
+
         SzymoGetOfferStatusResponse? response = null;
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try {
             response = await _httpClient.GetFromJsonAsync<SzymoGetOfferStatusResponse?>($"/offer/request/{code}/status", cancelToken.Token);
-        } catch (HttpRequestException ex) {
-            if (ex.Message.Contains(HttpStatusCode.NotFound.ToString())) {
-                return (StatusType.Cancelled, StatusCodes.Status200OK, null);
-            }
         } catch (TaskCanceledException e) {
             Console.WriteLine("SzymoHubApi have not responded within 30 seconds: " + e.Message);
         } catch (Exception e) {
@@ -40,7 +39,15 @@ public class SzymoHubApi : IWebApi {
         }
 
         if (response == null) {
-            return (null, (int)HttpStatusCode.GatewayTimeout, null);
+            var getResponse = await _httpClient.GetFromJsonAsync<SzymoGetOfferResponse>($"/offer/{code}", cancelToken.Token);
+
+            if (getResponse != null)
+                return getResponse.offerStatus switch
+                {
+                    Enums.SzymoHubApi.OfferStatus.Accepted => (StatusType.Confirmed, StatusCodes.Status200OK, null),
+                    _ => (StatusType.Cancelled, StatusCodes.Status200OK, null)
+                };
+                 
         } else {
             if (response.isReady) {
                 return (StatusType.Confirmed, StatusCodes.Status200OK, response.offerId);
@@ -48,6 +55,7 @@ public class SzymoHubApi : IWebApi {
                 return (StatusType.NotConfirmed, StatusCodes.Status200OK, null);
             }
         }
+        return (null, StatusCodes.Status503ServiceUnavailable, null);
     }
 
     public async Task<(ApiOffer?, int)> PostInquireGetOffer(ApiInquire inquire) {

@@ -15,7 +15,6 @@ public class ApiController : ControllerBase {
     private readonly CourierHubDbContext _context;
     private readonly IList<(List<string>, int)> _inquireCodes;
     private readonly IList<IWebApi> _webApis;
-
     public ApiController(CourierHubDbContext context, WebApiContainer apiContainer, InquireCodeContainer inquireContainer) {
         _context = context;
         _inquireCodes = inquireContainer.InquireCodes;
