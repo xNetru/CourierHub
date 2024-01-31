@@ -7,6 +7,7 @@ namespace CourierHub.Shared.Logging {
         private string _date = string.Empty;
         private string _method = string.Empty;
         private string _time = string.Empty;
+        private readonly string _default = "unknown";
 
         public void AddApplication(Applications application) {
             _application = application switch {
@@ -30,6 +31,22 @@ namespace CourierHub.Shared.Logging {
 
         public void AddTime(TimeSpan time) {
             _time = time.ToString("hh\\:mm\\:ss");
+        }
+
+        public void AddDefaultMethod()
+        {
+            _method = _default;
+        }
+
+        public void AddDefaultController()
+        {
+            _controller = _default;
+        }
+
+        public void AddDateAndTime(DateTime datetime)
+        {
+            AddTime(datetime.TimeOfDay);
+            AddDate(DateOnly.FromDateTime(datetime));
         }
 
         public string? Build() {

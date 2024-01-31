@@ -19,13 +19,21 @@ namespace CourierHubWebApi.Services {
             if (!_registeredOffers.TryGetValue(InquireCode, out OfferData? offer)) {
                 return new ApiError(StatusCodes.Status404NotFound, "Such offer does not exist.", "Offer not found.");
             }
-            if (obtainmentTime > offer.TimeStamp) {
-                return new ApiError(StatusCodes.Status408RequestTimeout, "Offer expired.", "Request timeout");
+            OneOf<decimal, ApiError> result;
+            if (obtainmentTime > offer.TimeStamp)
+            {
+                result = new ApiError(StatusCodes.Status408RequestTimeout, "Offer expired.", "Request timeout.");
+            }
+            else
+            {
+                result = offer.Price;
             }
             try {
                 _registeredOffers.Remove(InquireCode);
-                return offer.Price;
-            } catch {
+                return result;
+            }
+            catch
+            {
                 return ApiError.DefaultInternalServerError;
             }
         }

@@ -2,7 +2,7 @@
 using CourierHub.Cloud;
 using CourierHub.Shared.Data;
 using CourierHubWebApi.Examples;
-using CourierHubWebApi.Middleware;
+using CourierHubWebApi.Middlewares;
 using CourierHubWebApi.Models;
 using CourierHubWebApi.Services;
 using CourierHubWebApi.Services.Contracts;
@@ -84,9 +84,13 @@ namespace CourierHubWebApi {
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CourierHub-BCK API v1");
+            });
 
             app.UseHttpsRedirection();
+
+            app.UseLoggingMiddleware();
 
             app.UseApiKeyMiddleware();
 
