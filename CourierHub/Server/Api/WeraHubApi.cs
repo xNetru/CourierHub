@@ -23,6 +23,7 @@ public class WeraHubApi : IWebApi {
         {
             var cancelToken = new CancellationTokenSource(30 * 3000);
             var postResponse = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null, cancelToken.Token);
+            string? newCode = null;
 
             if(postResponse != null)
             {
@@ -37,13 +38,34 @@ public class WeraHubApi : IWebApi {
                     if(postResult != null && postResult.result.companyDeliveryId != null) 
                     {
                         code = postResult.result.companyDeliveryId;
+                        newCode = code;
                     }
                 }
                 
-                var getResponse = await _httpClient.GetFromJsonAsync<WeraDeliveryResponse>($"/api/Delivery/GetDelivery/{code}", cancelToken.Token);
+                var getResponse = await _httpClient.GetAsync($"/api/Delivery/GetDelivery/{code}", cancelToken.Token);
                 if(getResponse != null)
                 {
-                    
+                    switch(getResponse.StatusCode) 
+                    {
+                        case HttpStatusCode.OK:
+                            var getResult = await getResponse.Content.ReadFromJsonAsync<WeraDeliveryResponse>();
+                            
+                            if(getResult != null && getResult.result != null)
+                            {
+                                return getResult.result.deliveryStatus switch
+                                {
+                                    Enums.WeraHubApi.DeliveryStatus.Proccessing => (StatusType.Confirmed, StatusCodes.Status200OK, newCode),
+                                    Enums.WeraHubApi.DeliveryStatus.PickedUp => (StatusType.PickedUp, StatusCodes.Status200OK, newCode),
+                                    Enums.WeraHubApi.DeliveryStatus.Delivered => (StatusType.Delivered, StatusCodes.Status200OK, newCode),
+                                    Enums.WeraHubApi.DeliveryStatus.Canceled => (StatusType.Cancelled, StatusCodes.Status200OK, newCode),
+                                    _ => (StatusType.CouldNotDeliver, StatusCodes.Status200OK, newCode)
+                                };
+                            }
+                            break;
+                        default:
+                            return (StatusType.NotConfirmed, StatusCodes.Status200OK, newCode);
+                            
+                    }
                 }
                 
                
@@ -215,21 +237,12 @@ public class WeraHubApi : IWebApi {
         var cancelToken = new CancellationTokenSource(30 * 1000);
         try
         {
-            response = await _httpClient.PostAsync($"/api/Delivery/PostDelivery/{code}", null);
-            if(response != null)
-            {
-                if(response.IsSuccessStatusCode)
-                {
-                    var deliveryResponse = await response.Content.ReadFromJsonAsync<WeraRequestAcceptResponse>();
-                    if(deliveryResponse != null)
-                    {
-                        response = await _httpClient.DeleteAsync($"/api/Delivery/CancelDelivery/{deliveryResponse.result.companyDeliveryId}", cancelToken.Token);
-                        if (response == null)
-                            return StatusCodes.Status503ServiceUnavailable;
-                    }
-                }
-                return (int)response.StatusCode;
-            }
+            response = await _httpClient.DeleteAsync($"api/Delivery/CancelDelivery/{code}", cancelToken.Token);
+            if (response != null && response.IsSuccessStatusCode)
+                return StatusCodes.Status200OK;
+            else
+                return StatusCodes.Status403Forbidden;
+
         }
         catch (TaskCanceledException e)
         {
